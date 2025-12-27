@@ -4,15 +4,15 @@ export const LoginForm = () => {
   return (
     <section
       aria-labelledby="login-heading"
-      className="h-screen flex items-center justify-center"
+      className="h-screen px-2 flex items-center justify-center"
     >
-      <div className="bg-bg p-6 w-full max-w-100 rounded-lg space-y-4 shadow-lg border border-color">
-        <h1 className="text-[3rem] leading-[1.2em] font-lato font-bold text-center">
+      <div className="bg-bg p-6 w-full max-w-100 rounded-lg font-lato space-y-4 shadow-lg border border-color">
+        <h1 className="text-[3rem] leading-[1.2em] font-bold text-center">
           Login
         </h1>
 
         <form className="space-y-6">
-          <div className="flex flex-col gap-1 font-lato">
+          <div className="flex flex-col gap-1">
             <label
               htmlFor="email"
               className="text-text text-base leading-[1.6em]"
@@ -29,7 +29,7 @@ export const LoginForm = () => {
             />
           </div>
 
-          <div className="flex flex-col gap-1 font-lato">
+          <div className="flex flex-col gap-1">
             <label
               htmlFor="password"
               className="text-text text-base leading-[1.6em]"
@@ -57,7 +57,7 @@ export const LoginForm = () => {
             type="submit"
             className="mt-5 w-full bg-primary p-2 text-white rounded-lg hover:opacity-80 disabled:opacity-90 disabled:cursor-not-allowed transition-opacity"
           >
-            Submit
+            Login
           </button>
         </form>
 
