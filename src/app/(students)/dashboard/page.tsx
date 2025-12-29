@@ -1,5 +1,3 @@
-import { Timer } from "lucide-react";
-
 const DashboardPage = () => {
   const courses = 1;
 
@@ -51,11 +49,10 @@ const DashboardPage = () => {
     <main>
       <section className="w-full font-lato space-y-4">
         {/* Heading */}
-        <div className="space-y-2 text-center bg-bg p-6 sm:p-8">
+        <div className="space-y-2 text-center p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold">Welcome</h1>
           <p className="text-sm text-muted-foreground">
-            You haven&apos;t joined any course yet. Enter the code provided by
-            your teacher.
+            View Details of the courses you are enrolled in
           </p>
         </div>
 

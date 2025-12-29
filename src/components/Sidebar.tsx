@@ -8,7 +8,7 @@ import { SidebarLink } from "./SidebarLink";
 
 export const Sidebar = () => {
   return (
-    <aside className="hidden md:flex flex-col border-r border-color min-h-screen bg-bg py-6">
+    <aside className="hidden md:flex flex-col border-r border-color min-h-screen bg-bg py-6 px-4">
       <div className="p-6">
         <div className="text-4xl text-center font-bold uppercase leading-[1em] tracking-wide">
           Assesly
@@ -16,7 +16,7 @@ export const Sidebar = () => {
       </div>
 
       {/* LINKS */}
-      <nav className="flex-1 px-4">
+      <nav className="flex-1">
         <ul className="space-y-3">
           <SidebarLink
             href="/dashboard"
@@ -33,7 +33,7 @@ export const Sidebar = () => {
         </ul>
       </nav>
 
-      <button className="w-1/2 self-center bg-light p-2 border border-color shadow rounded-md hover:-translate-y-0.5 transition-transform">
+      <button className="w-full self-center bg-light p-2 border border-color shadow rounded-md hover:-translate-y-0.5 transition-transform">
         Sign Out
       </button>
     </aside>

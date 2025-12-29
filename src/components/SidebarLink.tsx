@@ -24,7 +24,7 @@ export const SidebarLink = ({
           "flex items-center gap-3 rounded-lg p-4 text-sm font-lato font-medium transition-colors",
           isActive
             ? "bg-light text-text ring-1 ring-primary"
-            : "text-muted-foreground hover:text-text hover:bg-light",
+            : "text-muted-foreground hover:text-text hover:bg-light border border-transparent hover:border-color",
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         )}
       >
