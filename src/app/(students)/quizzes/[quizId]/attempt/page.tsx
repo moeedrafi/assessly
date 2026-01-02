@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Timer } from "@/components/Timer";
 
 const quizQuestions = [
   {
@@ -38,6 +39,8 @@ const quizQuestions = [
 const QuizAttemptPage = () => {
   const [questionNumber, setQuestionNumber] = useState<number>(0);
 
+  const [answers, setAnswers] = useState<{ [questionId: number]: string }>({});
+
   const isPrev = questionNumber === 0;
   const question = quizQuestions[questionNumber];
   const isNext = quizQuestions.length - 1 === questionNumber;
@@ -54,7 +57,11 @@ const QuizAttemptPage = () => {
     setQuestionNumber((prev) => prev - 1);
   };
 
-  const submitQuiz = () => {};
+  const submitQuiz = () => {
+    // router.push("/quizzes/1/result");
+
+    console.log(answers);
+  };
 
   return (
     <main>
@@ -65,6 +72,7 @@ const QuizAttemptPage = () => {
           <p className="text-muted-foreground">
             {questionNumber + 1} / {quizQuestions.length}
           </p>
+          <Timer duration={20} />
         </div>
 
         <div className="space-y-4 max-w-lg mx-auto bg-bg p-6 sm:p-8 rounded-lg shadow border border-color">
@@ -76,9 +84,17 @@ const QuizAttemptPage = () => {
             {question.options.map((option) => (
               <label key={option.id} className="flex items-center gap-2">
                 <input
+                  required
                   type="radio"
-                  name="drone"
+                  name={`question-${question.id}`}
                   value={option.content.toLowerCase()}
+                  checked={answers[question.id] === option.id}
+                  onChange={() =>
+                    setAnswers((prev) => ({
+                      ...prev,
+                      [question.id]: option.id,
+                    }))
+                  }
                 />
                 {option.content}
               </label>
