@@ -48,6 +48,13 @@
   --color-color: var(--border-color);
   --color-gradient: var(--gradient);
   --color-gradient-hover: var(--gradient-hover);
+
+  --shadow-inset: inset 0px 4px 10px 2px hsla(0 0% 0% / 0.4),
+    inset 0 -4px 6px -4px hsl(0 0% 100%);
+  --shadow-inset-lg: inset 0 6px 6px -4px hsla(0 0% 0% / 0.4),
+    inset 6px 0 6px -4px hsla(0 0% 0% / 0.4),
+    inset -6px 0 6px -4px hsla(0 0% 0% / 0.4),
+    inset 0 -6px 6px -4px hsla(0 0% 100% / 1);
   --shadow: 0px 2px 2px hsla(0 0% 0% / 0.19), 0px 4px 4px hsla(0 0% 0% / 0.08);
   --shadow-lg: 0px 4px 4px hsla(0 0% 0% / 0.19),
     0px 8px 8px hsla(0 0% 0% / 0.08);
