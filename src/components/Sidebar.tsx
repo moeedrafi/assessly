@@ -1,12 +1,17 @@
-import {
-  History,
-  LayoutDashboard,
-  TestTube,
-  TextSelectionIcon,
-} from "lucide-react";
+import { SidebarRoute, UserRole } from "@/lib/sidebar-routes";
 import { SidebarLink } from "./SidebarLink";
 
-export const Sidebar = () => {
+export const Sidebar = ({
+  basePath,
+  routes,
+  role,
+}: {
+  basePath: string;
+  routes: SidebarRoute[];
+  role: UserRole;
+}) => {
+  const filteredRoutes = routes.filter((route) => route.roles.includes(role));
+
   return (
     <aside className="hidden md:flex flex-col border-r border-color min-h-screen bg-bg py-6 px-4">
       <div className="p-6">
@@ -18,18 +23,18 @@ export const Sidebar = () => {
       {/* LINKS */}
       <nav className="flex-1">
         <ul className="space-y-3">
-          <SidebarLink
-            href="/dashboard"
-            icon={<LayoutDashboard />}
-            label="Dashboard"
-          />
-          <SidebarLink href="/quizzes" icon={<TestTube />} label="Quizzes" />
-          <SidebarLink
-            href="/courses"
-            icon={<TextSelectionIcon />}
-            label="Courses"
-          />
-          <SidebarLink href="/history" icon={<History />} label="History" />
+          {filteredRoutes.map((route) => {
+            const href = `${basePath}/${route.path}`;
+
+            return (
+              <SidebarLink
+                key={route.id}
+                href={href}
+                icon={route.icon}
+                label={route.label}
+              />
+            );
+          })}
         </ul>
       </nav>
 

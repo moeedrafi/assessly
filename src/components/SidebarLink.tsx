@@ -3,6 +3,17 @@
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { usePathname } from "next/navigation";
+import {
+  CircleQuestionMark,
+  LayoutDashboard,
+  TextSelectionIcon,
+} from "lucide-react";
+
+const iconMap = {
+  dashboard: LayoutDashboard,
+  quiz: CircleQuestionMark,
+  courses: TextSelectionIcon,
+};
 
 export const SidebarLink = ({
   href,
@@ -10,11 +21,13 @@ export const SidebarLink = ({
   label,
 }: {
   href: string;
-  icon: React.ReactNode;
+  icon: keyof typeof iconMap;
   label: string;
 }) => {
+  const Icon = iconMap[icon];
   const pathname = usePathname();
-  const isActive = pathname === href;
+
+  const isActive = pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <li>
@@ -28,7 +41,7 @@ export const SidebarLink = ({
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         )}
       >
-        <span className="h-5 w-5">{icon}</span>
+        <Icon className="w-5 h-5" />
         <span>{label}</span>
       </Link>
     </li>
