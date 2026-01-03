@@ -7,10 +7,10 @@ const AdminDashboardPage = () => {
         <section className="w-full max-w-md rounded-2xl font-lato border border-color bg-bg p-6 sm:p-8 shadow-lg">
           {/* Heading */}
           <div className="space-y-2 text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold">Join a Course</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Create a Course</h1>
             <p className="text-sm text-muted-foreground">
-              You haven&apos;t joined any course yet. Enter the code provided by
-              your teacher.
+              You haven&apos;t created any course yet. Create a code and send it
+              to your students.
             </p>
           </div>
 
@@ -47,23 +47,23 @@ const AdminDashboardPage = () => {
 
   return (
     <main>
-      <section className="w-full font-lato space-y-4">
+      <section className="w-full font-lato space-y-4 px-2 py-4">
         {/* Heading */}
         <div className="space-y-2 text-center p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold">Welcome</h1>
           <p className="text-sm text-muted-foreground">
-            View Details of the courses you are enrolled in
+            View Details of the courses you are managing
           </p>
         </div>
 
-        <div className="space-y-2 bg-bg p-6 sm:p-8">
+        <div className="space-y-2 bg-bg p-6 sm:p-8 shadow border border-color rounded-lg">
           <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-light p-4 space-y-4 border border-color rounded-lg shadow">
               <div>
                 <h3 className="text-lg font-semibold">Course Name</h3>
-                <h4 className="text-muted-foreground">Instructor Name</h4>
+                <h4 className="text-muted-foreground">30 Students</h4>
               </div>
 
               <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
@@ -73,7 +73,7 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        <div className="space-y-2 bg-bg p-6 sm:p-8">
+        <div className="space-y-2 bg-bg p-6 sm:p-8 shadow border border-color rounded-lg">
           <h2 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
