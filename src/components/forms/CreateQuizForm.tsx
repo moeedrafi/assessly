@@ -1,0 +1,273 @@
+"use client";
+
+import { QuizCreate } from "@/types/question";
+import { useForm } from "@tanstack/react-form";
+
+const defaultFormValues: QuizCreate = {
+  name: "",
+  duration: 0,
+  startTime: "",
+  description: "",
+  questions: [
+    { question: "", type: "single_choice", options: ["", "", "", ""] },
+  ],
+};
+
+export const CreateQuizForm = () => {
+  const form = useForm({
+    defaultValues: defaultFormValues,
+    onSubmit: ({ value }) => {
+      console.log(value);
+    },
+  });
+
+  return (
+    <form
+      className="space-y-6"
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      {/* Name */}
+      <form.Field name="name">
+        {(field) => (
+          <div className="flex flex-col gap-1">
+            <label htmlFor={field.name}>Quiz Name</label>
+            <input
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              placeholder="Enter quiz name"
+              aria-invalid={!field.state.meta.isValid}
+              onChange={(e) => field.handleChange(e.target.value)}
+              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+            />
+          </div>
+        )}
+      </form.Field>
+
+      {/* DURATION + Type */}
+      <div className="flex flex-col md:flex-row gap-3">
+        <form.Field name="duration">
+          {(field) => (
+            <div className="w-full flex flex-col gap-1">
+              <label htmlFor={field.name}>Duration (in minutes)</label>
+              <input
+                type="number"
+                id={field.name}
+                placeholder="10"
+                name={field.name}
+                value={field.state.value}
+                aria-invalid={!field.state.meta.isValid}
+                onChange={(e) => field.handleChange(Number(e.target.value))}
+                className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+              />
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field name="startTime">
+          {(field) => (
+            <div className="w-full flex flex-col gap-1">
+              <label htmlFor={field.name}>Start Time</label>
+              <input
+                id={field.name}
+                name={field.name}
+                type="datetime-local"
+                value={field.state.value}
+                aria-invalid={!field.state.meta.isValid}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+              />
+            </div>
+          )}
+        </form.Field>
+      </div>
+
+      {/* Desc */}
+      <form.Field name="description">
+        {(field) => (
+          <div className="flex flex-col gap-1">
+            <label htmlFor={field.name}>Quiz Description</label>
+            <textarea
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              placeholder="Enter quiz description"
+              aria-invalid={!field.state.meta.isValid}
+              onChange={(e) => field.handleChange(e.target.value)}
+              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+            />
+          </div>
+        )}
+      </form.Field>
+
+      {/* Questions */}
+      <div className="space-y-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Questions</h2>
+
+        <form.Field name="questions" mode="array">
+          {(field) => (
+            <>
+              {field.state.value.map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-light space-y-3 p-4 rounded-lg border border-color"
+                >
+                  <div className="flex items-center gap-3">
+                    <form.Field
+                      key={`question-${i}`}
+                      name={`questions[${i}].question`}
+                    >
+                      {(subField) => (
+                        <div key={i} className="w-full flex flex-col gap-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <label htmlFor={subField.name}>
+                              Question {i + 1}
+                            </label>
+                            <button
+                              onClick={() => field.removeValue(i)}
+                              className="text-secondary hover:text-primary cursor-pointer transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+
+                          <input
+                            id={subField.name}
+                            name={subField.name}
+                            value={subField.state.value}
+                            placeholder="Enter question..."
+                            aria-invalid={!subField.state.meta.isValid}
+                            onChange={(e) =>
+                              subField.handleChange(e.target.value)
+                            }
+                            className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+                          />
+                        </div>
+                      )}
+                    </form.Field>
+
+                    <form.Field key={`type-${i}`} name={`questions[${i}].type`}>
+                      {(subField) => (
+                        <div key={i} className="w-full flex flex-col gap-1">
+                          <label htmlFor={subField.name}>Type</label>
+
+                          <select
+                            defaultValue=""
+                            id={subField.name}
+                            name={subField.name}
+                            className="bg-light px-3 py-2.5 ring-1 ring-color rounded-lg focus-visible:ring-2 outline-none"
+                          >
+                            <option selected>Choose type</option>
+                            <option value="single_choice">Single Choice</option>
+                            <option value="multi_choice">Multi Choice</option>
+                          </select>
+                        </div>
+                      )}
+                    </form.Field>
+                  </div>
+
+                  {/* OPTIONS */}
+                  <form.Field
+                    key={`options-${i}`}
+                    name={`questions[${i}].options`}
+                    mode="array"
+                  >
+                    {(optionsField) => (
+                      <>
+                        <div key={i} className="w-full flex flex-col gap-1">
+                          <button
+                            onClick={() => optionsField.pushValue("")}
+                            className="self-end text-secondary hover:text-primary cursor-pointer transition-colors"
+                          >
+                            + Add Option
+                          </button>
+
+                          {optionsField.state.value.map((_, optionIndex) => (
+                            <div
+                              key={optionIndex}
+                              className="flex items-center gap-3 space-y-6"
+                            >
+                              <form.Field
+                                name={`questions[${i}].options[${optionIndex}]`}
+                              >
+                                {(optionField) => (
+                                  <div className="w-full flex flex-col gap-1">
+                                    <label htmlFor={optionField.name}>
+                                      Option {optionIndex + 1}
+                                    </label>
+                                    <input
+                                      id={optionField.name}
+                                      name={optionField.name}
+                                      value={optionField.state.value}
+                                      placeholder="Enter option"
+                                      aria-invalid={
+                                        !optionField.state.meta.isValid
+                                      }
+                                      onChange={(e) =>
+                                        optionField.handleChange(e.target.value)
+                                      }
+                                      className="w-full bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+                                    />
+                                  </div>
+                                )}
+                              </form.Field>
+
+                              {optionsField.state.value.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    optionsField.removeValue(optionIndex)
+                                  }
+                                  className="text-secondary hover:text-primary transition-colors"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </form.Field>
+                </div>
+              ))}
+
+              <button
+                onClick={() =>
+                  field.pushValue({
+                    question: "",
+                    type: "",
+                    options: ["", "", "", ""],
+                  })
+                }
+                className="text-secondary hover:text-primary cursor-pointer transition-colors"
+              >
+                + Add Question
+              </button>
+            </>
+          )}
+        </form.Field>
+      </div>
+
+      {/* BUTTONS */}
+      <div className="space-x-3">
+        <button
+          type="submit"
+          className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-secondary cursor-pointer hover:-translate-y-0.5 transition-transform disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          Create Quiz
+        </button>
+        <button
+          type="submit"
+          className="border border-secondary text-secondary px-8 py-3 rounded-lg cursor-pointer hover:-translate-y-0.5 transition-transform will-change-transform disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          Save as Draft
+        </button>
+      </div>
+    </form>
+  );
+};
