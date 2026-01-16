@@ -16,16 +16,19 @@ export class User {
   email: string;
 
   @Column()
+  name: string;
+
+  @Column()
   password: string;
 
-  @Column()
-  accessToken: string;
+  // @Column()
+  // accessToken?: string;
 
-  @Column()
-  refreshToken: string;
+  // @Column()
+  // refreshToken?: string;
 
   @Column({ default: false })
-  admin: boolean;
+  isAdmin: boolean;
 
   @AfterInsert()
   logInsert() {
