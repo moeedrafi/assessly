@@ -1,6 +1,28 @@
+"use client";
 import Link from "next/link";
+import { useState } from "react";
 
 export const LoginForm = () => {
+  const [email, setemail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:8000/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, password, email }),
+      });
+
+      const data = await response.json();
+      console.log("Success:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <section
       aria-labelledby="login-heading"
@@ -11,7 +33,7 @@ export const LoginForm = () => {
           Login
         </h1>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1">
             <label
               htmlFor="email"
@@ -25,6 +47,7 @@ export const LoginForm = () => {
               type="email"
               name="email"
               placeholder="john.doe@gmail.com"
+              onChange={(e) => setemail(e.target.value)}
               className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
             />
           </div>
@@ -42,6 +65,7 @@ export const LoginForm = () => {
               type="password"
               name="password"
               placeholder="******"
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2"
             />
 

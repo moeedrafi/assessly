@@ -10,6 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
+import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -85,5 +86,10 @@ export class AuthController {
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
     return { message: 'Logged out successfully' };
+  }
+
+  @Post('/forgot-password')
+  forgotPassword(@Body() body: ForgotPasswordDTO) {
+    return this.authService.forgotPassword(body.email);
   }
 }

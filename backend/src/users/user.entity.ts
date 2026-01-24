@@ -12,7 +12,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
@@ -23,6 +23,12 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken?: string;
+
+  @Column({ nullable: true })
+  resetToken?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetTokenExpiry?: Date;
 
   @Column({ default: false })
   isAdmin: boolean;

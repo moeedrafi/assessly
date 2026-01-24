@@ -1,17 +1,21 @@
 import bcrypt from 'bcrypt';
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '@nestjs-modules/mailer';
+import { randomBytes, createHash } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private readonly mailService: MailerService,
   ) {}
 
   private async isPasswordMatch(
@@ -24,6 +28,8 @@ export class AuthService {
   private hashing(password: string) {
     return bcrypt.hash(password, 10);
   }
+
+  private resetPasswordToken() {}
 
   async getTokens(id: number, name: string) {
     const payload = { sub: id, name };
@@ -48,7 +54,12 @@ export class AuthService {
     name: string,
     isAdmin: boolean,
   ) {
+    const user = await this.usersService.findOne(email);
+    if (user) throw new ConflictException('User already exists');
+
     const hashedPassword = await this.hashing(password);
+
+    // TODO: Send email verification
 
     return this.usersService.create(email, hashedPassword, name, isAdmin);
   }
@@ -56,6 +67,8 @@ export class AuthService {
   async signIn(email: string, password: string) {
     const user = await this.usersService.findOne(email);
     if (!user) throw new UnauthorizedException('Invalid user');
+
+    // TODO: Check email verified
 
     const isCorrect = await this.isPasswordMatch(password, user.password);
     if (!isCorrect) throw new UnauthorizedException('Invalid credentials');
@@ -91,5 +104,30 @@ export class AuthService {
     } catch (e) {
       throw new UnauthorizedException(`Invalid or expired refresh token ${e}`);
     }
+  }
+
+  async forgotPassword(email: string) {
+    const existingUser = await this.usersService.findOne(email);
+    if (!existingUser) throw new NotFoundException('user not found');
+
+    const rawToken = randomBytes(26).toString('hex');
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+
+    await this.usersService.update(existingUser.id, {
+      resetToken: tokenHash,
+      resetTokenExpiry: new Date(Date.now() + 1000 * 60 * 10),
+    });
+
+    await this.mailService.sendMail({
+      from: process.env.SENDER_EMAIL,
+      to: existingUser.email,
+      subject: `Welcome! Forgot Password? Don't worry`,
+      html: `
+        <p>Welcome! Please open this link and create a new password:</p>
+          <a href="http://localhost:8000/reset-password?token=${rawToken}">
+          Reset your password
+          </a>
+        `,
+    });
   }
 }
