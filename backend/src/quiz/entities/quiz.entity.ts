@@ -6,7 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
+import { Question } from './question.entity';
 
 @Entity()
 export class Quiz {
@@ -41,6 +43,9 @@ export class Quiz {
     onDelete: 'CASCADE',
   })
   course: Courses;
+
+  @OneToMany(() => Question, (question) => question.quiz)
+  questions: Question[];
 
   @CreateDateColumn()
   createdAt: Date;

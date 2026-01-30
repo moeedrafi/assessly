@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { Quiz } from 'src/quiz/quiz.entity';
+import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { User } from 'src/users/user.entity';
 import {
   Entity,
