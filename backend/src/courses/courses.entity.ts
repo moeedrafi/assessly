@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { Quiz } from 'src/quiz/quiz.entity';
 import { User } from 'src/users/user.entity';
 import {
   Entity,
@@ -8,6 +9,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -18,7 +20,7 @@ export class Courses {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ unique: true })
@@ -32,6 +34,9 @@ export class Courses {
 
   @ManyToOne(() => User, (user) => user.courses)
   teacher: User;
+
+  @OneToMany(() => Quiz, (quiz) => quiz.course)
+  quizzes: Quiz[];
 
   @CreateDateColumn()
   createdAt: Date;

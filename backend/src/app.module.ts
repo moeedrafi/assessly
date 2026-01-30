@@ -4,12 +4,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 import { AppService } from 'src/app.service';
+import { AppController } from 'src/app.controller';
+
+import { Quiz } from 'src/quiz/quiz.entity';
 import { User } from 'src/users/user.entity';
+import { Courses } from 'src/courses/courses.entity';
+
 import { AuthModule } from 'src/auth/auth.module';
 import { QuizModule } from 'src/quiz/quiz.module';
-import { AppController } from 'src/app.controller';
 import { UsersModule } from 'src/users/users.module';
-import { Courses } from 'src/courses/courses.entity';
 import { CoursesModule } from 'src/courses/courses.module';
 
 @Module({
@@ -20,7 +23,7 @@ import { CoursesModule } from 'src/courses/courses.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      entities: [User, Courses],
+      entities: [User, Courses, Quiz],
       url: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
       synchronize: true,

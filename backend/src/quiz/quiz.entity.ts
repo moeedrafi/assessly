@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Courses } from 'src/courses/courses.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity()
 export class Quiz {
@@ -8,6 +16,35 @@ export class Quiz {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
+
+  @Column({ type: 'int' })
+  totalMarks: number;
+
+  @Column({ type: 'int' })
+  timeLimit: number;
+
+  @Column({ type: 'int' })
+  passingMarks?: number;
+
+  @Column({ default: false })
+  isPublished: boolean;
+
+  @Column({ type: 'timestamp' })
+  startsAt: Date;
+
+  @Column({ type: 'timestamp' })
+  endsAt?: Date;
+
+  @ManyToOne(() => Courses, (courses) => courses.quizzes, {
+    onDelete: 'CASCADE',
+  })
+  course: Courses;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
