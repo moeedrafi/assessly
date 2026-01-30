@@ -11,6 +11,7 @@ import { Courses } from 'src/courses/courses.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { Option } from 'src/quiz/entities/option.entity';
 import { Question } from 'src/quiz/entities/question.entity';
+import { StudentAnswer } from 'src/quiz/entities/student-answer.entity';
 
 import { AuthModule } from 'src/auth/auth.module';
 import { QuizModule } from 'src/quiz/quiz.module';
@@ -25,7 +26,7 @@ import { CoursesModule } from 'src/courses/courses.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      entities: [User, Courses, Quiz, Question, Option],
+      entities: [User, Courses, Quiz, Question, Option, StudentAnswer],
       url: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
       synchronize: true,
