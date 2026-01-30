@@ -1,3 +1,4 @@
+import { Courses } from 'src/courses/courses.entity';
 import {
   Entity,
   Column,
@@ -5,6 +6,9 @@ import {
   AfterRemove,
   AfterUpdate,
   PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -32,6 +36,15 @@ export class User {
 
   @Column({ default: false })
   isAdmin: boolean;
+
+  @OneToMany(() => Courses, (courses) => courses.teacher)
+  courses: Courses[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @AfterInsert()
   logInsert() {
