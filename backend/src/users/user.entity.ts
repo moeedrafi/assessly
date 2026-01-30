@@ -21,10 +21,10 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: true })
   refreshToken?: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: true })
   resetToken?: string;
 
   @Column({ type: 'timestamp', nullable: true })

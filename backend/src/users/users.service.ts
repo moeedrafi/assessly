@@ -37,4 +37,8 @@ export class UsersService {
     if (result.affected === 0) throw new NotFoundException('User not found');
     return result;
   }
+
+  async findByResetToken(tokenHash: string) {
+    return this.repo.findOne({ where: { resetToken: tokenHash } });
+  }
 }

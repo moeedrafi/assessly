@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -11,6 +12,7 @@ import { AuthService } from './auth.service';
 import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
+import { ResetPasswordDTO } from './dtos/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -91,5 +93,14 @@ export class AuthController {
   @Post('/forgot-password')
   forgotPassword(@Body() body: ForgotPasswordDTO) {
     return this.authService.forgotPassword(body.email);
+  }
+
+  @Post('/reset-password')
+  resetPassword(@Query('token') token: string, @Body() body: ResetPasswordDTO) {
+    return this.authService.resetPassword(
+      token,
+      body.password,
+      body.confirmPassword,
+    );
   }
 }

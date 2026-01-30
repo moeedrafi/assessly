@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -28,8 +29,6 @@ export class AuthService {
   private hashing(password: string) {
     return bcrypt.hash(password, 10);
   }
-
-  private resetPasswordToken() {}
 
   async getTokens(id: number, name: string) {
     const payload = { sub: id, name };
@@ -129,5 +128,31 @@ export class AuthService {
           </a>
         `,
     });
+  }
+
+  async resetPassword(
+    token: string,
+    password: string,
+    confirmPassword: string,
+  ) {
+    if (password !== confirmPassword)
+      throw new BadRequestException('Password dont match');
+
+    const hashedToken = createHash('sha256').update(token).digest('hex');
+    const user = await this.usersService.findByResetToken(hashedToken);
+
+    if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const hashedPassword = await this.hashing(password);
+
+    await this.usersService.update(user.id, {
+      password: hashedPassword,
+      resetToken: undefined,
+      resetTokenExpiry: undefined,
+    });
+
+    return { message: 'password updated' };
   }
 }
