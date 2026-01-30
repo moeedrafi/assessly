@@ -7,6 +7,9 @@ import { AuthModule } from 'src/auth/auth.module';
 import { AppController } from 'src/app.controller';
 import { UsersModule } from 'src/users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CoursesModule } from './courses/courses.module';
+import { QuizzesModule } from './quizzes/quizzes.module';
+import { QuizModule } from './quiz/quiz.module';
 
 @Module({
   imports: [
@@ -35,6 +38,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
       },
     }),
     UsersModule,
+    CoursesModule,
+    QuizzesModule,
+    QuizModule,
   ],
   controllers: [AppController],
   providers: [AppService],
