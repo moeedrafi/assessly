@@ -47,8 +47,6 @@ export class AuthController {
       body.password,
     );
 
-    console.log('ACCess token sign in: ' + accessToken);
-
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

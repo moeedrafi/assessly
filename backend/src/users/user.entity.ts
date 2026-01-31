@@ -1,4 +1,5 @@
 import { Courses } from 'src/courses/courses.entity';
+import { UserRole } from 'src/enum';
 import {
   Entity,
   Column,
@@ -34,8 +35,8 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   resetTokenExpiry?: Date;
 
-  @Column({ default: false })
-  isAdmin: boolean;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
   @OneToMany(() => Courses, (courses) => courses.teacher)
   courses: Courses[];

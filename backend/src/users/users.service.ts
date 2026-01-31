@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { UserRole } from 'src/enum';
 
 @Injectable()
 export class UsersService {
@@ -15,15 +16,10 @@ export class UsersService {
     return this.repo.findOne({ where: { id } });
   }
 
-  async create(
-    email: string,
-    password: string,
-    name: string,
-    isAdmin: boolean,
-  ) {
+  async create(email: string, password: string, name: string, role: UserRole) {
     const user = this.repo.create({
       email,
-      isAdmin,
+      role,
       password,
       name,
     });

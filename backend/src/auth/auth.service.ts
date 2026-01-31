@@ -10,6 +10,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { randomBytes, createHash } from 'crypto';
+import { UserRole } from 'src/enum';
 
 @Injectable()
 export class AuthService {
@@ -57,7 +58,9 @@ export class AuthService {
 
     // TODO: Send email verification
 
-    return this.usersService.create(email, hashedPassword, name, isAdmin);
+    const userRole = isAdmin ? UserRole.ADMIN : UserRole.USER;
+
+    return this.usersService.create(email, hashedPassword, name, userRole);
   }
 
   async signIn(email: string, password: string) {
@@ -80,7 +83,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        isAdmin: user.isAdmin,
+        role: user.role,
         name: user.name,
       },
     };
