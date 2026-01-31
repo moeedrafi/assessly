@@ -2,21 +2,30 @@ import type { Response, Request } from 'express';
 import {
   Body,
   Controller,
+  Get,
   Post,
   Query,
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
 import { ResetPasswordDTO } from './dtos/reset-password.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get('/me')
+  @UseGuards(AuthGuard)
+  me() {
+    return 'Hello world';
+  }
 
   @Post('/signup')
   signUp(@Body() body: RegisterDTO) {
@@ -37,6 +46,8 @@ export class AuthController {
       body.email,
       body.password,
     );
+
+    console.log('ACCess token sign in: ' + accessToken);
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
