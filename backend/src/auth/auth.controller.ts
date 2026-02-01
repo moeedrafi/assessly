@@ -17,6 +17,7 @@ import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
 import { ResetPasswordDTO } from './dtos/reset-password.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,7 @@ export class AuthController {
     return req.user;
   }
 
+  @Public()
   @Post('/signup')
   signUp(@Body() body: RegisterDTO) {
     return this.authService.signUp(
@@ -38,6 +40,7 @@ export class AuthController {
     );
   }
 
+  @Public()
   @Post('/signin')
   async signIn(
     @Body() body: LoginDTO,
@@ -100,11 +103,13 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
+  @Public()
   @Post('/forgot-password')
   forgotPassword(@Body() body: ForgotPasswordDTO) {
     return this.authService.forgotPassword(body.email);
   }
 
+  @Public()
   @Post('/reset-password')
   resetPassword(@Query('token') token: string, @Body() body: ResetPasswordDTO) {
     return this.authService.resetPassword(
