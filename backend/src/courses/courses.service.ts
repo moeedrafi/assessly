@@ -11,13 +11,25 @@ export class CoursesService {
     private usersServices: UsersService,
   ) {}
 
-  async create(teacherId: number, name: string, description: string) {
+  async create(
+    teacherId: number,
+    name: string,
+    description: string,
+    allowStudentJoin: boolean,
+    isActive: boolean,
+  ) {
     if (!teacherId) throw new UnauthorizedException();
 
     const teacher = await this.usersServices.findById(teacherId);
     if (!teacher) throw new UnauthorizedException();
 
-    const course = this.repo.create({ name, description, teacher });
+    const course = this.repo.create({
+      name,
+      description,
+      teacher,
+      allowStudentJoin,
+      isActive,
+    });
     const savedCourse = await this.repo.save(course);
 
     return {

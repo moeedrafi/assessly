@@ -12,6 +12,12 @@ export class CourseDTO {
   code: string;
 
   @Expose()
+  isActive: boolean;
+
+  @Expose()
+  allowStudentJoin: boolean;
+
+  @Expose()
   @Type(() => UserDTO)
   teacher: UserDTO;
 }

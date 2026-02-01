@@ -26,6 +26,12 @@ export class CoursesController {
     @CurrentUser() user: { sub: number; name: string },
     @Body() body: CreateCourseDTO,
   ) {
-    return this.coursesServices.create(user.sub, body.name, body.description);
+    return this.coursesServices.create(
+      user.sub,
+      body.name,
+      body.description,
+      body.allowStudentJoin,
+      body.isActive,
+    );
   }
 }

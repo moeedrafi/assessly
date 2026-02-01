@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsBoolean } from 'class-validator';
 
 export class CreateCourseDTO {
   @IsString()
@@ -6,4 +6,10 @@ export class CreateCourseDTO {
 
   @IsString()
   description: string;
+
+  @IsBoolean()
+  isActive: boolean;
+
+  @IsBoolean()
+  allowStudentJoin: boolean;
 }
