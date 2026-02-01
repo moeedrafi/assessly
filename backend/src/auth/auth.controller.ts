@@ -16,15 +16,16 @@ import { LoginDTO } from './dtos/login.dto';
 import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
 import { ResetPasswordDTO } from './dtos/reset-password.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('/me')
-  @UseGuards(AuthGuard)
-  me() {
-    return 'Hello world';
+  @UseGuards(AuthGuard, AdminGuard)
+  me(@Req() req) {
+    return req.user;
   }
 
   @Post('/signup')
