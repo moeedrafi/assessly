@@ -23,7 +23,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('/me')
-  @UseGuards(AuthGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   me(@Req() req) {
     return req.user;
   }

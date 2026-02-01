@@ -17,6 +17,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { QuizModule } from 'src/quiz/quiz.module';
 import { UsersModule } from 'src/users/users.module';
 import { CoursesModule } from 'src/courses/courses.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
@@ -49,6 +51,12 @@ import { CoursesModule } from 'src/courses/courses.module';
     QuizModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}
