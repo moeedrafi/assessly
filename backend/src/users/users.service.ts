@@ -12,8 +12,8 @@ export class UsersService {
     return this.repo.findOne({ where: { email } });
   }
 
-  async findById(id: number) {
-    return this.repo.findOne({ where: { id } });
+  async findById(id: number, relations?: string[]) {
+    return this.repo.findOne({ where: { id }, relations });
   }
 
   async create(email: string, password: string, name: string, role: UserRole) {
@@ -36,5 +36,9 @@ export class UsersService {
 
   async findByResetToken(tokenHash: string) {
     return this.repo.findOne({ where: { resetToken: tokenHash } });
+  }
+
+  async save(user: User) {
+    return this.repo.save(user);
   }
 }

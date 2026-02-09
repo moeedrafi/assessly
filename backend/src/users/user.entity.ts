@@ -10,6 +10,8 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -39,7 +41,11 @@ export class User {
   role: UserRole;
 
   @OneToMany(() => Courses, (courses) => courses.teacher)
-  courses: Courses[];
+  teachingCourses: Courses[];
+
+  @ManyToMany(() => Courses, (courses) => courses.students)
+  @JoinTable()
+  joinedCourses: Courses[];
 
   @CreateDateColumn()
   createdAt: Date;

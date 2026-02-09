@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   Post,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CoursesService } from 'src/courses/courses.service';
 import { CreateCourseDTO } from 'src/courses/dtos/create-course.dto';
@@ -18,6 +20,7 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 export class CoursesController {
   constructor(private coursesServices: CoursesService) {}
 
+  /* ADMIN */
   @Serialize(CourseDTO)
   @Post()
   @UseGuards(AdminGuard)
@@ -33,5 +36,34 @@ export class CoursesController {
       body.allowStudentJoin,
       body.isActive,
     );
+  }
+
+  @Get()
+  getCourses(@CurrentUser() user: { sub: number; name: string }) {
+    return this.coursesServices.findAll(user.sub);
+  }
+
+  @Delete()
+  @UseGuards(AdminGuard)
+  @Roles(UserRole.ADMIN)
+  removeCourse(@Param('courseid') courseId: string) {
+    return this.coursesServices.delete(Number(courseId));
+  }
+
+  /* STUDENT ROUTES */
+  @Post('/join/:courseid')
+  joinCourse(
+    @Param('courseid') courseId: string,
+    @CurrentUser() user: { sub: number; name: string },
+  ) {
+    return this.coursesServices.join(user.sub, Number(courseId));
+  }
+
+  @Post('/leave/:courseid')
+  leaveCourse(
+    @Param('courseid') courseId: string,
+    @CurrentUser() user: { sub: number; name: string },
+  ) {
+    return this.coursesServices.leave(user.sub, Number(courseId));
   }
 }

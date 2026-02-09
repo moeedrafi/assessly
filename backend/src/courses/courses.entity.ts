@@ -10,6 +10,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity()
@@ -32,8 +33,11 @@ export class Courses {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => User, (user) => user.courses)
+  @ManyToOne(() => User, (user) => user.teachingCourses)
   teacher: User;
+
+  @ManyToMany(() => User, (user) => user.joinedCourses)
+  students: User[];
 
   @OneToMany(() => Quiz, (quiz) => quiz.course)
   quizzes: Quiz[];
