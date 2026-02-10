@@ -45,6 +45,20 @@ export class CoursesService {
     };
   }
 
+  async update(courseId: number, attr: Partial<Courses>) {
+    if (!courseId) throw new BadRequestException('course id is required');
+
+    const result = await this.repo.update(courseId, attr);
+    if (result.affected === 0) throw new NotFoundException('course not found');
+
+    const updatedCourse = await this.repo.findOneBy({ id: courseId });
+
+    return {
+      data: updatedCourse,
+      message: 'Course Updated Successfully!',
+    };
+  }
+
   async delete(courseId: number) {
     if (!courseId) throw new BadRequestException('course id is required');
 
@@ -70,6 +84,36 @@ export class CoursesService {
     }
 
     return user.joinedCourses;
+  }
+
+  async findOne(courseId: number, userId: number) {
+    if (!courseId) throw new BadRequestException('course id is required');
+    if (!userId) throw new BadRequestException('user is required');
+
+    const user = await this.usersServices.findById(userId);
+    if (!user) throw new UnauthorizedException('user not found');
+
+    if (user.role === UserRole.ADMIN) {
+      return this.repo.findOne({
+        where: {
+          id: courseId,
+          teacher: { id: userId },
+        },
+        relations: ['teacher', 'students', 'quizzes'],
+      });
+    }
+
+    const course = await this.repo.findOne({
+      where: { id: courseId },
+      relations: ['students', 'quizzes'],
+    });
+    if (!course) throw new BadRequestException('course not found');
+
+    const isEnrolled = course.students.some((student) => student.id === userId);
+    if (isEnrolled) return course;
+
+    const { id, name, description, allowStudentJoin, isActive, code } = course;
+    return { id, name, description, allowStudentJoin, isActive, code };
   }
 
   async join(userId: number, courseId: number) {

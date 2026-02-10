@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -41,6 +42,24 @@ export class CoursesController {
   @Get()
   getCourses(@CurrentUser() user: { sub: number; name: string }) {
     return this.coursesServices.findAll(user.sub);
+  }
+
+  @Get()
+  getCourse(
+    @Param('courseid') courseId: string,
+    @CurrentUser() user: { sub: number; name: string },
+  ) {
+    return this.coursesServices.findOne(Number(courseId), user.sub);
+  }
+
+  @Patch()
+  @UseGuards(AdminGuard)
+  @Roles(UserRole.ADMIN)
+  updateCourse(
+    @Param('courseid') courseId: string,
+    @Body() body: CreateCourseDTO,
+  ) {
+    return this.coursesServices.update(Number(courseId), body);
   }
 
   @Delete()
