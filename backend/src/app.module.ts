@@ -9,8 +9,8 @@ import { AppController } from 'src/app.controller';
 import { User } from 'src/users/user.entity';
 import { Courses } from 'src/courses/courses.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
-import { Option } from 'src/quiz/entities/option.entity';
-import { Question } from 'src/quiz/entities/question.entity';
+import { Option } from 'src/option/option.entity';
+import { Question } from 'src/question/question.entity';
 import { StudentAnswer } from 'src/quiz/entities/student-answer.entity';
 
 import { AuthModule } from 'src/auth/auth.module';

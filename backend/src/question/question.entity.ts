@@ -7,7 +7,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Option } from './option.entity';
+import { Option } from 'src/option/option.entity';
 
 @Entity()
 export class Question {
