@@ -36,7 +36,7 @@ export class Quiz {
   @Column({ type: 'timestamp' })
   startsAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   endsAt?: Date;
 
   @ManyToOne(() => Courses, (courses) => courses.quizzes, {
