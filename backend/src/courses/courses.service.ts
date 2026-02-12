@@ -15,9 +15,10 @@ import { UsersService } from 'src/users/users.service';
 export class CoursesService {
   constructor(
     @InjectRepository(Courses) private repo: Repository<Courses>,
-    private usersServices: UsersService,
+    private usersService: UsersService,
   ) {}
 
+  /* ADMIN */
   async create(
     teacherId: number,
     name: string,
@@ -27,7 +28,7 @@ export class CoursesService {
   ) {
     if (!teacherId) throw new UnauthorizedException();
 
-    const teacher = await this.usersServices.findById(teacherId);
+    const teacher = await this.usersService.findById(teacherId);
     if (!teacher) throw new UnauthorizedException();
 
     const course = this.repo.create({
@@ -68,20 +69,41 @@ export class CoursesService {
     return { message: 'Course Deleted Successfully!' };
   }
 
+  async findAllAdminCourses(userId: number) {
+    if (!userId) throw new UnauthorizedException();
+
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new NotFoundException();
+
+    return this.repo.find({ where: { teacher: { id: userId } } });
+  }
+
+  async findOneAdminCourse(courseId: number, userId: number) {
+    if (!courseId) throw new BadRequestException('course id is required');
+    if (!userId) throw new BadRequestException('user is required');
+
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('user not found');
+
+    const course = await this.repo.findOne({
+      where: {
+        id: courseId,
+        teacher: { id: userId },
+      },
+      relations: ['teacher', 'students', 'quizzes'],
+    });
+
+    if (!course) throw new NotFoundException();
+
+    return course;
+  }
+
+  /* STUDENT */
   async findAll(userId: number) {
     if (!userId) throw new UnauthorizedException();
 
-    const user = await this.usersServices.findById(userId, ['joinedCourses']);
-
+    const user = await this.usersService.findById(userId, ['joinedCourses']);
     if (!user) throw new NotFoundException();
-
-    if (user.role === UserRole.ADMIN) {
-      const courses = await this.repo.find({
-        where: { teacher: { id: userId } },
-      });
-
-      return courses;
-    }
 
     return user.joinedCourses;
   }
@@ -90,18 +112,8 @@ export class CoursesService {
     if (!courseId) throw new BadRequestException('course id is required');
     if (!userId) throw new BadRequestException('user is required');
 
-    const user = await this.usersServices.findById(userId);
+    const user = await this.usersService.findById(userId);
     if (!user) throw new UnauthorizedException('user not found');
-
-    if (user.role === UserRole.ADMIN) {
-      return this.repo.findOne({
-        where: {
-          id: courseId,
-          teacher: { id: userId },
-        },
-        relations: ['teacher', 'students', 'quizzes'],
-      });
-    }
 
     const course = await this.repo.findOne({
       where: { id: courseId },
@@ -120,7 +132,7 @@ export class CoursesService {
     if (!userId) throw new UnauthorizedException('user not logged in');
     if (!courseId) throw new BadRequestException('course id is required');
 
-    const user = await this.usersServices.findById(userId, ['joinedCourses']);
+    const user = await this.usersService.findById(userId, ['joinedCourses']);
     if (!user) throw new NotFoundException('user not found');
 
     if (user.role === UserRole.ADMIN)
@@ -136,7 +148,7 @@ export class CoursesService {
       throw new BadRequestException('already joined this course');
 
     user.joinedCourses.push(course);
-    await this.usersServices.save(user);
+    await this.usersService.save(user);
 
     return { message: 'joined course', data: course };
   }
@@ -145,7 +157,7 @@ export class CoursesService {
     if (!userId) throw new UnauthorizedException('user not logged in');
     if (!courseId) throw new BadRequestException('course id is required');
 
-    const user = await this.usersServices.findById(userId, ['joinedCourses']);
+    const user = await this.usersService.findById(userId, ['joinedCourses']);
     if (!user) throw new NotFoundException('user not found');
 
     if (user.role === UserRole.ADMIN)
@@ -160,7 +172,7 @@ export class CoursesService {
       );
 
     user.joinedCourses = user.joinedCourses.filter((c) => c.id !== courseId);
-    await this.usersServices.save(user);
+    await this.usersService.save(user);
 
     return { message: 'left course', data: course };
   }
