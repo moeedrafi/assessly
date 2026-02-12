@@ -15,9 +15,7 @@ import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { ResetPasswordDTO } from './dtos/reset-password.dto';
 import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
-import { UserRole } from 'src/enum';
 import { Public } from 'src/decorators/public.decorator';
-import { Roles } from 'src/decorators/roles.decorator';
 import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('auth')
@@ -26,7 +24,6 @@ export class AuthController {
 
   @Get('/me')
   @UseGuards(AdminGuard)
-  @Roles(UserRole.ADMIN)
   me(@Req() req) {
     return req.user;
   }

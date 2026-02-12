@@ -11,7 +11,6 @@ import {
 import { CoursesService } from 'src/courses/courses.service';
 import { CreateCourseDTO } from 'src/courses/dtos/create-course.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
-import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enum';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { CourseDTO } from './dtos/course.dto';
@@ -25,7 +24,6 @@ export class CoursesController {
   @Serialize(CourseDTO)
   @Post()
   @UseGuards(AdminGuard)
-  @Roles(UserRole.ADMIN)
   createCourse(
     @CurrentUser() user: { sub: number; name: string },
     @Body() body: CreateCourseDTO,
@@ -54,7 +52,6 @@ export class CoursesController {
 
   @Patch()
   @UseGuards(AdminGuard)
-  @Roles(UserRole.ADMIN)
   updateCourse(
     @Param('courseid') courseId: string,
     @Body() body: CreateCourseDTO,
@@ -64,7 +61,6 @@ export class CoursesController {
 
   @Delete()
   @UseGuards(AdminGuard)
-  @Roles(UserRole.ADMIN)
   removeCourse(@Param('courseid') courseId: string) {
     return this.coursesServices.delete(Number(courseId));
   }
