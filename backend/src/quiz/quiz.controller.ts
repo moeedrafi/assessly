@@ -5,12 +5,15 @@ import { UserRole } from 'src/enum';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { QuizService } from 'src/quiz/quiz.service';
 import { CreateQuizDTO } from './dtos/create-quiz.dto';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { QuizDTO } from './dtos/quiz.dto';
 
 @Controller('quiz')
 export class QuizController {
   constructor(private quizServices: QuizService) {}
 
   /* ADMIN */
+  @Serialize(QuizDTO)
   @Post(':courseid')
   @UseGuards(AdminGuard)
   @Roles(UserRole.ADMIN)
