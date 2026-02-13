@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { QuizService } from 'src/quiz/quiz.service';
@@ -20,5 +20,21 @@ export class QuizController {
     @Body() body: CreateQuizDTO,
   ) {
     return this.quizServices.create(user.sub, Number(courseId), body);
+  }
+
+  @Get(':courseid')
+  fetchCompletedQuizzes(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid') courseId: string,
+  ) {
+    return this.quizServices.findCompletedQuizzes(user.sub, Number(courseId));
+  }
+
+  @Get(':courseid')
+  fetchUpcomingQuizzes(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid') courseId: string,
+  ) {
+    return this.quizServices.findUpcomingQuizzes(user.sub, Number(courseId));
   }
 }

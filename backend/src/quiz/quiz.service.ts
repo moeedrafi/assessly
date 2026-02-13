@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
@@ -61,5 +61,33 @@ export class QuizService {
       data: savedQuiz,
       message: 'Successfully Created Quiz',
     };
+  }
+
+  async findCompletedQuizzes(teacherId: number, courseId: number) {
+    if (!teacherId) throw new UnauthorizedException('not authenticated');
+    if (!courseId) throw new UnauthorizedException('course id required');
+
+    const course = await this.coursesServices.findOne(courseId, teacherId);
+    if (!course) throw new UnauthorizedException('course not found');
+
+    const quizzes = await this.repo.find({
+      where: { course, endsAt: LessThan(new Date()) },
+    });
+
+    return quizzes;
+  }
+
+  async findUpcomingQuizzes(teacherId: number, courseId: number) {
+    if (!teacherId) throw new UnauthorizedException('not authenticated');
+    if (!courseId) throw new UnauthorizedException('course id required');
+
+    const course = await this.coursesServices.findOne(courseId, teacherId);
+    if (!course) throw new UnauthorizedException('course not found');
+
+    const quizzes = await this.repo.find({
+      where: { course, endsAt: MoreThan(new Date()) },
+    });
+
+    return quizzes;
   }
 }
