@@ -31,8 +31,8 @@ export class AuthService {
     return bcrypt.hash(password, 10);
   }
 
-  async getTokens(id: number, name: string) {
-    const payload = { sub: id, name };
+  async getTokens(id: number, role: UserRole) {
+    const payload = { sub: id, role };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
@@ -72,7 +72,7 @@ export class AuthService {
     const isCorrect = await this.isPasswordMatch(password, user.password);
     if (!isCorrect) throw new UnauthorizedException('Invalid credentials');
 
-    const tokens = await this.getTokens(user.id, user.name);
+    const tokens = await this.getTokens(user.id, user.role);
     const hashedRefreshToken = await this.hashing(tokens.refreshToken);
     await this.usersService.update(user.id, {
       refreshToken: hashedRefreshToken,
@@ -99,7 +99,7 @@ export class AuthService {
       const user = await this.usersService.findById(payload.sub);
       if (!user) throw new NotFoundException('User not found');
 
-      return this.getTokens(user.id, user.name);
+      return this.getTokens(user.id, user.role);
     } catch (e) {
       throw new UnauthorizedException(`Invalid or expired refresh token ${e}`);
     }
