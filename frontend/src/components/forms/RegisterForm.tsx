@@ -1,28 +1,19 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState } from "react";
+import { register } from "@/lib/action";
+import { RegisterFormData } from "@/schemas/auth.schemas";
+import type { ActionResponse } from "@/types/action";
+
+const initialState: ActionResponse<RegisterFormData> = {
+  message: "",
+  success: false,
+};
 
 export const RegisterForm = () => {
-  const [name, setName] = useState("");
-  const [email, setemail] = useState("");
-  const [password, setPassword] = useState("");
+  const [state, formAction, isPending] = useActionState(register, initialState);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch("http://localhost:8000/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, password, email }),
-      });
-
-      const data = await response.json();
-      console.log("Success:", data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  // TODO: NOTIFICATION
 
   return (
     <section
@@ -34,7 +25,7 @@ export const RegisterForm = () => {
           Register
         </h1>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" action={formAction}>
           <div className="flex flex-col gap-1">
             <label
               htmlFor="name"
@@ -46,10 +37,13 @@ export const RegisterForm = () => {
               required
               id="name"
               name="name"
-              onChange={(e) => setName(e.target.value)}
+              disabled={isPending}
               placeholder="John Doe"
               className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2"
             />
+            {state.errors?.name?.[0] && (
+              <p className="text-sm text-red-500">{state.errors.name[0]}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1">
@@ -57,17 +51,20 @@ export const RegisterForm = () => {
               htmlFor="email"
               className="text-text text-base leading-[1.6em]"
             >
-              email
+              Email
             </label>
             <input
               required
               id="email"
               type="email"
               name="email"
-              onChange={(e) => setemail(e.target.value)}
+              disabled={isPending}
               placeholder="john.doe@gmail.com"
               className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
             />
+            {state.errors?.email?.[0] && (
+              <p className="text-sm text-red-500">{state.errors.email[0]}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1">
@@ -82,14 +79,18 @@ export const RegisterForm = () => {
               id="password"
               type="password"
               name="password"
+              disabled={isPending}
               placeholder="******"
-              onChange={(e) => setPassword(e.target.value)}
               className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2"
             />
+            {state.errors?.password?.[0] && (
+              <p className="text-sm text-red-500">{state.errors.password[0]}</p>
+            )}
           </div>
 
           <button
             type="submit"
+            disabled={isPending}
             className="mt-5 w-full bg-primary p-2 text-white rounded-lg hover:opacity-80 disabled:opacity-90 disabled:cursor-not-allowed transition-opacity"
           >
             Create an Account
