@@ -18,7 +18,7 @@ export const RegisterForm = () => {
     if (!state.message) return;
 
     if (state.success) {
-      toast(state.message);
+      toast.success(state.message);
     } else {
       toast.error(state.message);
     }
