@@ -6,11 +6,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 import { randomBytes, createHash } from 'crypto';
+import { MailerService } from '@nestjs-modules/mailer';
 import { UserRole } from 'src/enum';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private readonly mailService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   private async isPasswordMatch(
@@ -37,7 +39,7 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
       this.jwtService.signAsync(payload, {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
         expiresIn: '7d',
       }),
     ]);
@@ -93,7 +95,7 @@ export class AuthService {
     try {
       const payload: { sub: number; name: string } =
         await this.jwtService.verifyAsync(refreshToken, {
-          secret: process.env.JWT_REFRESH_SECRET,
+          secret: this.configService.get('JWT_REFRESH_SECRET'),
         });
 
       const user = await this.usersService.findById(payload.sub);
@@ -117,17 +119,21 @@ export class AuthService {
       resetTokenExpiry: new Date(Date.now() + 1000 * 60 * 10),
     });
 
+    const frontendUrl = this.configService.get('FRONTEND_URL');
+
     await this.mailService.sendMail({
-      from: process.env.SENDER_EMAIL,
+      from: this.configService.get('SENDER_EMAIL'),
       to: existingUser.email,
-      subject: `Welcome! Forgot Password? Don't worry`,
+      subject: `Reset your Assessly Password`,
       html: `
         <p>Welcome! Please open this link and create a new password:</p>
-          <a href="http://localhost:8000/reset-password?token=${rawToken}">
+          <a href="${frontendUrl}/reset-password?token=${rawToken}">
           Reset your password
           </a>
         `,
     });
+
+    return { message: 'Check your email for reset password' };
   }
 
   async resetPassword(
@@ -153,6 +159,6 @@ export class AuthService {
       resetTokenExpiry: undefined,
     });
 
-    return { message: 'password updated' };
+    return { message: 'Password Successfully Updated' };
   }
 }
