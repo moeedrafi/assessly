@@ -1,28 +1,46 @@
 "use client";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
-import { register } from "@/lib/action";
-import { RegisterFormData } from "@/schemas/auth.schemas";
-import type { ActionResponse } from "@/types/action";
 import toast, { Toaster } from "react-hot-toast";
 
-const initialState: ActionResponse<RegisterFormData> = {
-  message: "",
-  success: false,
+import { useForm } from "@tanstack/react-form";
+import { RegisterFormData, registerSchema } from "@/schemas/auth.schemas";
+
+const initialState: RegisterFormData = {
+  email: "",
+  name: "",
+  password: "",
 };
 
 export const RegisterForm = () => {
-  const [state, formAction, isPending] = useActionState(register, initialState);
+  const form = useForm({
+    defaultValues: initialState,
+    validators: { onBlur: registerSchema },
+    onSubmit: async ({ value }) => {
+      const validatedData = registerSchema.safeParse(value);
+      if (!validatedData.success) {
+        toast.error("Please fix errors in the form");
+        return;
+      }
 
-  useEffect(() => {
-    if (!state.message) return;
+      try {
+        const res = await fetch("http://localhost:8000/auth/signin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(validatedData.data),
+        });
 
-    if (state.success) {
-      toast.success(state.message);
-    } else {
-      toast.error(state.message);
-    }
-  }, [state]);
+        if (!res.ok) {
+          toast.error("Invalid email or password");
+          return;
+        }
+
+        toast.success("Signed in successfully");
+      } catch (error) {
+        toast.error(`An unexpected error occured ${error}`);
+      }
+    },
+  });
 
   return (
     <section
@@ -34,76 +52,120 @@ export const RegisterForm = () => {
           Register
         </h1>
 
-        <form className="space-y-6" action={formAction}>
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor="name"
-              className="text-text text-base leading-[1.6em]"
-            >
-              Name
-            </label>
-            <input
-              required
-              id="name"
-              name="name"
-              disabled={isPending}
-              placeholder="John Doe"
-              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2 disabled:opacity-70 disabled:cursor-not-allowed"
-            />
-            {state.errors?.name?.[0] && (
-              <p className="text-sm text-red-500">{state.errors.name[0]}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor="email"
-              className="text-text text-base leading-[1.6em]"
-            >
-              Email
-            </label>
-            <input
-              required
-              id="email"
-              type="email"
-              name="email"
-              disabled={isPending}
-              placeholder="john.doe@gmail.com"
-              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-            />
-            {state.errors?.email?.[0] && (
-              <p className="text-sm text-red-500">{state.errors.email[0]}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor="password"
-              className="text-text text-base leading-[1.6em]"
-            >
-              Password
-            </label>
-            <input
-              required
-              id="password"
-              type="password"
-              name="password"
-              disabled={isPending}
-              placeholder="******"
-              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2 disabled:opacity-70 disabled:cursor-not-allowed"
-            />
-            {state.errors?.password?.[0] && (
-              <p className="text-sm text-red-500">{state.errors.password[0]}</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={isPending}
-            className="mt-5 w-full bg-primary p-2 text-white rounded-lg hover:opacity-80 disabled:opacity-90 disabled:cursor-not-allowed transition-opacity"
+        <form
+          className="space-y-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
           >
-            Create an Account
-          </button>
+            {([canSubmit, isSubmitting]) => (
+              <>
+                <form.Field name="name">
+                  {(field) => (
+                    <div className="flex flex-col gap-1">
+                      <label
+                        htmlFor={field.name}
+                        className="text-text text-base leading-[1.6em]"
+                      >
+                        Name
+                      </label>
+                      <input
+                        id={field.name}
+                        name={field.name}
+                        disabled={isSubmitting}
+                        value={field.state.value}
+                        placeholder="John Doe"
+                        aria-invalid={!field.state.meta.isValid}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:ring-0 disabled:focus-visible:ring-0"
+                      />
+                      {field.state.meta.isTouched &&
+                        !field.state.meta.isValid && (
+                          <em role="alert" className="text-red-500">
+                            {field.state.meta.errors.join(", ")}
+                          </em>
+                        )}
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="email">
+                  {(field) => (
+                    <div className="flex flex-col gap-1">
+                      <label
+                        htmlFor={field.name}
+                        className="text-text text-base leading-[1.6em]"
+                      >
+                        Email
+                      </label>
+                      <input
+                        id={field.name}
+                        name={field.name}
+                        disabled={isSubmitting}
+                        value={field.state.value}
+                        placeholder="john.doe@gmail.com"
+                        aria-invalid={!field.state.meta.isValid}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:ring-0 disabled:focus-visible:ring-0"
+                      />
+                      {field.state.meta.isTouched &&
+                        !field.state.meta.isValid && (
+                          <em role="alert" className="text-red-500">
+                            {field.state.meta.errors.join(", ")}
+                          </em>
+                        )}
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="password">
+                  {(field) => (
+                    <div className="flex flex-col gap-1">
+                      <label
+                        htmlFor={field.name}
+                        className="text-text text-base leading-[1.6em]"
+                      >
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        placeholder="******"
+                        disabled={isSubmitting}
+                        aria-invalid={!field.state.meta.isValid}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-70 disabled:cursor-not-allowed disabled:ring-0 disabled:focus-visible:ring-0"
+                      />
+                      {field.state.meta.isTouched &&
+                        !field.state.meta.isValid && (
+                          <em role="alert" className="text-red-500">
+                            {field.state.meta.errors.join(", ")}
+                          </em>
+                        )}
+                    </div>
+                  )}
+                </form.Field>
+
+                <button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="mt-5 w-full bg-primary p-2 text-white rounded-lg hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                >
+                  {isSubmitting ? "Registering..." : "Register"}
+                </button>
+              </>
+            )}
+          </form.Subscribe>
         </form>
 
         <Link
