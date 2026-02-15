@@ -37,7 +37,7 @@ export const RegisterForm = () => {
 
         toast.success("Signed in successfully");
       } catch (error) {
-        toast.error(`An unexpected error occured ${error}`);
+        toast.error("An unexpected error occured");
       }
     },
   });
@@ -88,7 +88,9 @@ export const RegisterForm = () => {
                       {field.state.meta.isTouched &&
                         !field.state.meta.isValid && (
                           <em role="alert" className="text-red-500">
-                            {field.state.meta.errors.join(", ")}
+                            {field.state.meta.errors
+                              .map((err) => err?.message)
+                              .join(", ")}
                           </em>
                         )}
                     </div>
@@ -118,7 +120,9 @@ export const RegisterForm = () => {
                       {field.state.meta.isTouched &&
                         !field.state.meta.isValid && (
                           <em role="alert" className="text-red-500">
-                            {field.state.meta.errors.join(", ")}
+                            {field.state.meta.errors
+                              .map((err) => err?.message)
+                              .join(", ")}
                           </em>
                         )}
                     </div>
@@ -149,7 +153,9 @@ export const RegisterForm = () => {
                       {field.state.meta.isTouched &&
                         !field.state.meta.isValid && (
                           <em role="alert" className="text-red-500">
-                            {field.state.meta.errors.join(", ")}
+                            {field.state.meta.errors
+                              .map((err) => err?.message)
+                              .join(", ")}
                           </em>
                         )}
                     </div>

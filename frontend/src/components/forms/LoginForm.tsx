@@ -86,7 +86,9 @@ export const LoginForm = () => {
                       {field.state.meta.isTouched &&
                         !field.state.meta.isValid && (
                           <em role="alert" className="text-red-500">
-                            {field.state.meta.errors.join(", ")}
+                            {field.state.meta.errors
+                              .map((err) => err?.message)
+                              .join(", ")}
                           </em>
                         )}
                     </div>
@@ -118,7 +120,9 @@ export const LoginForm = () => {
                         {field.state.meta.isTouched &&
                           !field.state.meta.isValid && (
                             <em role="alert" className="text-red-500">
-                              {field.state.meta.errors.join(", ")}
+                              {field.state.meta.errors
+                                .map((err) => err?.message)
+                                .join(", ")}
                             </em>
                           )}
                       </div>
