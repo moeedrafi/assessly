@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { register } from "@/lib/action";
 import { RegisterFormData } from "@/schemas/auth.schemas";
 import type { ActionResponse } from "@/types/action";
+import toast, { Toaster } from "react-hot-toast";
 
 const initialState: ActionResponse<RegisterFormData> = {
   message: "",
@@ -13,7 +14,15 @@ const initialState: ActionResponse<RegisterFormData> = {
 export const RegisterForm = () => {
   const [state, formAction, isPending] = useActionState(register, initialState);
 
-  // TODO: NOTIFICATION
+  useEffect(() => {
+    if (!state.message) return;
+
+    if (state.success) {
+      toast(state.message);
+    } else {
+      toast.error(state.message);
+    }
+  }, [state]);
 
   return (
     <section
@@ -103,6 +112,8 @@ export const RegisterForm = () => {
         >
           Already have an account?
         </Link>
+
+        <Toaster />
       </div>
     </section>
   );
