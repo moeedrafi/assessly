@@ -48,7 +48,7 @@ export const RegisterForm = () => {
               name="name"
               disabled={isPending}
               placeholder="John Doe"
-              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2"
+              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2 disabled:opacity-70 disabled:cursor-not-allowed"
             />
             {state.errors?.name?.[0] && (
               <p className="text-sm text-red-500">{state.errors.name[0]}</p>
@@ -69,7 +69,7 @@ export const RegisterForm = () => {
               name="email"
               disabled={isPending}
               placeholder="john.doe@gmail.com"
-              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-70 disabled:cursor-not-allowed"
             />
             {state.errors?.email?.[0] && (
               <p className="text-sm text-red-500">{state.errors.email[0]}</p>
@@ -90,7 +90,7 @@ export const RegisterForm = () => {
               name="password"
               disabled={isPending}
               placeholder="******"
-              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2"
+              className="bg-light px-3 py-2 rounded-lg ring-1 ring-color outline-none focus-visible:ring-2 disabled:opacity-70 disabled:cursor-not-allowed"
             />
             {state.errors?.password?.[0] && (
               <p className="text-sm text-red-500">{state.errors.password[0]}</p>
