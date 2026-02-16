@@ -24,7 +24,7 @@ export class StudentAnswer {
     questionId: string;
     selectionOptionIs: number[];
     marksObtained?: number;
-  };
+  }[];
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   student: User;

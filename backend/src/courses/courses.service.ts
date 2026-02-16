@@ -122,10 +122,9 @@ export class CoursesService {
     if (!course) throw new BadRequestException('course not found');
 
     const isEnrolled = course.students.some((student) => student.id === userId);
-    if (isEnrolled) return course;
+    if (!isEnrolled) throw new UnauthorizedException('not joined course');
 
-    const { id, name, description, allowStudentJoin, isActive, code } = course;
-    return { id, name, description, allowStudentJoin, isActive, code };
+    return course;
   }
 
   async join(userId: number, courseId: number) {
