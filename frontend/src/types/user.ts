@@ -14,14 +14,12 @@ export interface UserBase {
   updatedAt: string;
 }
 
-interface StudentUser extends UserBase {
+export interface StudentUser extends UserBase {
   role: UserRole.USER;
   joinedCourses: JoinedCourse[];
 }
 
-interface TeacherUser extends UserBase {
+export interface TeacherUser extends UserBase {
   role: UserRole.ADMIN;
   teachingCourses: TeachingCourse[];
 }
-
-export type User = StudentUser | TeacherUser;

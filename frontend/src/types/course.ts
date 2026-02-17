@@ -13,7 +13,9 @@ interface CourseBase {
   updatedAt: string;
 }
 
-export type JoinedCourse = CourseBase;
+export interface JoinedCourse extends CourseBase {
+  teacher: UserBase;
+}
 
 export interface TeachingCourse extends CourseBase {
   teacher: UserBase;
