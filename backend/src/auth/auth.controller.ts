@@ -64,7 +64,10 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return user;
+    return {
+      data: user,
+      message: 'Successfully SignedIn',
+    };
   }
 
   @Post('/refresh')

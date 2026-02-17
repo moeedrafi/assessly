@@ -62,7 +62,17 @@ export class AuthService {
 
     const userRole = isAdmin ? UserRole.ADMIN : UserRole.USER;
 
-    return this.usersService.create(email, hashedPassword, name, userRole);
+    const createdUser = await this.usersService.create(
+      email,
+      hashedPassword,
+      name,
+      userRole,
+    );
+
+    return {
+      data: createdUser,
+      message: 'Successfully SignedUp',
+    };
   }
 
   async signIn(email: string, password: string) {
@@ -83,7 +93,6 @@ export class AuthService {
     return {
       ...tokens,
       user: {
-        id: user.id,
         email: user.email,
         role: user.role,
         name: user.name,

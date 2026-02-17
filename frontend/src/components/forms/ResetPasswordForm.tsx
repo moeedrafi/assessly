@@ -2,6 +2,8 @@
 import { toast } from "react-hot-toast";
 import { useForm } from "@tanstack/react-form";
 import { useSearchParams } from "next/navigation";
+import { api } from "@/lib/api";
+import { ApiError } from "@/lib/error";
 import {
   resetPasswordSchema,
   ResetPasswordFormData,
@@ -27,26 +29,20 @@ export const ResetPasswordForm = () => {
       }
 
       try {
-        const res = await fetch(
-          `http://localhost:8000/auth/reset-password?token=${token}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(validatedData.data),
-          },
+        const res = await api.post<void, ResetPasswordFormData>(
+          `/auth/reset-password?token=${token}`,
+          validatedData.data,
         );
 
-        if (!res.ok) {
-          toast.error("Invalid");
-          return;
-        }
-
-        const response = await res.json();
-
-        toast.success(response.message);
+        toast.success(res.message);
       } catch (error) {
-        toast.error("An unexpected error occured");
+        if (error instanceof ApiError) {
+          toast.error(error.message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
       }
     },
   });

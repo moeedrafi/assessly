@@ -1,6 +1,8 @@
 "use client";
 import { toast } from "react-hot-toast";
 import { useForm } from "@tanstack/react-form";
+import { api } from "@/lib/api";
+import { ApiError } from "@/lib/error";
 import {
   ForgotPasswordFormData,
   forgotPasswordSchema,
@@ -22,23 +24,20 @@ export const ForgotPasswordForm = () => {
       }
 
       try {
-        const res = await fetch("http://localhost:8000/auth/forgot-password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(validatedData.data),
-        });
+        const res = await api.post<void, ForgotPasswordFormData>(
+          "/auth/forgot-password",
+          validatedData.data,
+        );
 
-        if (!res.ok) {
-          toast.error("Invalid email");
-          return;
-        }
-
-        const response = await res.json();
-
-        toast.success(response.message);
+        toast.success(res.message);
       } catch (error) {
-        toast.error("An unexpected error occured");
+        if (error instanceof ApiError) {
+          toast.error(error.message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
       }
     },
   });

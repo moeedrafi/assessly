@@ -2,9 +2,9 @@
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { useForm } from "@tanstack/react-form";
-import { LoginFormData, loginSchema } from "@/schemas/auth.schemas";
-import { api, ApiErrorResponse } from "@/lib/api";
+import { api } from "@/lib/api";
 import { ApiError } from "@/lib/error";
+import { LoginFormData, loginSchema } from "@/schemas/auth.schemas";
 
 const initialState: LoginFormData = {
   email: "",
