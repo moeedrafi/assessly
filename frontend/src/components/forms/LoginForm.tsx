@@ -3,6 +3,8 @@ import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { useForm } from "@tanstack/react-form";
 import { LoginFormData, loginSchema } from "@/schemas/auth.schemas";
+import { api, ApiErrorResponse } from "@/lib/api";
+import { ApiError } from "@/lib/error";
 
 const initialState: LoginFormData = {
   email: "",
@@ -21,21 +23,20 @@ export const LoginForm = () => {
       }
 
       try {
-        const res = await fetch("http://localhost:8000/auth/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(validatedData.data),
-        });
+        const res = await api.post<void, LoginFormData>(
+          "/auth/signin",
+          validatedData.data,
+        );
 
-        if (!res.ok) {
-          toast.error("Invalid email or password");
-          return;
-        }
-
-        toast.success("Signed in successfully");
+        toast.success(res.message);
       } catch (error) {
-        toast.error("An unexpected error occured");
+        if (error instanceof ApiError) {
+          toast.error(error.message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
       }
     },
   });
