@@ -102,10 +102,14 @@ export class CoursesService {
   async findAll(userId: number) {
     if (!userId) throw new UnauthorizedException();
 
-    const user = await this.usersService.findById(userId, ['joinedCourses']);
-    if (!user) throw new NotFoundException();
+    const courses = await this.repo
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.teacher', 'teacher')
+      .leftJoin('course.students', 'student')
+      .where('student.id = :userId', { userId })
+      .getMany();
 
-    return user.joinedCourses;
+    return courses;
   }
 
   async findOne(courseId: number, userId: number) {
