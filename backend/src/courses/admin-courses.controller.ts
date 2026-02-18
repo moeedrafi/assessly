@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   Post,
@@ -14,7 +15,7 @@ import { CourseDTO } from './dtos/course.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { CreateCourseDTO } from './dtos/create-course.dto';
 
-@Controller()
+@Controller('admin/courses')
 @UseGuards(AdminGuard)
 export class AdminCoursesController {
   constructor(private coursesService: CoursesService) {}
@@ -45,5 +46,18 @@ export class AdminCoursesController {
   @Delete(':courseid')
   removeCourse(@Param('courseid') courseId: string) {
     return this.coursesService.delete(Number(courseId));
+  }
+
+  @Get()
+  getCourses(@CurrentUser() user: { sub: number; name: string }) {
+    return this.coursesService.findAllAdminCourses(user.sub);
+  }
+
+  @Get(':courseid')
+  getCourse(
+    @Param('courseid') courseId: string,
+    @CurrentUser() user: { sub: number; name: string },
+  ) {
+    return this.coursesService.findOneAdminCourse(Number(courseId), user.sub);
   }
 }
