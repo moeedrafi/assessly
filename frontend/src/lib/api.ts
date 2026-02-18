@@ -1,6 +1,7 @@
 import { ApiError } from "./error";
 
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE_API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 type PaginationMeta = {
   page: number;

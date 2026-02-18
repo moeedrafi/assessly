@@ -1,7 +1,20 @@
+"use client";
 import Link from "next/link";
+import { api } from "@/lib/api";
+import { TeachingCourse } from "@/types/course";
+import { useQuery } from "@tanstack/react-query";
 
 const AdminCoursesPage = () => {
   const courses = 3;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["adminCourses"],
+    queryFn: async () => {
+      const res = await api.get<TeachingCourse[]>("/admin/courses");
+      console.log(res);
+      return res.data;
+    },
+  });
 
   if (!courses) {
     return (
@@ -54,7 +67,7 @@ const AdminCoursesPage = () => {
         <div className="space-y-2 text-center p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold">Welcome</h1>
           <p className="text-sm text-muted-foreground">
-            View Details of the courses you are enrolled in
+            View Details of the courses you are teaching
           </p>
         </div>
 
