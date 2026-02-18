@@ -75,7 +75,15 @@ export class CoursesService {
     const user = await this.usersService.findById(userId);
     if (!user) throw new NotFoundException();
 
-    return this.repo.find({ where: { teacher: { id: userId } } });
+    const courses = await this.repo.find({
+      where: { teacher: { id: userId } },
+    });
+
+    return {
+      data: courses,
+      message: 'Successfully fetched courses',
+      meta: null,
+    };
   }
 
   async findOneAdminCourse(courseId: number, userId: number) {

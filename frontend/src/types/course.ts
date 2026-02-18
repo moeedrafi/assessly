@@ -18,6 +18,5 @@ export interface JoinedCourse extends CourseBase {
 }
 
 export interface TeachingCourse extends CourseBase {
-  teacher: UserBase;
   students: UserBase[];
 }
