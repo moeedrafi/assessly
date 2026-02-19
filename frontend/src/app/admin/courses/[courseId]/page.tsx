@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import { CompletedQuizzes } from "@/components/CompletedQuizzes";
 
 const stats = [
   {
@@ -25,8 +25,12 @@ const stats = [
   },
 ];
 
-const CourseIdPage = () => {
-  const courseId = 1;
+const CourseIdPage = async ({
+  params,
+}: {
+  params: Promise<{ courseId: string }>;
+}) => {
+  const { courseId } = await params;
 
   if (!courseId) {
     return (
@@ -43,8 +47,6 @@ const CourseIdPage = () => {
     );
   }
 
-  const completedQuizzes = 10;
-
   return (
     <main>
       <section className="w-full font-lato space-y-4 p-2">
@@ -52,9 +54,6 @@ const CourseIdPage = () => {
         <div className="space-y-2 text-center p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold">Course Name</h1>
           <h2 className="text-xl text-muted-foreground">Total Students: 30</h2>
-          <h3 className="text-lg text-muted-foreground">
-            Your Rank: <span className="text-primary font-semibold">2nd</span>
-          </h3>
         </div>
 
         {/* STATS + Leaderboard */}
@@ -140,42 +139,7 @@ const CourseIdPage = () => {
         {/* QUIZ */}
         <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h3>
-
-          {completedQuizzes ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 overflow-y-auto hide-scrollbar max-h-64">
-              <div className="bg-light p-4 space-y-4 border border-color rounded-lg shadow">
-                <h3 className="text-lg font-semibold">Quiz Name</h3>
-
-                {/* Time */}
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">29 Dec 2025</span> · 11:00 -
-                  11:30
-                </div>
-
-                <div className="space-y-2">
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Result: </span>
-                    <span className="text-primary font-semibold">20 / 30</span>
-                  </div>
-
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Rank: </span>
-                    <span className="text-primary font-semibold">10th</span>
-                  </div>
-                </div>
-
-                <Link href="/quizzes/1/result">
-                  <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              No Completed Quizzes
-            </p>
-          )}
+          <CompletedQuizzes courseId={courseId} />
         </div>
       </section>
     </main>

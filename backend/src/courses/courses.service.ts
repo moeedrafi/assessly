@@ -101,7 +101,7 @@ export class CoursesService {
       relations: ['teacher', 'students', 'quizzes'],
     });
 
-    if (!course) throw new NotFoundException();
+    if (!course) throw new NotFoundException('course not found');
 
     return course;
   }

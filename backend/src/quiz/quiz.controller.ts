@@ -23,9 +23,9 @@ export class QuizController {
     return this.quizServices.create(user.sub, Number(courseId), body);
   }
 
-  @Get('/adming/:courseid/completed')
+  @Get('/admin/:courseid/completed')
   @UseGuards(AdminGuard)
-  getCompletedQuizzes(
+  getAdminCompletedQuizzes(
     @CurrentUser() user: { sub: number },
     @Param('courseid') courseId: string,
   ) {

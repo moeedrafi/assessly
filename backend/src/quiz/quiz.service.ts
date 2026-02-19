@@ -31,8 +31,10 @@ export class QuizService {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     if (!courseId) throw new UnauthorizedException('course id required');
 
-    const course = await this.coursesServices.findOne(courseId, teacherId);
-    if (!course) throw new UnauthorizedException('course not found');
+    const course = await this.coursesServices.findOneAdminCourse(
+      courseId,
+      teacherId,
+    );
 
     const {
       description,
@@ -74,14 +76,17 @@ export class QuizService {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     if (!courseId) throw new UnauthorizedException('course id required');
 
-    const course = await this.coursesServices.findOne(courseId, teacherId);
-    if (!course) throw new UnauthorizedException('course not found');
+    await this.coursesServices.findOneAdminCourse(courseId, teacherId);
 
     const quizzes = await this.repo.find({
-      where: { course, endsAt: LessThan(new Date()) },
+      where: { course: { id: courseId }, endsAt: LessThan(new Date()) },
     });
 
-    return quizzes;
+    return {
+      data: quizzes,
+      message: 'Successfully fetched completed quizzes',
+      meta: null,
+    };
   }
 
   async findAdminUpcomingQuizzes(teacherId: number, courseId: number) {

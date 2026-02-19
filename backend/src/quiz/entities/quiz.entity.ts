@@ -37,8 +37,8 @@ export class Quiz {
   @Column({ type: 'timestamp' })
   startsAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
-  endsAt?: Date;
+  @Column({ type: 'timestamp' })
+  endsAt: Date;
 
   @ManyToOne(() => Courses, (courses) => courses.quizzes, {
     onDelete: 'CASCADE',

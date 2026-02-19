@@ -25,7 +25,7 @@ export class QuizDTO {
   startsAt: Date;
 
   @Expose()
-  endsAt?: Date;
+  endsAt: Date;
 
   @Expose()
   @Type(() => CourseDTO)
