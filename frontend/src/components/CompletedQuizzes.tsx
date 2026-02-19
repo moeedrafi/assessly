@@ -45,10 +45,29 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
               </p>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 font-semibold">
               <div className="space-x-1 text-sm">
-                <span className="text-muted-foreground">Started: </span>
-                <span className="text-primary">
+                <span className="text-muted-foreground">Total Marks: </span>
+                <span className="text-primary">{quiz.totalMarks}</span>
+              </div>
+
+              <div className="space-x-1 text-sm">
+                <span className="text-muted-foreground">Passing Marks: </span>
+                <span className="text-primary">{quiz.passingMarks}</span>
+              </div>
+
+              <div className="space-x-1 text-sm">
+                <span className="text-muted-foreground">Time Limit: </span>
+                <span className="text-primary font-semibold">
+                  {quiz.timeLimit} minutes
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <div className="space-x-1 text-sm text-muted-foreground">
+                <span>Started: </span>
+                <span>
                   {startsAt.toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -59,9 +78,9 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
                 </span>
               </div>
 
-              <div className="space-x-1 text-sm">
-                <span className="text-muted-foreground">Ended: </span>
-                <span className="text-primary">
+              <div className="space-x-1 text-sm text-muted-foreground">
+                <span>Ended: </span>
+                <span>
                   {endsAt.toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
