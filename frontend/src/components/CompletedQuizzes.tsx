@@ -28,7 +28,7 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 overflow-y-auto hide-scrollbar max-h-64">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3">
       {completedQuizzes.map((quiz) => {
         const startsAt = new Date(quiz.startsAt);
         const endsAt = new Date(quiz.endsAt);

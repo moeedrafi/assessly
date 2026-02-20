@@ -11,6 +11,7 @@ export const Courses = () => {
       const res = await api.get<TeachingCourse[]>("/admin/courses");
       return res.data;
     },
+    staleTime: 24 * 60,
   });
 
   if (isLoading) return <div className="p-6">Loading...</div>;
@@ -63,7 +64,7 @@ export const Courses = () => {
     <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
       <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {courses.map((course) => (
           <div
             key={course.id}
