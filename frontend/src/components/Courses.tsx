@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { PlusCircle } from "lucide-react";
 import { TeachingCourse } from "@/types/course";
 import { useQuery } from "@tanstack/react-query";
 
@@ -62,7 +63,16 @@ export const Courses = () => {
 
   return (
     <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
-      <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
+        <Link
+          href="/admin/courses/create-course"
+          className="inline-flex items-center gap-2 rounded-md text-white px-4 py-2 bg-secondary hover:bg-secondary/80"
+        >
+          <PlusCircle />
+          View Details
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {courses.map((course) => (
@@ -99,7 +109,7 @@ export const Courses = () => {
 
               <Link
                 href={`/admin/courses/${course.id}`}
-                className="block text-center bg-primary px-4 py-2 text-white rounded-md hover:opacity-80 transition"
+                className="inline-block w-full text-center bg-primary px-4 py-2 text-white rounded-md hover:bg-primary/80 transition"
               >
                 View Details
               </Link>

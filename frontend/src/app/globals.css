@@ -14,7 +14,7 @@
   --text-muted-foreground: hsl(0 0 30%);
 
   --color-primary: hsl(235, 100%, 50%);
-  --color-secondary: hsl(235, 100%, 30%);
+  --color-secondary: hsl(235, 100%, 40%);
 }
 
 .dark {
@@ -31,7 +31,7 @@
   --text-muted-foreground: hsl(0 0 70%);
 
   --color-primary: hsl(235, 100%, 50%);
-  --color-secondary: hsl(235, 100%, 70%);
+  --color-secondary: hsl(235, 100%, 60%);
 }
 
 @theme inline {
@@ -49,15 +49,17 @@
   --color-gradient: var(--gradient);
   --color-gradient-hover: var(--gradient-hover);
 
-  --shadow-inset: inset 0px 4px 10px 2px hsla(0 0% 0% / 0.4),
+  --shadow-inset:
+    inset 0px 4px 10px 2px hsla(0 0% 0% / 0.4),
     inset 0 -4px 6px -4px hsl(0 0% 100%);
-  --shadow-inset-lg: inset 0 6px 6px -4px hsla(0 0% 0% / 0.4),
+  --shadow-inset-lg:
+    inset 0 6px 6px -4px hsla(0 0% 0% / 0.4),
     inset 6px 0 6px -4px hsla(0 0% 0% / 0.4),
     inset -6px 0 6px -4px hsla(0 0% 0% / 0.4),
     inset 0 -6px 6px -4px hsla(0 0% 100% / 1);
   --shadow: 0px 2px 2px hsla(0 0% 0% / 0.19), 0px 4px 4px hsla(0 0% 0% / 0.08);
-  --shadow-lg: 0px 4px 4px hsla(0 0% 0% / 0.19),
-    0px 8px 8px hsla(0 0% 0% / 0.08);
+  --shadow-lg:
+    0px 4px 4px hsla(0 0% 0% / 0.19), 0px 8px 8px hsla(0 0% 0% / 0.08);
 
   --font-lato: var(--font-lato);
 

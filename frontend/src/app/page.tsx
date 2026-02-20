@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
 const features = [
@@ -68,7 +69,7 @@ export default function Home() {
             Assessly
           </Link>
 
-          <nav className="hidden sm:block space-x-5 text-text">
+          <nav className="hidden sm:block space-x-10 text-text">
             <Link href="/">Home</Link>
             <Link href="/">Features</Link>
             <Link href="/">Pricing</Link>
@@ -76,16 +77,18 @@ export default function Home() {
           </nav>
 
           <div className="space-x-2">
-            <Link href="/login">
-              <button className="bg-primary px-3 py-1.5 hover:bg-secondary border border-primary text-white cursor-pointer transition-colors duration-100">
-                Sign In
-              </button>
+            <Link
+              href="/login"
+              className="bg-primary px-3 py-2 hover:bg-secondary border border-primary text-white cursor-pointer transition-colors duration-100"
+            >
+              Sign In
             </Link>
 
-            <Link href="/register">
-              <button className="px-3 py-1.5 border border-primary text-primary cursor-pointer transition-colors duration-100">
-                Sign Up
-              </button>
+            <Link
+              href="/register"
+              className="px-3 py-2 border border-primary text-primary cursor-pointer transition-colors duration-100"
+            >
+              Sign Up
             </Link>
           </div>
         </div>
@@ -104,9 +107,7 @@ export default function Home() {
               tools and intuitive design.
             </p>
 
-            <button className="bg-primary text-white px-5 py-2 rounded-md">
-              Start Now
-            </button>
+            <Button className="px-6">Start Now</Button>
           </div>
         </section>
 
