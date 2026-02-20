@@ -14,6 +14,7 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CourseDTO } from './dtos/course.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { CreateCourseDTO } from './dtos/create-course.dto';
+import { UpdateCourseDTO } from './dtos/update-course.dto';
 
 @Controller('admin/courses')
 @UseGuards(AdminGuard)
@@ -38,7 +39,7 @@ export class AdminCoursesController {
   @Patch(':courseid')
   updateCourse(
     @Param('courseid') courseId: string,
-    @Body() body: CreateCourseDTO,
+    @Body() body: UpdateCourseDTO,
   ) {
     return this.coursesService.update(Number(courseId), body);
   }

@@ -49,10 +49,12 @@ export class CoursesService {
   async update(courseId: number, attr: Partial<Courses>) {
     if (!courseId) throw new BadRequestException('course id is required');
 
-    const result = await this.repo.update(courseId, attr);
-    if (result.affected === 0) throw new NotFoundException('course not found');
+    const course = await this.repo.findOneBy({ id: courseId });
+    if (!course) throw new NotFoundException('course not found');
 
-    const updatedCourse = await this.repo.findOneBy({ id: courseId });
+    Object.assign(course, attr);
+
+    const updatedCourse = await this.repo.save(course);
 
     return {
       data: updatedCourse,
