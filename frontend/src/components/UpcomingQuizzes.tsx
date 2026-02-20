@@ -1,14 +1,14 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { Quiz } from "@/types/quiz";
+import type { Quiz } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 
-export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
-  const { data: completedQuizzes, isLoading } = useQuery({
-    queryKey: ["completedQuizzes"],
+export const UpcomingQuizzes = ({ courseId }: { courseId: string }) => {
+  const { data: upcomingQuizzes, isLoading } = useQuery({
+    queryKey: ["upcomingQuizzes"],
     queryFn: async () => {
-      const res = await api.get<Quiz[]>(`/quiz/admin/${courseId}/completed`);
+      const res = await api.get<Quiz[]>(`/quiz/admin/${courseId}/upcoming`);
       return res.data;
     },
     staleTime: Infinity,
@@ -17,17 +17,21 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading) return <p>loaing...</p>;
-
-  if (!completedQuizzes || completedQuizzes.length === 0) {
+  if (isLoading) {
     return (
-      <p className="text-muted-foreground text-sm">No Completed Quizzes</p>
+      <p className="text-muted-foreground text-sm">
+        Fetching upcoming quizzes...
+      </p>
     );
   }
 
+  if (!upcomingQuizzes || upcomingQuizzes.length === 0) {
+    return <p className="text-muted-foreground text-sm">No Upcoming Quizzes</p>;
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 overflow-y-scroll hide-scrollbar max-h-80">
-      {completedQuizzes.map((quiz) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 overflow-y-scroll hide-scrollbar max-h-80">
+      {upcomingQuizzes.map((quiz) => {
         const startsAt = new Date(quiz.startsAt);
         const endsAt = new Date(quiz.endsAt);
 

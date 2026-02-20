@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { CompletedQuizzes } from "@/components/CompletedQuizzes";
+import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
 
 const stats = [
   {
@@ -134,6 +135,12 @@ const CourseIdPage = async ({
               ))}
             </div>
           </div>
+        </div>
+
+        {/* QUIZ */}
+        <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
+          <h3 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h3>
+          <UpcomingQuizzes courseId={courseId} />
         </div>
 
         {/* QUIZ */}
