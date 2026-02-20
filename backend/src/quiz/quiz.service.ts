@@ -31,10 +31,7 @@ export class QuizService {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     if (!courseId) throw new UnauthorizedException('course id required');
 
-    const course = await this.coursesServices.findOneAdminCourse(
-      courseId,
-      teacherId,
-    );
+    await this.coursesServices.findOneAdminCourse(courseId, teacherId);
 
     const {
       description,
@@ -55,7 +52,7 @@ export class QuizService {
       timeLimit,
       totalMarks,
       isPublished,
-      course,
+      course: { id: courseId },
       startsAt: startsAt ? new Date(startsAt) : new Date(),
       endsAt: endsAt ? new Date(endsAt) : '',
     });

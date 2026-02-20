@@ -11,7 +11,7 @@ const CreateCoursesPage = () => {
           </p>
         </div>
 
-        <CourseForm />
+        <CourseForm mode="create" />
       </div>
     </main>
   );

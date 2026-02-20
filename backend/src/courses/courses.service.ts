@@ -98,12 +98,18 @@ export class CoursesService {
         id: courseId,
         teacher: { id: userId },
       },
-      relations: ['teacher', 'students', 'quizzes'],
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        allowStudentJoin: true,
+        isActive: true,
+      },
     });
 
     if (!course) throw new NotFoundException('course not found');
 
-    return course;
+    return { data: course, message: 'Fetched Successfully' };
   }
 
   /* STUDENT */

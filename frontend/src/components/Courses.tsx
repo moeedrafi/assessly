@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { PlusCircle } from "lucide-react";
+import { EditIcon, PlusCircle } from "lucide-react";
 import { TeachingCourse } from "@/types/course";
 import { useQuery } from "@tanstack/react-query";
 
@@ -81,7 +81,13 @@ export const Courses = () => {
             className="flex flex-col h-full bg-light p-4 space-y-3 border border-color rounded-lg shadow"
           >
             <div className="flex-1 space-y-2">
-              <h3 className="text-lg font-semibold">{course.name}</h3>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold">{course.name}</h3>
+                <Link href={`/admin/courses/${course.id}/edit-course`}>
+                  <EditIcon className="w-5 h-5 text-muted-foreground" />
+                </Link>
+              </div>
+
               <p className="text-muted-foreground text-sm">
                 {course.description}
               </p>

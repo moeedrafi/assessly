@@ -1,9 +1,12 @@
 "use client";
+import Link from "next/link";
 import { api } from "@/lib/api";
+import { useEffect } from "react";
 import { ApiError } from "@/lib/error";
 import { toast } from "react-hot-toast";
 import { useForm } from "@tanstack/react-form";
 import { Button } from "@/components/ui/Button";
+import { useQuery } from "@tanstack/react-query";
 import { CourseFormData, courseSchema } from "@/schemas/course.schemas";
 
 const defaultFormValues: CourseFormData = {
@@ -13,7 +16,13 @@ const defaultFormValues: CourseFormData = {
   isActive: true,
 };
 
-export const CourseForm = () => {
+export const CourseForm = ({
+  courseId,
+  mode = "create",
+}: {
+  mode: "create" | "edit";
+  courseId?: string;
+}) => {
   const form = useForm({
     defaultValues: defaultFormValues,
     validators: { onBlur: courseSchema },
@@ -25,10 +34,18 @@ export const CourseForm = () => {
       }
 
       try {
-        const res = await api.post<void, CourseFormData>(
-          "/admin/courses",
-          validatedData.data,
-        );
+        let res;
+        if (mode === "create") {
+          res = await api.post<void, CourseFormData>(
+            "/admin/courses",
+            validatedData.data,
+          );
+        } else {
+          res = await api.patch<void, CourseFormData>(
+            `/admin/courses/${courseId}`,
+            validatedData.data,
+          );
+        }
 
         toast.success(res.message);
       } catch (error) {
@@ -42,6 +59,30 @@ export const CourseForm = () => {
       }
     },
   });
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["course", courseId],
+    queryFn: () => api.get<CourseFormData>(`/admin/courses/${courseId}`),
+    staleTime: Infinity,
+    enabled: !!courseId,
+  });
+
+  useEffect(() => {
+    if (data?.data) {
+      form.reset(data.data);
+    }
+  }, [data?.data]);
+
+  if (isLoading) return <p>Loading...</p>;
+
+  if (error) {
+    return (
+      <div>
+        <p>Not found</p>
+        <Link href="/admin/courses">Go back to courses</Link>
+      </div>
+    );
+  }
 
   return (
     <form
