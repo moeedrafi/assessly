@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "ghost";
 }
 
 export const Button = ({
@@ -17,6 +17,7 @@ export const Button = ({
   const variantClasses = {
     primary: "bg-primary hover:bg-primary/80",
     secondary: "bg-secondary hover:bg-secondary/80",
+    ghost: "border border-secondary text-secondary hover:bg-secondary/5",
   }[variant];
 
   return (
