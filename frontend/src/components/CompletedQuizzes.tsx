@@ -43,19 +43,17 @@ export const CompletedQuizzes = ({ url }: { url: string }) => {
             <div className="space-y-1 font-semibold">
               <div className="space-x-1 text-sm">
                 <span className="text-muted-foreground">Total Marks: </span>
-                <span className="text-primary">{quiz.totalMarks}</span>
+                <span className="text-secondary">{quiz.totalMarks}</span>
               </div>
 
               <div className="space-x-1 text-sm">
                 <span className="text-muted-foreground">Passing Marks: </span>
-                <span className="text-primary">{quiz.passingMarks}</span>
+                <span className="text-secondary">{quiz.passingMarks}</span>
               </div>
 
               <div className="space-x-1 text-sm">
                 <span className="text-muted-foreground">Time Limit: </span>
-                <span className="text-primary font-semibold">
-                  {quiz.timeLimit} minutes
-                </span>
+                <span className="text-secondary">{quiz.timeLimit} minutes</span>
               </div>
             </div>
 
