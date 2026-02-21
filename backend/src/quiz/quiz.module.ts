@@ -7,6 +7,7 @@ import { QuizController } from 'src/quiz/quiz.controller';
 import { CoursesModule } from 'src/courses/courses.module';
 import { QuestionModule } from 'src/question/question.module';
 import { StudentAnswer } from 'src/quiz/entities/student-answer.entity';
+import { AdminQuizController } from './admin-quiz.controller';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { StudentAnswer } from 'src/quiz/entities/student-answer.entity';
     QuestionModule,
     OptionModule,
   ],
-  controllers: [QuizController],
+  controllers: [QuizController, AdminQuizController],
   providers: [QuizService],
 })
 export class QuizModule {}

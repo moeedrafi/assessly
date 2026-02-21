@@ -8,13 +8,10 @@ export const UpcomingQuizzes = ({ courseId }: { courseId: string }) => {
   const { data: upcomingQuizzes, isLoading } = useQuery({
     queryKey: ["upcomingQuizzes"],
     queryFn: async () => {
-      const res = await api.get<Quiz[]>(`/quiz/admin/${courseId}/upcoming`);
+      const res = await api.get<Quiz[]>(`/admin/quiz/${courseId}/upcoming`);
       return res.data;
     },
     staleTime: Infinity,
-    gcTime: Infinity,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {

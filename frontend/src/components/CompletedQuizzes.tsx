@@ -8,13 +8,10 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
   const { data: completedQuizzes, isLoading } = useQuery({
     queryKey: ["completedQuizzes"],
     queryFn: async () => {
-      const res = await api.get<Quiz[]>(`/quiz/admin/${courseId}/completed`);
+      const res = await api.get<Quiz[]>(`/admin/quiz/${courseId}/completed`);
       return res.data;
     },
     staleTime: Infinity,
-    gcTime: Infinity,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
   });
 
   if (isLoading) return <p>loaing...</p>;

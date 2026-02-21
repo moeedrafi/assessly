@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
-import { UsersService } from 'src/users/users.service';
 import { CoursesService } from 'src/courses/courses.service';
 import { QuestionService } from 'src/question/question.service';
 import { CreateQuizDTO } from './dtos/create-quiz.dto';
@@ -23,6 +22,7 @@ export class QuizService {
     private studentAnswerRepo: Repository<StudentAnswer>,
   ) {}
 
+  /* ADMIN */
   async create(
     teacherId: number,
     courseId: number,
@@ -103,6 +103,7 @@ export class QuizService {
     };
   }
 
+  /* STUDENT */
   async findCompletedQuizzes(teacherId: number, courseId: number) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     if (!courseId) throw new UnauthorizedException('course id required');
