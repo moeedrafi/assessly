@@ -1,16 +1,19 @@
 "use client";
+import { LoaderIcon } from "lucide-react";
 import { ButtonHTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
-  variant?: "primary" | "secondary" | "ghost";
+  loading?: boolean;
+  variant?: "primary" | "secondary" | "ghost" | "destructive" | "outline";
 }
 
 export const Button = ({
   variant = "primary",
   children,
   className,
+  loading,
   icon,
   ...props
 }: ButtonProps) => {
@@ -18,19 +21,21 @@ export const Button = ({
     primary: "bg-primary hover:bg-primary/80",
     secondary: "bg-secondary hover:bg-secondary/80",
     ghost: "border border-secondary text-secondary hover:bg-secondary/5",
+    destructive: "bg-rose-600 hover:bg-rose-500",
+    outline: "border border-color bg-dark hover:bg-bg text-muted-foreground",
   }[variant];
 
   return (
     <button
       {...props}
       className={twMerge(
-        "flex items-center justify-center gap-2 text-white dark:text-black py-2 px-4 whitespace-nowrap rounded-md transition duration-200 disabled:opacity-75 disabled:cursor-not-allowed",
+        "flex items-center border border-transparent justify-center gap-2 text-white dark:text-black py-2 px-4 whitespace-nowrap rounded-md transition duration-200 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed",
         variantClasses,
         className,
       )}
     >
       {icon}
-      {children}
+      {loading ? <LoaderIcon className="animate-spin" /> : children}
     </button>
   );
 };

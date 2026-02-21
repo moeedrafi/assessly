@@ -1,11 +1,19 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { EditIcon, PlusCircle, Trash2Icon } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { api } from "@/lib/api";
-import { EditIcon, PlusCircle } from "lucide-react";
+import { ApiError } from "@/lib/error";
+import { useDialog } from "@/hooks/useDialog";
+import { Button } from "@/components/ui/Button";
 import { TeachingCourse } from "@/types/course";
-import { useQuery } from "@tanstack/react-query";
+import { DeleteModal } from "@/components/DeleteModal";
 
 export const Courses = () => {
+  const queryClient = useQueryClient();
   const { data: courses, isLoading } = useQuery({
     queryKey: ["adminCourses"],
     queryFn: async () => {
@@ -15,49 +23,46 @@ export const Courses = () => {
     staleTime: 24 * 60,
   });
 
+  const { close, dialogRef, open } = useDialog();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+
+  const handleDelete = async () => {
+    if (!selectedCourseId) return;
+    setIsDeleting(true);
+
+    try {
+      const { message } = await api.delete(
+        `/admin/courses/${selectedCourseId}`,
+      );
+      toast.success(message);
+      queryClient.invalidateQueries({ queryKey: ["adminCourses"] });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setIsDeleting(false);
+      close();
+      setSelectedCourseId(null);
+    }
+  };
+
   if (isLoading) return <div className="p-6">Loading...</div>;
 
   if (!courses || courses.length === 0) {
     return (
-      <main className="flex items-center justify-center px-4">
-        <section className="w-full max-w-md rounded-2xl font-lato border border-color bg-bg p-6 sm:p-8 shadow-lg">
-          {/* Heading */}
-          <div className="space-y-2 text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold">Join a Course</h1>
-            <p className="text-sm text-muted-foreground">
-              You haven&apos;t joined any course yet. Enter the code provided by
-              your teacher.
-            </p>
-          </div>
-
-          {/* Form */}
-          <form className="mt-6 space-y-4">
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor="courseCode"
-                className="text-sm font-medium text-text"
-              >
-                Course Code
-              </label>
-              <input
-                required
-                id="courseCode"
-                name="courseCode"
-                type="text"
-                placeholder="e.g. QZ-8F4K"
-                className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90 transition"
-            >
-              Join Course
-            </button>
-          </form>
-        </section>
-      </main>
+      <div className="w-full space-y-2 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold">No Courses Found</h1>
+        <p className="text-sm text-muted-foreground">
+          Create a course to see course yet. Enter the code provided by your
+          teacher.
+        </p>
+      </div>
     );
   }
 
@@ -83,9 +88,24 @@ export const Courses = () => {
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-lg font-semibold">{course.name}</h3>
-                <Link href={`/admin/courses/${course.id}/edit-course`}>
-                  <EditIcon className="w-5 h-5 text-muted-foreground" />
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/admin/courses/${course.id}/edit-course`}
+                    className="text-muted-foreground hover:text-text"
+                  >
+                    <EditIcon className="w-5 h-5" />
+                  </Link>
+
+                  <Button
+                    onClick={() => {
+                      open();
+                      setSelectedCourseId(course.id);
+                    }}
+                    className="p-0 bg-transparent hover:bg-transparent text-red-500 hover:text-red-600"
+                  >
+                    <Trash2Icon className="w-5 h-5" />
+                  </Button>
+                </div>
               </div>
 
               <p className="text-muted-foreground text-sm">
@@ -122,6 +142,13 @@ export const Courses = () => {
             </div>
           </div>
         ))}
+
+        <DeleteModal
+          onDelete={handleDelete}
+          close={close}
+          dialogRef={dialogRef}
+          isLoading={isDeleting}
+        />
       </div>
     </div>
   );
