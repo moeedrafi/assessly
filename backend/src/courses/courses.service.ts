@@ -151,7 +151,9 @@ export class CoursesService {
     if (!userId) throw new UnauthorizedException('user not logged in');
     if (!courseId) throw new BadRequestException('course id is required');
 
-    const user = await this.usersService.findById(userId, ['joinedCourses']);
+    const user = await this.usersService.findById(userId, {
+      relations: ['joinedCourses'],
+    });
     if (!user) throw new NotFoundException('user not found');
 
     if (user.role === UserRole.ADMIN)
@@ -176,7 +178,9 @@ export class CoursesService {
     if (!userId) throw new UnauthorizedException('user not logged in');
     if (!courseId) throw new BadRequestException('course id is required');
 
-    const user = await this.usersService.findById(userId, ['joinedCourses']);
+    const user = await this.usersService.findById(userId, {
+      relations: ['joinedCourses'],
+    });
     if (!user) throw new NotFoundException('user not found');
 
     if (user.role === UserRole.ADMIN)

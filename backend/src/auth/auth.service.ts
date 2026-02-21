@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes, createHash, randomUUID } from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserRole } from 'src/enum';
 import { UsersService } from 'src/users/users.service';
@@ -29,16 +29,19 @@ export class AuthService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  private hashing(password: string) {
-    return bcrypt.hash(password, 10);
+  private hashing(data: string, saltRounds = 10) {
+    return bcrypt.hash(data, saltRounds);
   }
 
   async getTokens(id: number, role: UserRole) {
-    const payload = { sub: id, role };
+    const refreshTokenId = randomUUID();
+
+    const accessPayload = { sub: id, role };
+    const refreshPayload = { sub: id, jti: refreshTokenId };
 
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload),
-      this.jwtService.signAsync(payload, {
+      this.jwtService.signAsync(accessPayload),
+      this.jwtService.signAsync(refreshPayload, {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
         expiresIn: '7d',
       }),
@@ -85,7 +88,7 @@ export class AuthService {
     if (!isCorrect) throw new UnauthorizedException('Invalid credentials');
 
     const tokens = await this.getTokens(user.id, user.role);
-    const hashedRefreshToken = await this.hashing(tokens.refreshToken);
+    const hashedRefreshToken = await this.hashing(tokens.refreshToken, 12);
     await this.usersService.update(user.id, {
       refreshToken: hashedRefreshToken,
     });
@@ -102,17 +105,34 @@ export class AuthService {
 
   async refreshAccessToken(refreshToken: string) {
     try {
-      const payload: { sub: number; name: string } =
+      // 1️⃣ verify token
+      const payload: { sub: number; jti: string } =
         await this.jwtService.verifyAsync(refreshToken, {
           secret: this.configService.get('JWT_REFRESH_SECRET'),
         });
 
-      const user = await this.usersService.findById(payload.sub);
-      if (!user) throw new NotFoundException('User not found');
+      // 2️⃣ fetch user + hashed refresh token
+      const user = await this.usersService.findById(payload.sub, {
+        select: ['refreshToken'],
+      });
+      if (!user || !user.refreshToken) throw new UnauthorizedException();
 
-      return this.getTokens(user.id, user.role);
-    } catch (e) {
-      throw new UnauthorizedException(`Invalid or expired refresh token ${e}`);
+      // 3️⃣ compare hash
+      const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+      if (!isValid) throw new UnauthorizedException();
+
+      // 4️⃣ generate new tokens
+      const { accessToken, refreshToken: newRefreshToken } =
+        await this.getTokens(user.id, user.role);
+
+      // 5️⃣ hash new refresh token and save
+      const hashed = await this.hashing(newRefreshToken);
+      await this.usersService.update(user.id, { refreshToken: hashed });
+
+      // 6️⃣ return new tokens
+      return { accessToken, refreshToken: newRefreshToken };
+    } catch {
+      throw new UnauthorizedException(`Invalid or expired refresh token`);
     }
   }
 

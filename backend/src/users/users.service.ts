@@ -12,8 +12,15 @@ export class UsersService {
     return this.repo.findOne({ where: { email } });
   }
 
-  async findById(id: number, relations?: string[]) {
-    return this.repo.findOne({ where: { id }, relations });
+  async findById(
+    id: number,
+    options?: { relations?: string[]; select?: (keyof User)[] },
+  ) {
+    return this.repo.findOne({
+      where: { id },
+      select: options?.select,
+      relations: options?.relations,
+    });
   }
 
   async create(email: string, password: string, name: string, role: UserRole) {
