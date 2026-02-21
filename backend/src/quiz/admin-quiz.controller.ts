@@ -42,4 +42,14 @@ export class AdminQuizController {
       Number(courseId),
     );
   }
+
+  @Get('completed')
+  getAllCompletedQuizzes(@CurrentUser() user: { sub: number }) {
+    return this.quizServices.findAllCompletedQuizzes(user.sub);
+  }
+
+  @Get('upcoming')
+  getAllUpcomingQuizzes(@CurrentUser() user: { sub: number }) {
+    return this.quizServices.findAllUpcomingQuizzes(user.sub);
+  }
 }

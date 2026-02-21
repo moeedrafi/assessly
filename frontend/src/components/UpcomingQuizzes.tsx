@@ -4,11 +4,11 @@ import { api } from "@/lib/api";
 import type { Quiz } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 
-export const UpcomingQuizzes = ({ courseId }: { courseId: string }) => {
+export const UpcomingQuizzes = ({ url }: { url: string }) => {
   const { data: upcomingQuizzes, isLoading } = useQuery({
     queryKey: ["upcomingQuizzes"],
     queryFn: async () => {
-      const res = await api.get<Quiz[]>(`/admin/quiz/${courseId}/upcoming`);
+      const res = await api.get<Quiz[]>(url);
       return res.data;
     },
     staleTime: Infinity,
@@ -35,7 +35,7 @@ export const UpcomingQuizzes = ({ courseId }: { courseId: string }) => {
         return (
           <div
             key={quiz.id}
-            className="bg-light p-4 space-y-4 border border-color rounded-lg shadow"
+            className="flex flex-col gap-4 bg-light p-4 border border-color rounded-lg shadow"
           >
             <div className="flex-1 space-y-2">
               <h3 className="text-lg font-semibold">{quiz.name}</h3>
@@ -47,19 +47,17 @@ export const UpcomingQuizzes = ({ courseId }: { courseId: string }) => {
             <div className="space-y-1 font-semibold">
               <div className="space-x-1 text-sm">
                 <span className="text-muted-foreground">Total Marks: </span>
-                <span className="text-primary">{quiz.totalMarks}</span>
+                <span className="text-secondary">{quiz.totalMarks}</span>
               </div>
 
               <div className="space-x-1 text-sm">
                 <span className="text-muted-foreground">Passing Marks: </span>
-                <span className="text-primary">{quiz.passingMarks}</span>
+                <span className="text-secondary">{quiz.passingMarks}</span>
               </div>
 
               <div className="space-x-1 text-sm">
                 <span className="text-muted-foreground">Time Limit: </span>
-                <span className="text-primary font-semibold">
-                  {quiz.timeLimit} minutes
-                </span>
+                <span className="text-secondary">{quiz.timeLimit} minutes</span>
               </div>
             </div>
 
@@ -91,10 +89,11 @@ export const UpcomingQuizzes = ({ courseId }: { courseId: string }) => {
               </div>
             </div>
 
-            <Link href="/quizzes/1/result">
-              <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
-                View Details
-              </button>
+            <Link
+              href={`/quizzes/${quiz.id}/edit-quiz`}
+              className="w-full text-center border border-secondary text-secondary hover:bg-secondary/5 px-4 py-2 rounded-md"
+            >
+              Edit Quiz
             </Link>
           </div>
         );

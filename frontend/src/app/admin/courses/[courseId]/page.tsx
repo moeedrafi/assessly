@@ -140,13 +140,13 @@ const CourseIdPage = async ({
         {/* QUIZ */}
         <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h3>
-          <UpcomingQuizzes courseId={courseId} />
+          <UpcomingQuizzes url={`/admin/quiz/${courseId}/upcoming`} />
         </div>
 
         {/* QUIZ */}
         <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h3>
-          <CompletedQuizzes courseId={courseId} />
+          <CompletedQuizzes url={`/admin/quiz/${courseId}/completed`} />
         </div>
       </section>
     </main>

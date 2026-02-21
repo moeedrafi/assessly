@@ -4,11 +4,11 @@ import { api } from "@/lib/api";
 import { Quiz } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 
-export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
+export const CompletedQuizzes = ({ url }: { url: string }) => {
   const { data: completedQuizzes, isLoading } = useQuery({
     queryKey: ["completedQuizzes"],
     queryFn: async () => {
-      const res = await api.get<Quiz[]>(`/admin/quiz/${courseId}/completed`);
+      const res = await api.get<Quiz[]>(url);
       return res.data;
     },
     staleTime: Infinity,
@@ -31,7 +31,7 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
         return (
           <div
             key={quiz.id}
-            className="bg-light p-4 space-y-4 border border-color rounded-lg shadow"
+            className="flex flex-col gap-4 bg-light p-4 border border-color rounded-lg shadow"
           >
             <div className="flex-1 space-y-2">
               <h3 className="text-lg font-semibold">{quiz.name}</h3>
@@ -87,10 +87,11 @@ export const CompletedQuizzes = ({ courseId }: { courseId: string }) => {
               </div>
             </div>
 
-            <Link href="/quizzes/1/result">
-              <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
-                View Details
-              </button>
+            <Link
+              href={`/quizzes/${quiz.id}/result`}
+              className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
+            >
+              View Details
             </Link>
           </div>
         );

@@ -103,6 +103,44 @@ export class QuizService {
     };
   }
 
+  async findAllCompletedQuizzes(teacherId: number) {
+    if (!teacherId) throw new UnauthorizedException('not authenticated');
+    const now = new Date();
+
+    const quizzes = await this.repo
+      .createQueryBuilder('quiz')
+      .leftJoin('quiz.course', 'course')
+      .leftJoin('course.teacher', 'teacher')
+      .where('teacher.id = :teacherId', { teacherId })
+      .andWhere('quiz.endsAt < :now', { now })
+      .getMany();
+
+    return {
+      data: quizzes,
+      message: 'Successfully fetched all completed quizzes',
+      meta: null,
+    };
+  }
+
+  async findAllUpcomingQuizzes(teacherId: number) {
+    if (!teacherId) throw new UnauthorizedException('not authenticated');
+    const now = new Date();
+
+    const quizzes = await this.repo
+      .createQueryBuilder('quiz')
+      .leftJoin('quiz.course', 'course')
+      .leftJoin('course.teacher', 'teacher')
+      .where('teacher.id = :teacherId', { teacherId })
+      .andWhere('quiz.endsAt > :now', { now })
+      .getMany();
+
+    return {
+      data: quizzes,
+      message: 'Successfully fetched all Upcoming quizzes',
+      meta: null,
+    };
+  }
+
   /* STUDENT */
   async findCompletedQuizzes(teacherId: number, courseId: number) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
