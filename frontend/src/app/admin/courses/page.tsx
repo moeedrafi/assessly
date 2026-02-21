@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 import { Courses } from "@/components/Courses";
 
 const AdminCoursesPage = () => {
@@ -11,7 +13,20 @@ const AdminCoursesPage = () => {
           </p>
         </div>
 
-        <Courses />
+        <div className="space-y-6 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
+            <Link
+              href="/admin/courses/create-course"
+              className="inline-flex items-center gap-2 rounded-md text-white px-4 py-2 bg-secondary hover:bg-secondary/80"
+            >
+              <PlusCircle />
+              Create Course
+            </Link>
+          </div>
+
+          <Courses />
+        </div>
       </section>
     </main>
   );
