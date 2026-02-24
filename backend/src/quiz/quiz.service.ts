@@ -141,6 +141,27 @@ export class QuizService {
     };
   }
 
+  async findOneAdminQuiz(teacherId: number, quizId: number) {
+    if (!teacherId) throw new UnauthorizedException('not authenticated');
+    if (!quizId) throw new UnauthorizedException('quiz not found');
+
+    const quiz = await this.repo
+      .createQueryBuilder('quiz')
+      .leftJoin('quiz.course', 'course')
+      .leftJoin('course.teacher', 'teacher')
+      .leftJoinAndSelect('quiz.questions', 'question')
+      .leftJoinAndSelect('question.options', 'options')
+      .addSelect(['course.name', 'teacher.name'])
+      .where('quiz.id = :quizId', { quizId })
+      .andWhere('teacher.id = :teacherId', { teacherId })
+      .getOne();
+
+    return {
+      data: quiz,
+      message: 'Successfully fetched quiz',
+    };
+  }
+
   /* STUDENT */
   async findCompletedQuizzes(teacherId: number, courseId: number) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');

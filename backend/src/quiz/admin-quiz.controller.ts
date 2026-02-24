@@ -5,6 +5,7 @@ import { QuizService } from 'src/quiz/quiz.service';
 import { CreateQuizDTO } from './dtos/create-quiz.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { QuizDTO } from './dtos/quiz.dto';
+import { QuizDetailDTO } from './dtos/quiz-detail.dto';
 
 @Controller('/admin/quiz')
 @UseGuards(AdminGuard)
@@ -51,5 +52,15 @@ export class AdminQuizController {
   @Get('upcoming')
   getAllUpcomingQuizzes(@CurrentUser() user: { sub: number }) {
     return this.quizServices.findAllUpcomingQuizzes(user.sub);
+  }
+
+  @Serialize(QuizDetailDTO)
+  @Get(':quizid')
+  getOneQuiz(
+    @CurrentUser() user: { sub: number },
+    @Param('quizid') quizId: string,
+  ) {
+    // TODO: separate quiz and question + option into two apis
+    return this.quizServices.findOneAdminQuiz(user.sub, Number(quizId));
   }
 }

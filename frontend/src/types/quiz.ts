@@ -11,3 +11,15 @@ export interface Quiz {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface QuizDetail extends Quiz {
+  course: string;
+  teacher: string;
+  questions: {
+    id: number;
+    marks: number;
+    text: string;
+    type: string;
+    options: { id: number; text: string; isCorrect: boolean }[];
+  }[];
+}

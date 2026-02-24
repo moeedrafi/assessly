@@ -90,7 +90,7 @@ export const UpcomingQuizzes = ({ url }: { url: string }) => {
             </div>
 
             <Link
-              href={`/quizzes/${quiz.id}/edit-quiz`}
+              href={`/admin/quizzes/${quiz.id}`}
               className="w-full text-center border border-secondary text-secondary hover:bg-secondary/5 px-4 py-2 rounded-md"
             >
               Edit Quiz

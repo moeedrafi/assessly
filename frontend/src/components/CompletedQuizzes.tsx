@@ -86,7 +86,7 @@ export const CompletedQuizzes = ({ url }: { url: string }) => {
             </div>
 
             <Link
-              href={`/quizzes/${quiz.id}/result`}
+              href={`/admin/quizzes/${quiz.id}`}
               className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
             >
               View Details

@@ -4,6 +4,9 @@ import { OptionDTO } from 'src/option/dtos/option.dto';
 
 export class QuestionDTO {
   @Expose()
+  id: number;
+
+  @Expose()
   text: string;
 
   @Expose()
