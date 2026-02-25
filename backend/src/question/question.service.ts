@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './question.entity';
 import { OptionService } from 'src/option/option.service';
@@ -24,5 +24,18 @@ export class QuestionService {
     }
 
     return savedQuestion;
+  }
+
+  async findAll(quizId: number) {
+    if (!quizId) throw new NotFoundException('quiz not found');
+
+    const question = await this.repo
+      .createQueryBuilder('question')
+      .leftJoin('question.quiz', 'quiz')
+      .leftJoinAndSelect('question.options', 'options')
+      .where('quiz.id = :quizId', { quizId })
+      .getMany();
+
+    return { data: question, message: 'Successfully fetched questions' };
   }
 }

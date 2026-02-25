@@ -1,6 +1,4 @@
-import { Expose, Transform, Type } from 'class-transformer';
-import { CourseDTO } from 'src/courses/dtos/course.dto';
-import { QuestionDTO } from 'src/question/dtos/question.dto';
+import { Expose, Transform } from 'class-transformer';
 
 export class QuizDetailDTO {
   @Expose()
@@ -34,8 +32,4 @@ export class QuizDetailDTO {
   @Expose()
   @Transform(({ obj }) => obj.course.teacher.name)
   teacher: string;
-
-  @Expose()
-  @Type(() => QuestionDTO)
-  questions: QuestionDTO[];
 }

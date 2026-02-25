@@ -149,8 +149,6 @@ export class QuizService {
       .createQueryBuilder('quiz')
       .leftJoin('quiz.course', 'course')
       .leftJoin('course.teacher', 'teacher')
-      .leftJoinAndSelect('quiz.questions', 'question')
-      .leftJoinAndSelect('question.options', 'options')
       .addSelect(['course.name', 'teacher.name'])
       .where('quiz.id = :quizId', { quizId })
       .andWhere('teacher.id = :teacherId', { teacherId })

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { QuizService } from 'src/quiz/quiz.service';
@@ -58,9 +66,8 @@ export class AdminQuizController {
   @Get(':quizid')
   getOneQuiz(
     @CurrentUser() user: { sub: number },
-    @Param('quizid') quizId: string,
+    @Param('quizid', ParseIntPipe) quizId: number,
   ) {
-    // TODO: separate quiz and question + option into two apis
-    return this.quizServices.findOneAdminQuiz(user.sub, Number(quizId));
+    return this.quizServices.findOneAdminQuiz(user.sub, quizId);
   }
 }

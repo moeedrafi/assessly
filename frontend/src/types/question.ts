@@ -1,7 +1,10 @@
-export interface Question {
-  question: string;
+import { OptionBase } from "./option";
+
+export interface QuestionBase {
+  id: number;
+  text: string;
   type: string;
-  options: string[];
+  marks: number;
 }
 
 export interface QuizCreate {
@@ -10,4 +13,8 @@ export interface QuizCreate {
   startTime: string;
   description: string;
   questions: Question[];
+}
+
+export interface Question extends QuestionBase {
+  options: OptionBase[];
 }

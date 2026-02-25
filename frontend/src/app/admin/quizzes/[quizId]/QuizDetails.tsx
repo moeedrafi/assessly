@@ -1,26 +1,54 @@
+"use client";
+import Link from "next/link";
 import { api } from "@/lib/api";
-import { cookies } from "next/headers";
+import { QuizDetail } from "@/types/quiz";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { useQueries } from "@tanstack/react-query";
+import { Question } from "@/types/question";
 
-const QuizIdPage = async ({
-  params,
-}: {
-  params: Promise<{ quizId: string }>;
-}) => {
-  const { quizId } = await params;
+const QuizIdPage = () => {
+  const { quizId } = useParams();
 
-  const cookieStore = await cookies();
-
-  const { data } = await api.get(`/admin/quiz/${quizId}`, {
-    Cookie: cookieStore.toString(),
+  const [
+    { data, isLoading, error },
+    { data: questions, isLoading: questionLoading, error: questionerror },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ["quiz", quizId],
+        queryFn: async () => {
+          const res = await api.get<QuizDetail>(`/admin/quiz/${quizId}`);
+          return res.data;
+        },
+        enabled: !!quizId,
+        staleTime: Infinity,
+      },
+      {
+        queryKey: ["questions", quizId],
+        queryFn: async () => {
+          const res = await api.get<Question[]>(`/question/${quizId}`);
+          return res.data;
+        },
+        enabled: !!quizId,
+        staleTime: Infinity,
+      },
+    ],
   });
+
+  if (isLoading) return <p>LOADING....</p>;
+  if (error) return <p>error</p>;
+  if (!data) return <p>No data found</p>;
+
+  if (questionLoading) return <p>LOADING....</p>;
+  if (questionerror) return <p>error</p>;
+  if (!questions) return <p>NO Questions</p>;
 
   return (
     <main>
       <section className="w-full font-lato space-y-4 px-2 py-4">
-        <h2>What</h2>
-
         {/* Heading */}
-        {/* <div className="space-y-2 text-center p-6 sm:p-8">
+        <div className="space-y-2 text-center p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold">{data.name}</h1>
           <p className="text-sm text-muted-foreground">
             {data.course} - {data.teacher}
@@ -74,7 +102,7 @@ const QuizIdPage = async ({
               Delete Quiz
             </Button>
           </div>
-        </div> */}
+        </div>
       </section>
     </main>
   );
