@@ -20,3 +20,33 @@ export const loadFromStorage = (key: string) => {
     return null;
   }
 };
+
+function getOrdinal(n: number) {
+  if (n > 3 && n < 21) return "th";
+  switch (n % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}
+
+export const formattedDateTime = (iso: string) => {
+  const date = new Date(iso);
+  const day = date.getDate();
+  const suffix = getOrdinal(day);
+
+  const month = date.toLocaleString("en-GB", { month: "short" });
+  const year = date.getFullYear();
+  const time = date.toLocaleString("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${day}${suffix} ${month}, ${year} — ${time}`;
+};

@@ -147,8 +147,8 @@ export class QuizService {
 
     const quiz = await this.repo
       .createQueryBuilder('quiz')
-      .leftJoin('quiz.course', 'course')
-      .leftJoin('course.teacher', 'teacher')
+      .innerJoin('quiz.course', 'course')
+      .innerJoin('course.teacher', 'teacher')
       .addSelect(['course.name', 'teacher.name'])
       .where('quiz.id = :quizId', { quizId })
       .andWhere('teacher.id = :teacherId', { teacherId })

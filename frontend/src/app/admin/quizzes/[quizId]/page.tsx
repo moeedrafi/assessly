@@ -1,5 +1,15 @@
 import { api } from "@/lib/api";
+import { Suspense } from "react";
 import { cookies } from "next/headers";
+import { QuizDetails } from "./QuizDetails";
+import type { QuizDetail } from "@/types/quiz";
+import { Skeleton } from "@/components/Skeleton";
+import { QuestionDetails } from "./QuestionDetails";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
 const QuizIdPage = async ({
   params,
@@ -7,74 +17,30 @@ const QuizIdPage = async ({
   params: Promise<{ quizId: string }>;
 }) => {
   const { quizId } = await params;
-
   const cookieStore = await cookies();
+  const queryClient = new QueryClient();
 
-  const { data } = await api.get(`/admin/quiz/${quizId}`, {
-    Cookie: cookieStore.toString(),
+  await queryClient.prefetchQuery({
+    queryKey: ["quiz", quizId],
+    queryFn: async () => {
+      const { data } = await api.get<QuizDetail>(`/admin/quiz/${quizId}`, {
+        Cookie: cookieStore.toString(),
+      });
+
+      return data;
+    },
   });
 
   return (
     <main>
       <section className="w-full font-lato space-y-4 px-2 py-4">
-        <h2>What</h2>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <QuizDetails />
 
-        {/* Heading */}
-        {/* <div className="space-y-2 text-center p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">{data.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            {data.course} - {data.teacher}
-          </p>
-        </div>
-
-        <div className="space-y-4 bg-bg p-6 sm:p-8 border border-color shadow-lg rounded-lg">
-          <p className="text-sm text-muted-foreground">{data.description}</p>
-
-          <div>
-            <div className="space-x-1">
-              <span className="text-muted-foreground">Duration: </span>
-              <span className="text-primary font-semibold">
-                {data.timeLimit} minutes
-              </span>
-            </div>
-
-            <div className="space-x-1">
-              <span className="text-muted-foreground">Questions: </span>
-              <span className="text-primary font-semibold">20</span>
-            </div>
-          </div>
-
-          <h2 className="text-xl sm:text-2xl font-bold">Questions</h2>
-
-          {questions.map((question, idx) => (
-            <details
-              key={question.id}
-              className="mb-2 border border-color p-2 rounded-md"
-            >
-              <summary className="font-semibold">
-                Question {idx + 1}. {question.text}
-              </summary>
-              <ul className="list-decimal list-outside pl-8 space-y-1 text-muted-foreground mt-2">
-                {question.options.map((option) => (
-                  <li key={option.id}>{option.text}</li>
-                ))}
-              </ul>
-            </details>
-          ))}
-
-          <div className="flex items-center gap-3">
-            <Link
-              href={`/admin/quizzes/${quizId}/edit`}
-              className="bg-primary px-6 py-2 text-white rounded-md hover:bg-primary/80"
-            >
-              Edit Quiz
-            </Link>
-
-            <Button variant="destructive" className="px-6">
-              Delete Quiz
-            </Button>
-          </div>
-        </div> */}
+          <Suspense fallback={<Skeleton max={1} />}>
+            <QuestionDetails />
+          </Suspense>
+        </HydrationBoundary>
       </section>
     </main>
   );
