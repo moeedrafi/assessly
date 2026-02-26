@@ -1,10 +1,12 @@
-export interface Quiz {
+import { CreateQuestion } from "@/types/question";
+
+export interface QuizEntity {
   id: number;
   name: string;
   description: string;
   totalMarks: number;
   timeLimit: number;
-  passingMarks?: number;
+  passingMarks: number;
   isPublished: boolean;
   startsAt: string;
   endsAt: string;
@@ -12,7 +14,11 @@ export interface Quiz {
   updatedAt: string;
 }
 
-export interface QuizDetail extends Quiz {
+export interface QuizDetail extends QuizEntity {
   course: string;
   teacher: string;
 }
+
+export type CreateQuiz = Omit<QuizEntity, "id" | "createdAt" | "updatedAt"> & {
+  questions: CreateQuestion[];
+};

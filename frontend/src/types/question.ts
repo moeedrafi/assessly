@@ -1,20 +1,16 @@
-import { OptionBase } from "./option";
+import { CreateOption, OptionEntity } from "@/types/option";
 
-export interface QuestionBase {
+export interface QuestionEntity {
   id: number;
   text: string;
   type: string;
   marks: number;
 }
 
-export interface QuizCreate {
-  name: string;
-  duration: number;
-  startTime: string;
-  description: string;
-  questions: Question[];
-}
+export type CreateQuestion = Omit<QuestionEntity, "id"> & {
+  options: CreateOption[];
+};
 
-export interface Question extends QuestionBase {
-  options: OptionBase[];
+export interface QuestionDetail extends QuestionEntity {
+  options: OptionEntity[];
 }

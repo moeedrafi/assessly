@@ -1,14 +1,14 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { Quiz } from "@/types/quiz";
+import { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 
 export const CompletedQuizzes = ({ url }: { url: string }) => {
   const { data: completedQuizzes, isLoading } = useQuery({
     queryKey: ["completedQuizzes"],
     queryFn: async () => {
-      const res = await api.get<Quiz[]>(url);
+      const res = await api.get<QuizEntity[]>(url);
       return res.data;
     },
     staleTime: Infinity,

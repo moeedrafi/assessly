@@ -1,15 +1,28 @@
 "use client";
-
-import { QuizCreate } from "@/types/question";
+import type { CreateQuiz } from "@/types/quiz";
 import { useForm } from "@tanstack/react-form";
 
-const defaultFormValues: QuizCreate = {
+const defaultFormValues: CreateQuiz = {
   name: "",
-  duration: 0,
-  startTime: "",
+  startsAt: "",
+  endsAt: "",
   description: "",
+  timeLimit: 0,
+  totalMarks: 0,
+  passingMarks: 0,
+  isPublished: true,
   questions: [
-    { question: "", type: "single_choice", options: ["", "", "", ""] },
+    {
+      marks: 0,
+      text: "",
+      type: "single_choice",
+      options: [
+        { isCorrect: true, text: "" },
+        { isCorrect: false, text: "" },
+        { isCorrect: false, text: "" },
+        { isCorrect: false, text: "" },
+      ],
+    },
   ],
 };
 
@@ -30,7 +43,7 @@ export const CreateQuizForm = () => {
         form.handleSubmit();
       }}
     >
-      {/* Name */}
+      {/* NAME */}
       <form.Field name="name">
         {(field) => (
           <div className="flex flex-col gap-1">
@@ -48,9 +61,9 @@ export const CreateQuizForm = () => {
         )}
       </form.Field>
 
-      {/* DURATION + Type */}
+      {/* TIME LIMIT + START AND END TIME */}
       <div className="flex flex-col md:flex-row gap-3">
-        <form.Field name="duration">
+        <form.Field name="timeLimit">
           {(field) => (
             <div className="w-full flex flex-col gap-1">
               <label htmlFor={field.name}>Duration (in minutes)</label>
@@ -68,10 +81,27 @@ export const CreateQuizForm = () => {
           )}
         </form.Field>
 
-        <form.Field name="startTime">
+        <form.Field name="startsAt">
           {(field) => (
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor={field.name}>Start Time</label>
+              <label htmlFor={field.name}>Start Date & Time</label>
+              <input
+                id={field.name}
+                name={field.name}
+                type="datetime-local"
+                value={field.state.value}
+                aria-invalid={!field.state.meta.isValid}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+              />
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field name="endsAt">
+          {(field) => (
+            <div className="w-full flex flex-col gap-1">
+              <label htmlFor={field.name}>End Date & Time</label>
               <input
                 id={field.name}
                 name={field.name}
@@ -86,7 +116,7 @@ export const CreateQuizForm = () => {
         </form.Field>
       </div>
 
-      {/* Desc */}
+      {/* DESC */}
       <form.Field name="description">
         {(field) => (
           <div className="flex flex-col gap-1">
@@ -104,7 +134,7 @@ export const CreateQuizForm = () => {
         )}
       </form.Field>
 
-      {/* Questions */}
+      {/* QUESTIONS */}
       <div className="space-y-4">
         <h2 className="text-xl sm:text-2xl font-bold">Questions</h2>
 
@@ -119,7 +149,7 @@ export const CreateQuizForm = () => {
                   <div className="flex items-center gap-3">
                     <form.Field
                       key={`question-${i}`}
-                      name={`questions[${i}].question`}
+                      name={`questions[${i}].text`}
                     >
                       {(subField) => (
                         <div key={i} className="w-full flex flex-col gap-1">
@@ -180,7 +210,12 @@ export const CreateQuizForm = () => {
                       <>
                         <div key={i} className="w-full flex flex-col gap-1">
                           <button
-                            onClick={() => optionsField.pushValue("")}
+                            onClick={() =>
+                              optionsField.pushValue({
+                                text: "",
+                                isCorrect: false,
+                              })
+                            }
                             className="self-end text-secondary hover:text-primary cursor-pointer transition-colors"
                           >
                             + Add Option
@@ -202,13 +237,16 @@ export const CreateQuizForm = () => {
                                     <input
                                       id={optionField.name}
                                       name={optionField.name}
-                                      value={optionField.state.value}
+                                      value={optionField.state.value.text}
                                       placeholder="Enter option"
                                       aria-invalid={
                                         !optionField.state.meta.isValid
                                       }
                                       onChange={(e) =>
-                                        optionField.handleChange(e.target.value)
+                                        optionField.handleChange({
+                                          ...optionField.state.value,
+                                          text: e.target.value,
+                                        })
                                       }
                                       className="w-full bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
                                     />
@@ -239,9 +277,13 @@ export const CreateQuizForm = () => {
               <button
                 onClick={() =>
                   field.pushValue({
-                    question: "",
+                    text: "",
+                    marks: 0,
                     type: "",
-                    options: ["", "", "", ""],
+                    options: [
+                      { isCorrect: true, text: "" },
+                      { isCorrect: false, text: "" },
+                    ],
                   })
                 }
                 className="text-secondary hover:text-primary cursor-pointer transition-colors"
