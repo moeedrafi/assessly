@@ -73,13 +73,7 @@ export class CoursesService {
 
   async findAllAdminCourses(userId: number) {
     if (!userId) throw new UnauthorizedException();
-
-    const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException();
-
-    const courses = await this.repo.find({
-      where: { teacher: { id: userId } },
-    });
+    const courses = await this.repo.findBy({ teacher: { id: userId } });
 
     return {
       data: courses,
