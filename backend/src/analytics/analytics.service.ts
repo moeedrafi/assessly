@@ -47,10 +47,16 @@ export class AnalyticsService {
 
     const users = await this.userRepo
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.joinedCourses', 'joinedCourses')
+      .leftJoin('user.joinedCourses', 'joinedCourses')
+      .select([
+        'user.id',
+        'user.name',
+        'user.email',
+        'joinedCourses.id',
+        'joinedCourses.name',
+      ])
       .where('joinedCourses.id IN (:...courseIds)', { courseIds })
       .andWhere('user.role != :role', { role: 'ADMIN' })
-      .addSelect(['joinedCourses.id', 'joinedCourses.name'])
       .orderBy('user.createdAt', 'DESC')
       .limit(limit)
       .getMany();
