@@ -1,3 +1,5 @@
+import { Stats } from "@/components/Stats";
+
 const AdminDashboardPage = () => {
   const courses = 1;
 
@@ -55,6 +57,8 @@ const AdminDashboardPage = () => {
             View Details of the courses you are managing
           </p>
         </div>
+
+        <Stats />
 
         <div className="space-y-2 bg-bg p-6 sm:p-8 shadow border border-color rounded-lg">
           <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
