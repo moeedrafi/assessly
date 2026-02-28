@@ -5,6 +5,7 @@ import { User } from 'src/users/user.entity';
 import { Courses } from 'src/courses/courses.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { DashboardKpisDTO } from './dtos/dashboard-kpis.dto';
+import { RecentUserDTO } from './dtos/recent-user.dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -19,14 +20,7 @@ export class AnalyticsService {
     private readonly quizRepo: Repository<Quiz>,
   ) {}
 
-  async getDashboardAnalytics() {
-    await Promise.all([
-      this.getDashboardKpis(),
-      this.getRecentRegisteredUsers(),
-      this.getCourseSnapshots,
-      this.getDashboardAlerts(),
-    ]);
-  }
+  async getDashboardAnalytics() {}
 
   async getDashboardKpis(): Promise<DashboardKpisDTO> {
     const [totalUsers, totalCourses, totalQuizzes] = await Promise.all([
@@ -42,7 +36,35 @@ export class AnalyticsService {
     };
   }
 
-  async getRecentRegisteredUsers(limit = 5) {}
+  async getRecentRegisteredUsers(
+    userId: number,
+    limit: number = 5,
+  ): Promise<RecentUserDTO[]> {
+    const courses = await this.courseRepo.find({
+      where: { teacher: { id: userId } },
+    });
+    const courseIds = courses.map((c) => c.id);
+
+    const users = await this.userRepo
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.joinedCourses', 'joinedCourses')
+      .where('joinedCourses.id IN (:...courseIds)', { courseIds })
+      .andWhere('user.role != :role', { role: 'ADMIN' })
+      .addSelect(['joinedCourses.id', 'joinedCourses.name'])
+      .orderBy('user.createdAt', 'DESC')
+      .limit(limit)
+      .getMany();
+
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      joinedCourses: (user.joinedCourses || []).map((course) => ({
+        id: course.id,
+        name: course.name,
+      })),
+    }));
+  }
 
   async getCourseSnapshots() {}
 

@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import { cookies } from "next/headers";
 import { StatsCard } from "@/types/analytics";
-import { LibraryBigIcon } from "lucide-react";
+import { BookIcon, BookOpenCheckIcon, LibraryBigIcon } from "lucide-react";
 
 export const Stats = async () => {
   const cookieStore = await cookies();
@@ -23,19 +23,19 @@ export const Stats = async () => {
           {
             title: "Total Courses",
             value: data.totalCourses,
-            icon: LibraryBigIcon,
+            icon: BookIcon,
           },
           {
             title: "Total Quizzes",
             value: data.totalQuizzes,
-            icon: LibraryBigIcon,
+            icon: BookOpenCheckIcon,
           },
         ].map((stat, idx) => {
           const Icon = stat.icon;
           return (
             <div
               key={idx}
-              className="bg-light p-4 space-y-4 border border-color rounded-lg hover:shadow-md transition-shadow duration-200"
+              className="bg-light p-4 space-y-4 border border-color rounded-lg"
             >
               <div className="bg-primary w-max p-2 rounded-lg">
                 <Icon className="text-white w-6 h-6" />

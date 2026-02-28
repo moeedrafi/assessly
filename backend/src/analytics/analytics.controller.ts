@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AnalyticsService } from 'src/analytics/analytics.service';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 
 @Controller('analytics')
 export class AnalyticsController {
@@ -22,8 +23,11 @@ export class AnalyticsController {
   }
 
   @Get('recent-users')
-  getRecentRegisteredUsers() {
-    return this.analyticsService.getRecentRegisteredUsers();
+  async getRecentRegisteredUsers(
+    @CurrentUser() user: { sub: number; role: string },
+  ) {
+    const data = await this.analyticsService.getRecentRegisteredUsers(user.sub);
+    return { data, message: 'Fetched recent users successfully', meta: null };
   }
 
   @Get('course-snapshots')

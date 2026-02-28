@@ -1,8 +1,23 @@
-import { IsDate, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsDate,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
-export class RecentUserDto {
+class JoinedCourseDTO {
+  @IsNumber()
+  id: number;
+
   @IsString()
-  id: string;
+  name: string;
+}
+
+export class RecentUserDTO {
+  @IsNumber()
+  id: number;
 
   @IsString()
   name: string;
@@ -10,6 +25,8 @@ export class RecentUserDto {
   @IsString()
   email: string;
 
-  @IsDate()
-  createdAt: Date;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => JoinedCourseDTO)
+  joinedCourses: JoinedCourseDTO[];
 }

@@ -1,6 +1,16 @@
+import { api } from "@/lib/api";
+import { cookies } from "next/headers";
 import { Stats } from "@/components/Stats";
+import type { RecentUser } from "@/types/analytics";
+import { RecentJoinedUsers } from "@/components/RecentJoinedUsers";
 
-const AdminDashboardPage = () => {
+const AdminDashboardPage = async () => {
+  const cookieStore = await cookies();
+
+  const { data } = await api.get<RecentUser[]>("/analytics/recent-users", {
+    Cookie: cookieStore.toString(),
+  });
+
   const courses = 1;
 
   if (!courses) {
@@ -59,6 +69,7 @@ const AdminDashboardPage = () => {
         </div>
 
         <Stats />
+        <RecentJoinedUsers initialData={data} />
 
         <div className="space-y-2 bg-bg p-6 sm:p-8 shadow border border-color rounded-lg">
           <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
