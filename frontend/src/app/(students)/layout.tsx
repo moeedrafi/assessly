@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { UserRole } from "@/types/user";
 import { Sidebar } from "@/components/Sidebar";
 import { SIDEBAR_ROUTES } from "@/lib/sidebar-routes";
 
@@ -14,7 +15,7 @@ export default function StudentLayout({
 }>) {
   return (
     <div className="grid md:grid-cols-[260px_1fr]">
-      <Sidebar basePath="" role="student" routes={SIDEBAR_ROUTES} />
+      <Sidebar basePath="" role={UserRole.USER} routes={SIDEBAR_ROUTES} />
 
       {children}
     </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/Sidebar";
 import { SIDEBAR_ROUTES } from "@/lib/sidebar-routes";
+import { UserRole } from "@/types/user";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +15,11 @@ export default function AdminLayout({
 }>) {
   return (
     <div className="grid md:grid-cols-[260px_1fr]">
-      <Sidebar basePath="/admin" role="admin" routes={SIDEBAR_ROUTES} />
+      <Sidebar
+        basePath="/admin"
+        role={UserRole.ADMIN}
+        routes={SIDEBAR_ROUTES}
+      />
 
       {children}
     </div>

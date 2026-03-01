@@ -1,6 +1,7 @@
+import { UserRole } from "@/types/user";
+import { SidebarRoute } from "@/lib/sidebar-routes";
 import { SidebarLink } from "@/components/SidebarLink";
 import { LogoutButton } from "@/components/LogoutButton";
-import { SidebarRoute, UserRole } from "@/lib/sidebar-routes";
 
 export const Sidebar = ({
   basePath,
