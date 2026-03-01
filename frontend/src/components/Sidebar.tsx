@@ -1,5 +1,6 @@
+import { SidebarLink } from "@/components/SidebarLink";
+import { LogoutButton } from "@/components/LogoutButton";
 import { SidebarRoute, UserRole } from "@/lib/sidebar-routes";
-import { SidebarLink } from "./SidebarLink";
 
 export const Sidebar = ({
   basePath,
@@ -38,9 +39,7 @@ export const Sidebar = ({
         </ul>
       </nav>
 
-      <button className="w-full self-center bg-light p-2 border border-color shadow rounded-md hover:-translate-y-0.5 transition-transform">
-        Sign Out
-      </button>
+      <LogoutButton />
     </aside>
   );
 };
