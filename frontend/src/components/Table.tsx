@@ -11,12 +11,14 @@ interface TableComponentProps<T> {
   data: T[];
   columns: ColumnDef<T, unknown>[];
   isLoading: boolean;
+  className: string;
 }
 
 export const Table = <T,>({
   data,
   columns,
   isLoading,
+  className,
 }: TableComponentProps<T>) => {
   const table = useReactTable<T>({
     data,
@@ -33,7 +35,7 @@ export const Table = <T,>({
           </div>
         )}
 
-        <div className="overflow-x-auto hidden lg:block">
+        <div className={`overflow-x-auto hidden lg:block ${className}`}>
           <table className="w-full border-separate border-spacing-y-2 text-sm">
             <thead className="sticky top-0 z-0 bg-dark backdrop-blur-md">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -76,7 +78,7 @@ export const Table = <T,>({
           </table>
         </div>
 
-        <div className="lg:hidden space-y-2">
+        <div className={`lg:hidden space-y-2 ${className}`}>
           {table.getRowModel().rows.map((row) => (
             <div
               key={row.id}

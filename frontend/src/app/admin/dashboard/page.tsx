@@ -1,15 +1,22 @@
-import { api } from "@/lib/api";
+import { api, PaginationMeta } from "@/lib/api";
 import { cookies } from "next/headers";
 import { Stats } from "@/components/Stats";
-import type { RecentUser } from "@/types/analytics";
+import { CourseSnapshot } from "@/components/CourseSnapshot";
 import { RecentJoinedUsers } from "@/components/RecentJoinedUsers";
+import type { CourseSnapshotType, RecentUser } from "@/types/analytics";
 
 const AdminDashboardPage = async () => {
   const cookieStore = await cookies();
 
-  const { data } = await api.get<RecentUser[]>("/analytics/recent-users", {
-    Cookie: cookieStore.toString(),
-  });
+  const [recentUsers, courseSnapshot] = await Promise.all([
+    api.get<RecentUser[]>("/analytics/recent-users", {
+      Cookie: cookieStore.toString(),
+    }),
+    api.get<CourseSnapshotType[], PaginationMeta>(
+      "/analytics/course-snapshot?page=1&rpp=5",
+      { Cookie: cookieStore.toString() },
+    ),
+  ]);
 
   const courses = 1;
 
@@ -69,7 +76,8 @@ const AdminDashboardPage = async () => {
         </div>
 
         <Stats />
-        <RecentJoinedUsers initialData={data} />
+        <RecentJoinedUsers initialData={recentUsers.data} />
+        <CourseSnapshot initialData={courseSnapshot} />
 
         <div className="space-y-2 bg-bg p-6 sm:p-8 shadow border border-color rounded-lg">
           <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>

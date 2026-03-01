@@ -6,6 +6,7 @@ import { Courses } from 'src/courses/courses.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { DashboardKpisDTO } from './dtos/dashboard-kpis.dto';
 import { RecentUserDTO } from './dtos/recent-user.dto';
+import { CourseSnapshotDTO } from './dtos/course-snapshot.dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -72,7 +73,56 @@ export class AnalyticsService {
     }));
   }
 
-  async getCourseSnapshots() {}
+  async getCourseSnapshots(teacherId: number, page: number, rpp: number) {
+    const offset = (page - 1) * rpp;
+
+    const totalItems = await this.courseRepo
+      .createQueryBuilder('course')
+      .where('course.teacherId = :teacherId', { teacherId })
+      .getCount();
+
+    const rows = await this.courseRepo
+      .createQueryBuilder('course')
+      .where('course.teacherId = :teacherId', { teacherId })
+      .leftJoin('course.students', 'students')
+      .leftJoin('course.quizzes', 'quiz')
+      .leftJoin('quiz.studentAnswers', 'sa')
+      .select('course.id', 'id')
+      .addSelect('course.name', 'title')
+      .addSelect('COUNT(DISTINCT students.id)', 'totalStudents')
+      .addSelect('AVG(sa.totalScore)', 'avgScore')
+      .addSelect(
+        `
+      (
+        SUM(
+          CASE 
+            WHEN sa.totalScore >= quiz.passingMarks THEN 1
+            ELSE 0
+          END
+        ) * 100.0
+        /
+        NULLIF(COUNT(sa.id), 0)
+      )
+    `,
+        'passRate',
+      )
+      .groupBy('course.id')
+      .addGroupBy('course.name')
+      .limit(rpp)
+      .offset(offset)
+      .getRawMany();
+
+    return {
+      totalItems,
+      rows: rows.map((row) => ({
+        id: Number(row.id),
+        title: row.title,
+        totalStudents: Number(row.totalStudents),
+        avgScore: Number(row.avgScore) || 0,
+        passRate: Number(row.passRate) || 0,
+      })),
+    };
+  }
 
   async getDashboardAlerts() {}
 }

@@ -3,14 +3,14 @@ import { ApiError } from "./error";
 const BASE_API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-type PaginationMeta = {
+export type PaginationMeta = {
   page: number;
   totalPages: number;
   rpp: number;
   totalItems: number;
 };
 
-type ApiResponse<T, M = PaginationMeta> = {
+export type ApiResponse<T, M = PaginationMeta> = {
   data: T;
   message: string;
   meta?: M;

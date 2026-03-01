@@ -1,8 +1,8 @@
 import { IsNumber, IsString } from 'class-validator';
 
 export class CourseSnapshotDTO {
-  @IsString()
-  id: string;
+  @IsNumber()
+  id: number;
 
   @IsString()
   title: string;

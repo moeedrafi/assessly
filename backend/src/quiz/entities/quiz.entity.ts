@@ -29,7 +29,7 @@ export class Quiz {
   timeLimit: number;
 
   @Column({ type: 'int' })
-  passingMarks?: number;
+  passingMarks: number;
 
   @Column({ default: false })
   isPublished: boolean;

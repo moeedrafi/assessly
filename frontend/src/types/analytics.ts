@@ -10,3 +10,11 @@ export interface RecentUser {
   email: string;
   joinedCourses: { id: number; name: string }[];
 }
+
+export interface CourseSnapshotType {
+  id: number;
+  title: string;
+  totalStudents: number;
+  avgScore: number;
+  passRate: number;
+}

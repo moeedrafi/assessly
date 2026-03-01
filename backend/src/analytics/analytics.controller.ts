@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { AnalyticsService } from 'src/analytics/analytics.service';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 
@@ -30,9 +30,27 @@ export class AnalyticsController {
     return { data, message: 'Fetched recent users successfully', meta: null };
   }
 
-  @Get('course-snapshots')
-  getCourseSnapshots() {
-    return this.analyticsService.getCourseSnapshots();
+  @Get('course-snapshot')
+  async getCourseSnapshots(
+    @CurrentUser() user: { sub: number; role: string },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    const data = await this.analyticsService.getCourseSnapshots(
+      user.sub,
+      page,
+      rpp,
+    );
+    return {
+      data,
+      message: 'Fetched course snapshot successfully',
+      meta: {
+        totalItems: data.totalItems,
+        totalPages: Math.ceil(data.totalItems / rpp),
+        page,
+        rpp,
+      },
+    };
   }
 
   @Get('alerts')

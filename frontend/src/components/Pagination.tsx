@@ -1,14 +1,16 @@
 "use client";
 
+import { useMemo } from "react";
 import { Button } from "./ui/Button";
 
 interface TablePaginationProps {
   isLoading: boolean;
   total: number;
   page: number;
-  onPageChange?: (page: number) => void;
+  totalPages: number;
+  onPageChange: (page: number) => void;
   rpp: number;
-  setRpp?: React.Dispatch<React.SetStateAction<number>>;
+  setRpp: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const Pagination = ({
@@ -18,11 +20,32 @@ export const Pagination = ({
   onPageChange,
   rpp,
   setRpp,
+  totalPages,
 }: TablePaginationProps) => {
-  if (isLoading) return null;
-
   const start = total === 0 ? 0 : (page - 1) * rpp + 1;
   const end = Math.min(page * rpp, total);
+
+  const pages = useMemo(() => {
+    const pagesArr: (number | "...")[] = [];
+    const windowSize = 2;
+
+    const startPage = Math.max(2, page - windowSize);
+    const endPage = Math.min(totalPages - 1, page + windowSize);
+
+    pagesArr.push(1);
+
+    if (startPage > 2) pagesArr.push("...");
+
+    for (let i = startPage; i <= endPage; i++) pagesArr.push(i);
+
+    if (endPage < totalPages - 1) pagesArr.push("...");
+
+    if (totalPages > 1) pagesArr.push(totalPages);
+
+    return pagesArr;
+  }, [page, totalPages]);
+
+  if (isLoading) return null;
 
   const handleRpp = (value: string) => {
     setRpp(Number(value));
@@ -30,41 +53,45 @@ export const Pagination = ({
   };
 
   return (
-    <div className="w-full flex flex-col mt-4">
-      <div className="w-full">
-        <div className="h-full p-4 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div>
-            {total && (
-              <div className="font-lato text-zinc-600 dark:text-text-silver">
-                {`Showing ${start} to ${end} of ${total} Records`}
-              </div>
-            )}
-          </div>
+    <div className="w-full mt-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 p-2 sm:p-4 bg-dark rounded-lg shadow-sm border border-color">
+        <div className="order-2 sm:order-1 text-sm text-muted-foreground">
+          {total > 0
+            ? `Showing ${start} to ${end} of ${total} Records`
+            : "No records found"}
+        </div>
 
-          <div className="space-y-2">
-            <select
-              id="rpp"
-              name="rpp"
-              defaultValue={5}
-              className="w-full bg-light px-3 py-2.5 ring-1 ring-color rounded-lg focus-visible:ring-2 outline-none"
-            >
-              <option>5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-            </select>
+        <div className="flex flex-wrap justify-center gap-2 order-1 sm:order-2">
+          {pages.map((p, index) =>
+            p === "..." ? (
+              <span key={index} className="px-2">
+                ...
+              </span>
+            ) : (
+              <Button
+                key={p}
+                onClick={() => onPageChange(p as number)}
+                disabled={p === page}
+                variant={p === page ? "primary" : "ghost"}
+              >
+                {p}
+              </Button>
+            ),
+          )}
+        </div>
 
-            <div className="flex items-center gap-2">
-              {Array.from({ length: total / rpp }).map((_, index) => (
-                <Button
-                  key={index}
-                  variant="secondary"
-                  className="rounded-none"
-                >
-                  {index + 1}
-                </Button>
-              ))}
-            </div>
-          </div>
+        <div className="order-3 w-1/4">
+          <select
+            id="rpp"
+            name="rpp"
+            value={rpp}
+            onChange={(e) => handleRpp(e.target.value)}
+            className="order-3 w-full bg-light dark:bg-dark px-3 py-2 rounded-lg ring-1 ring-color focus:ring-2 outline-none text-sm"
+          >
+            <option>5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
         </div>
       </div>
     </div>
