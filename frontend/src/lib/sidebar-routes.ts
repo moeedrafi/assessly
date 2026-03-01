@@ -1,4 +1,4 @@
-export type UserRole = "student" | "admin";
+import { UserRole } from "@/types/user";
 
 export type SidebarRoute = {
   id: number;
@@ -14,20 +14,20 @@ export const SIDEBAR_ROUTES: SidebarRoute[] = [
     path: "dashboard",
     label: "Dashboard",
     icon: "dashboard",
-    roles: ["student", "admin"],
+    roles: [UserRole.ADMIN, UserRole.USER],
   },
   {
     id: 2,
     path: "quizzes",
     label: "Quizzes",
     icon: "quiz",
-    roles: ["student", "admin"],
+    roles: [UserRole.ADMIN, UserRole.USER],
   },
   {
     id: 3,
     path: "courses",
     label: "Courses",
     icon: "courses",
-    roles: ["student", "admin"],
+    roles: [UserRole.ADMIN, UserRole.USER],
   },
 ];

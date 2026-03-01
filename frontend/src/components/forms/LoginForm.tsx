@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { api } from "@/lib/api";
 import { ApiError } from "@/lib/error";
+import { UserRole } from "@/types/user";
 import { LoginFormData, loginSchema } from "@/schemas/auth.schemas";
 
 const initialState: LoginFormData = {
@@ -11,7 +13,15 @@ const initialState: LoginFormData = {
   password: "",
 };
 
+type Response = {
+  email: string;
+  name: string;
+  role: UserRole;
+};
+
 export const LoginForm = () => {
+  const router = useRouter();
+
   const form = useForm({
     defaultValues: initialState,
     validators: { onBlur: loginSchema },
@@ -23,12 +33,18 @@ export const LoginForm = () => {
       }
 
       try {
-        const res = await api.post<void, LoginFormData>(
+        const res = await api.post<Response, LoginFormData>(
           "/auth/signin",
           validatedData.data,
         );
 
         toast.success(res.message);
+
+        if (res.data.role === UserRole.ADMIN) {
+          router.push("/admin/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
       } catch (error) {
         if (error instanceof ApiError) {
           toast.error(error.message);
