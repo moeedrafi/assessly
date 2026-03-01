@@ -42,7 +42,7 @@ export class AnalyticsController {
       rpp,
     );
     return {
-      data,
+      data: data.rows,
       message: 'Fetched course snapshot successfully',
       meta: {
         totalItems: data.totalItems,
