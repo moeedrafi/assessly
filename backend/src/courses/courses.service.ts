@@ -110,17 +110,22 @@ export class CoursesService {
 
   /* STUDENT */
   async findAll(studentId: number) {
-    console.time('findAll');
     if (!studentId) throw new UnauthorizedException();
 
     const courses = await this.repo
       .createQueryBuilder('course')
-      .leftJoinAndSelect('course.teacher', 'teacher')
+      .leftJoin('course.teacher', 'teacher')
       .leftJoin('course.students', 'student')
       .where('student.id = :studentId', { studentId })
+      .select([
+        'course.id',
+        'course.name',
+        'course.description',
+        'course.isActive',
+        'teacher.name',
+      ])
       .getMany();
 
-    console.timeEnd('findAll');
     return {
       data: courses,
       message: 'Successfully fetched courses',

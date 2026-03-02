@@ -11,12 +11,11 @@ interface CourseEntity {
   updatedAt: string;
 }
 
-// export interface JoinedCourse extends CourseBase {
-//   teacher: { name: string };
-// }
-
-export type JoinedCourse = Omit<CourseEntity, "code" | "allowStudentJoin"> & {
-  teacher: { name: string };
+export type JoinedCourse = Omit<
+  CourseEntity,
+  "code" | "allowStudentJoin" | "createdAt" | "updatedAt"
+> & {
+  teacherName: string;
 };
 
 export interface TeachingCourse extends CourseEntity {

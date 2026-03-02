@@ -28,7 +28,11 @@ export const StudentCourses = () => {
           <div className="flex-1 space-y-2">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-lg font-semibold">{course.name}</h3>
-              <span>{course.isActive ? "Active" : "Inactive"}</span>
+              <span
+                className={`px-2 py-0.5 text-white border rounded-lg ${course.isActive ? "bg-green-700 border-green-400" : "bg-red-700 border-red-400"}`}
+              >
+                {course.isActive ? "Active" : "Inactive"}
+              </span>
             </div>
 
             <p className="text-muted-foreground text-sm">
@@ -40,7 +44,7 @@ export const StudentCourses = () => {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground">Instructor:</span>
               <span className="px-2 py-0.5 rounded bg-bg border text-xs">
-                {course.teacher.name}
+                {course.teacherName}
               </span>
             </div>
 
