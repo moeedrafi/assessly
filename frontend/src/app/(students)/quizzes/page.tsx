@@ -1,26 +1,40 @@
-import Link from "next/link";
+import { api } from "@/lib/api";
+import { cookies } from "next/headers";
+import type { QuizEntity } from "@/types/quiz";
+import { CompletedQuizzes } from "@/components/CompletedQuizzes";
+import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { UserRole } from "@/types/user";
 
-const QuizzesPage = () => {
-  const quizzes = 1;
+const QuizzesPage = async () => {
+  const cookieStore = await cookies();
+  const queryClient = new QueryClient();
 
-  if (!quizzes) {
-    return (
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <section className="w-full max-w-md font-lato p-6 sm:p-8">
-          <div className="space-y-2 text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold">Join a Course</h1>
-            <p className="text-sm text-muted-foreground">
-              You haven&apos;t joined any course yet. Enter the code provided by
-              your teacher.
-            </p>
-          </div>
-        </section>
-      </main>
-    );
-  }
+  await Promise.all([
+    await queryClient.prefetchQuery({
+      queryKey: ["upcomingQuizzes"],
+      queryFn: async () => {
+        const res = await api.get<QuizEntity[]>("/quiz/upcoming", {
+          Cookie: cookieStore.toString(),
+        });
+        return res.data;
+      },
+    }),
 
-  const upcomingQuizzes = 10;
-  const completedQuizzes = 0;
+    await queryClient.prefetchQuery({
+      queryKey: ["completedQuizzes"],
+      queryFn: async () => {
+        const res = await api.get<QuizEntity[]>("/quiz/completed", {
+          Cookie: cookieStore.toString(),
+        });
+        return res.data;
+      },
+    }),
+  ]);
 
   return (
     <main>
@@ -33,89 +47,19 @@ const QuizzesPage = () => {
           </p>
         </div>
 
-        <div className="space-y-2 bg-bg p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h2>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
+            <h2 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h2>
 
-          {upcomingQuizzes ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 overflow-y-auto hide-scrollbar max-h-64">
-              <div className="bg-light p-4 space-y-4 border border-color rounded-lg shadow">
-                <div>
-                  <h3 className="text-lg font-semibold">Quiz Name</h3>
-                  <p className="text-muted-foreground">Course Name</p>
-                </div>
+            <UpcomingQuizzes role={UserRole.ADMIN} url="/quiz/upcoming" />
+          </div>
 
-                {/* Time */}
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">29 Dec 2025</span> · 11:00 -
-                  11:30
-                </div>
+          <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
+            <h2 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h2>
 
-                <div className="text-sm">
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Duration: </span>
-                    <span className="text-primary font-semibold">30m</span>
-                  </div>
-
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Questions: </span>
-                    <span className="text-primary font-semibold">20</span>
-                  </div>
-                </div>
-
-                <Link href="/quizzes/1">
-                  <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">No Upcoming Quizzes</p>
-          )}
-        </div>
-
-        <div className="space-y-2 bg-bg p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h2>
-
-          {completedQuizzes ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 overflow-y-auto hide-scrollbar max-h-64">
-              <div className="bg-light p-4 space-y-4 border border-color rounded-lg shadow">
-                <div>
-                  <h3 className="text-lg font-semibold">Quiz Name</h3>
-                  <p className="text-muted-foreground">Course Name</p>
-                </div>
-
-                {/* Time */}
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">29 Dec 2025</span> · 11:00 -
-                  11:30
-                </div>
-
-                <div className="text-sm">
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Duration: </span>
-                    <span className="text-primary font-semibold">30m</span>
-                  </div>
-
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Result: </span>
-                    <span className="text-primary font-semibold">20 / 30</span>
-                  </div>
-                </div>
-
-                <Link href="/quizzes/1">
-                  <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              No Completed Quizzes
-            </p>
-          )}
-        </div>
+            <CompletedQuizzes role={UserRole.ADMIN} url="/quiz/completed" />
+          </div>
+        </HydrationBoundary>
       </section>
     </main>
   );

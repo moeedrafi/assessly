@@ -1,5 +1,8 @@
-import Link from "next/link";
 import Image from "next/image";
+import { UserRole } from "@/types/user";
+import { MissedQuizzes } from "@/components/MissedQuizzes";
+import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
+import { CompletedQuizzes } from "@/components/CompletedQuizzes";
 
 const stats = [
   {
@@ -25,8 +28,12 @@ const stats = [
   },
 ];
 
-const CourseIdPage = () => {
-  const courseId = 1;
+const CourseIdPage = async ({
+  params,
+}: {
+  params: Promise<{ courseId: string }>;
+}) => {
+  const { courseId } = await params;
 
   if (!courseId) {
     return (
@@ -42,8 +49,6 @@ const CourseIdPage = () => {
       </main>
     );
   }
-
-  const completedQuizzes = 10;
 
   return (
     <main>
@@ -138,43 +143,24 @@ const CourseIdPage = () => {
         </div>
 
         <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
+          <h3 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h3>
+          <UpcomingQuizzes
+            role={UserRole.USER}
+            url={`/quiz/${courseId}/upcoming`}
+          />
+        </div>
+
+        <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
+          <h3 className="text-xl sm:text-2xl font-bold">Missed Quizzes</h3>
+          <MissedQuizzes url={`/quiz/${courseId}/missed`} />
+        </div>
+
+        <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h3>
-
-          {completedQuizzes ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 overflow-y-auto hide-scrollbar max-h-64">
-              <div className="bg-light p-4 space-y-4 border border-color rounded-lg shadow">
-                <h3 className="text-lg font-semibold">Quiz Name</h3>
-
-                {/* Time */}
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">29 Dec 2025</span> · 11:00 -
-                  11:30
-                </div>
-
-                <div className="space-y-2">
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Result: </span>
-                    <span className="text-primary font-semibold">20 / 30</span>
-                  </div>
-
-                  <div className="space-x-1">
-                    <span className="text-muted-foreground">Rank: </span>
-                    <span className="text-primary font-semibold">10th</span>
-                  </div>
-                </div>
-
-                <Link href="/quizzes/1/result">
-                  <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              No Completed Quizzes
-            </p>
-          )}
+          <CompletedQuizzes
+            role={UserRole.USER}
+            url={`/quiz/${courseId}/completed`}
+          />
         </div>
       </section>
     </main>

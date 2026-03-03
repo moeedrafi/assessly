@@ -1,19 +1,13 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { UserRole } from "@/types/user";
 import type { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/Skeleton";
 
-export const UpcomingQuizzes = ({
-  url,
-  role,
-}: {
-  url: string;
-  role: UserRole;
-}) => {
-  const { data: upcomingQuizzes, isLoading } = useQuery({
-    queryKey: ["upcomingQuizzes"],
+export const MissedQuizzes = ({ url }: { url: string }) => {
+  const { data: missedQuizzes, isLoading } = useQuery({
+    queryKey: ["missedQuizzes"],
     queryFn: async () => {
       const res = await api.get<QuizEntity[]>(url);
       return res.data;
@@ -21,21 +15,15 @@ export const UpcomingQuizzes = ({
     staleTime: Infinity,
   });
 
-  if (isLoading) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        Fetching upcoming quizzes...
-      </p>
-    );
-  }
+  if (isLoading) return <Skeleton />;
 
-  if (!upcomingQuizzes || upcomingQuizzes.length === 0) {
-    return <p className="text-muted-foreground text-sm">No Upcoming Quizzes</p>;
+  if (!missedQuizzes || missedQuizzes.length === 0) {
+    return <p className="text-muted-foreground text-sm">No Missed Quizzes</p>;
   }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 overflow-y-scroll hide-scrollbar max-h-80">
-      {upcomingQuizzes.map((quiz) => {
+      {missedQuizzes.map((quiz) => {
         const startsAt = new Date(quiz.startsAt);
         const endsAt = new Date(quiz.endsAt);
 
@@ -96,21 +84,12 @@ export const UpcomingQuizzes = ({
               </div>
             </div>
 
-            {role === UserRole.ADMIN ? (
-              <Link
-                href={`/admin/quizzes/${quiz.id}`}
-                className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
-              >
-                View Details
-              </Link>
-            ) : (
-              <Link
-                href={`/quizzes/${quiz.id}`}
-                className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
-              >
-                View Details
-              </Link>
-            )}
+            <Link
+              href={`/quizzes/${quiz.id}`}
+              className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
+            >
+              View Details
+            </Link>
           </div>
         );
       })}

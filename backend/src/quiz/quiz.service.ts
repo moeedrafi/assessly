@@ -172,7 +172,7 @@ export class QuizService {
       where: { course, endsAt: LessThan(new Date()) },
     });
 
-    return quizzes;
+    return { data: quizzes, message: 'Fetched completed quizzes' };
   }
 
   async findUpcomingQuizzes(studentId: number, courseId: number) {
@@ -183,16 +183,18 @@ export class QuizService {
 
     const now = new Date();
 
-    return this.repo
+    const quizzes = await this.repo
       .createQueryBuilder('quiz')
       .leftJoin('quiz.course', 'course')
-      .leftJoin('quiz.studentsAnswers', 'sa', 'sa.studentId = :studentId', {
+      .leftJoin('quiz.studentAnswers', 'sa', 'sa.studentId = :studentId', {
         studentId,
       })
-      .where('course.id = :courseid', { courseId })
+      .where('course.id = :courseId', { courseId })
       .andWhere('quiz.startsAt > :now', { now })
       .andWhere('sa.id IS NULL')
       .getMany();
+
+    return { data: quizzes, message: 'Fetched upcoming quizzes' };
   }
 
   async findAttemptedQuizzes(studentId: number, courseId: number) {
@@ -203,16 +205,18 @@ export class QuizService {
 
     const now = new Date();
 
-    return this.repo
+    const quizzes = await this.repo
       .createQueryBuilder('quiz')
       .leftJoin('quiz.course', 'course')
-      .leftJoin('quiz.studentsAnswers', 'sa', 'sa.studentId = :studentId', {
+      .leftJoin('quiz.studentAnswers', 'sa', 'sa.studentId = :studentId', {
         studentId,
       })
       .where('course.id = :courseId', { courseId })
       .andWhere('quiz.startsAt < :now', { now })
       .andWhere('sa.id IS NOT NULL')
       .getMany();
+
+    return { data: quizzes, message: 'Fetched attempted quizzes' };
   }
 
   async findMissedQuizzes(studentId: number, courseId: number) {
@@ -223,16 +227,18 @@ export class QuizService {
 
     const now = new Date();
 
-    return this.repo
+    const quizzes = await this.repo
       .createQueryBuilder('quiz')
       .leftJoin('quiz.course', 'course')
-      .leftJoin('quiz.studentsAnswers', 'sa', 'sa.studentId = :studentId', {
+      .leftJoin('quiz.studentAnswers', 'sa', 'sa.studentId = :studentId', {
         studentId,
       })
       .where('course.id = :courseId', { courseId })
       .andWhere('quiz.startsAt < :now', { now })
       .andWhere('sa.id IS NULL')
       .getMany();
+
+    return { data: quizzes, message: 'Fetched missed quizzes' };
   }
 
   async attempt(

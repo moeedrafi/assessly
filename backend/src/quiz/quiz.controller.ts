@@ -15,6 +15,14 @@ export class QuizController {
     return this.quizServices.findAttemptedQuizzes(user.sub, Number(courseId));
   }
 
+  @Get(':courseid/completed')
+  getCompletedQuizzes(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid') courseId: string,
+  ) {
+    return this.quizServices.findCompletedQuizzes(user.sub, Number(courseId));
+  }
+
   @Get(':courseid/upcoming')
   getUpcomingQuizzes(
     @CurrentUser() user: { sub: number },

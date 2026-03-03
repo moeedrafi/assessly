@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { cookies } from "next/headers";
+import { UserRole } from "@/types/user";
 import type { QuizEntity } from "@/types/quiz";
+import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
+import { CompletedQuizzes } from "@/components/CompletedQuizzes";
 import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
-import { CompletedQuizzes } from "@/components/CompletedQuizzes";
 
 const AdminQuizzesPage = async () => {
   const cookieStore = await cookies();
@@ -56,13 +57,16 @@ const AdminQuizzesPage = async () => {
           <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h2>
 
-            <UpcomingQuizzes url="/admin/quiz/upcoming" />
+            <UpcomingQuizzes role={UserRole.ADMIN} url="/admin/quiz/upcoming" />
           </div>
 
           <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h2>
 
-            <CompletedQuizzes url="/admin/quiz/completed" />
+            <CompletedQuizzes
+              role={UserRole.ADMIN}
+              url="/admin/quiz/completed"
+            />
           </div>
         </HydrationBoundary>
       </section>

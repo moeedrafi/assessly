@@ -1,10 +1,17 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { UserRole } from "@/types/user";
 import { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 
-export const CompletedQuizzes = ({ url }: { url: string }) => {
+export const CompletedQuizzes = ({
+  url,
+  role,
+}: {
+  url: string;
+  role: UserRole;
+}) => {
   const { data: completedQuizzes, isLoading } = useQuery({
     queryKey: ["completedQuizzes"],
     queryFn: async () => {
@@ -85,12 +92,21 @@ export const CompletedQuizzes = ({ url }: { url: string }) => {
               </div>
             </div>
 
-            <Link
-              href={`/admin/quizzes/${quiz.id}`}
-              className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
-            >
-              View Details
-            </Link>
+            {role === UserRole.ADMIN ? (
+              <Link
+                href={`/admin/quizzes/${quiz.id}`}
+                className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
+              >
+                View Details
+              </Link>
+            ) : (
+              <Link
+                href={`/quizzes/${quiz.id}`}
+                className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
+              >
+                View Details
+              </Link>
+            )}
           </div>
         );
       })}
