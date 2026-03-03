@@ -7,7 +7,17 @@ import { AttemptQuizDTO } from './dtos/attempt-quiz.dto';
 export class QuizController {
   constructor(private quizServices: QuizService) {}
 
-  @Get(':courseid/attemplted')
+  @Get('attempted')
+  getAllAttemptedQuizzes(@CurrentUser() user: { sub: number }) {
+    return this.quizServices.findAllJoinedAttemptedQuizzes(user.sub);
+  }
+
+  @Get('upcoming')
+  getAllUpcomingQuizzes(@CurrentUser() user: { sub: number }) {
+    return this.quizServices.findAllJoinedUpcomingQuizzes(user.sub);
+  }
+
+  @Get(':courseid/attempted')
   getAttemptedQuizzes(
     @CurrentUser() user: { sub: number },
     @Param('courseid') courseId: string,

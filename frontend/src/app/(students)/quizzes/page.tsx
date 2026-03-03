@@ -38,12 +38,12 @@ const QuizzesPage = async () => {
 
   return (
     <main>
-      <section className="w-full font-lato space-y-4">
+      <section className="w-full font-lato space-y-4 px-2 py-4">
         {/* Heading */}
         <div className="space-y-2 text-center p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold">Welcome</h1>
           <p className="text-sm text-muted-foreground">
-            View Details of the courses you are enrolled in
+            View Details of the courses quizzes you are enrolled in
           </p>
         </div>
 
@@ -55,9 +55,9 @@ const QuizzesPage = async () => {
           </div>
 
           <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
-            <h2 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h2>
+            <h2 className="text-xl sm:text-2xl font-bold">Attempted Quizzes</h2>
 
-            <CompletedQuizzes role={UserRole.ADMIN} url="/quiz/completed" />
+            <CompletedQuizzes role={UserRole.ADMIN} url="/quiz/attempted" />
           </div>
         </HydrationBoundary>
       </section>

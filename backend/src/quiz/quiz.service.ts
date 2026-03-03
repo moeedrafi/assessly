@@ -161,6 +161,51 @@ export class QuizService {
   }
 
   /* STUDENT */
+  async findAllJoinedAttemptedQuizzes(studentId: number) {
+    if (!studentId) throw new UnauthorizedException('not authenticated');
+
+    const quizzes = await this.repo
+      .createQueryBuilder('quiz')
+      .innerJoin('quiz.course', 'course')
+      .innerJoin('course.students', 'student', 'student.id = :studentId', {
+        studentId,
+      })
+      .innerJoin('quiz.studentAnswers', 'sa', 'sa.studentId = :studentId', {
+        studentId,
+      })
+      .getMany();
+
+    return {
+      data: quizzes,
+      message: 'Successfully fetched all completed quizzes',
+      meta: null,
+    };
+  }
+
+  async findAllJoinedUpcomingQuizzes(studentId: number) {
+    if (!studentId) throw new UnauthorizedException('not authenticated');
+    const now = new Date();
+
+    const quizzes = await this.repo
+      .createQueryBuilder('quiz')
+      .innerJoin('quiz.course', 'course')
+      .innerJoin('course.students', 'student', 'student.id = :studentId', {
+        studentId,
+      })
+      .leftJoin('quiz.studentAnswers', 'sa', 'sa.studentId = :studentId', {
+        studentId,
+      })
+      .where('quiz.startsAt > :now', { now })
+      .andWhere('sa.id IS NULL')
+      .getMany();
+
+    return {
+      data: quizzes,
+      message: 'Successfully fetched all Upcoming quizzes',
+      meta: null,
+    };
+  }
+
   async findCompletedQuizzes(teacherId: number, courseId: number) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     if (!courseId) throw new UnauthorizedException('course id required');
