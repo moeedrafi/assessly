@@ -1,10 +1,18 @@
 "use client";
 import Link from "next/link";
-import { Skeleton } from "@/components/Skeleton";
-import { useCourses } from "@/hooks/useCourses";
+import { api } from "@/lib/api";
+import toast from "react-hot-toast";
+import { Modal } from "@/components/Modal";
+import { useDialog } from "@/hooks/useDialog";
 import { JoinedCourse } from "@/types/course";
+import { Button } from "@/components/ui/Button";
+import { useCourses } from "@/hooks/useCourses";
+import { Skeleton } from "@/components/Skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const StudentCourses = () => {
+  const queryClient = useQueryClient();
+  const { close, dialogRef, open } = useDialog();
   const { data: courses, isLoading } = useCourses<JoinedCourse[]>("/courses");
 
   if (isLoading) return <Skeleton />;
@@ -17,6 +25,12 @@ export const StudentCourses = () => {
       </p>
     );
   }
+
+  const leaveCourse = async (courseId: number) => {
+    const { message } = await api.post(`/courses/leave/${courseId}`, {});
+    queryClient.invalidateQueries({ queryKey: ["courses"] });
+    toast.success(message);
+  };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -48,13 +62,36 @@ export const StudentCourses = () => {
               </span>
             </div>
 
-            <Link
-              href={`/courses/${course.id}`}
-              className="inline-block w-full text-center bg-primary px-4 py-2 text-white rounded-md hover:bg-primary/80 transition"
-            >
-              View Details
-            </Link>
+            <div className="space-y-1">
+              <Link
+                href={`/courses/${course.id}`}
+                className="inline-block w-full text-center bg-primary px-4 py-2 text-white rounded-md hover:bg-primary/80 transition"
+              >
+                View Details
+              </Link>
+
+              <Button
+                className="w-full"
+                variant="destructive"
+                onClick={open}
+                // onClick={() => leaveCourse(course.id)}
+              >
+                Leave Course
+              </Button>
+            </div>
           </div>
+
+          <Modal
+            title="Leave Course"
+            description={`Are you sure you want to leave ${course.name}?`}
+            close={close}
+            dialogRef={dialogRef}
+            isLoading={false}
+            onClick={async () => {
+              await leaveCourse(course.id);
+              close();
+            }}
+          />
         </div>
       ))}
     </div>

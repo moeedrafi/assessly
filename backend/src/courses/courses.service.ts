@@ -152,9 +152,8 @@ export class CoursesService {
     return course;
   }
 
-  async join(userId: number, courseId: number) {
+  async join(userId: number, code: string) {
     if (!userId) throw new UnauthorizedException('user not logged in');
-    if (!courseId) throw new BadRequestException('course id is required');
 
     const user = await this.usersService.findById(userId, {
       relations: ['joinedCourses'],
@@ -164,14 +163,16 @@ export class CoursesService {
     if (user.role === UserRole.ADMIN)
       throw new ForbiddenException('admins cannot join courses');
 
-    const course = await this.repo.findOne({ where: { id: courseId } });
+    const course = await this.repo.findOne({ where: { code } });
     if (!course) throw new NotFoundException('course not found');
 
-    if (!course.allowStudentJoin)
+    if (!course.allowStudentJoin) {
       throw new ForbiddenException('not allowed to join course');
+    }
 
-    if (user.joinedCourses.some((course) => course.id === courseId))
+    if (user.joinedCourses.some((course) => course.code === code)) {
       throw new BadRequestException('already joined this course');
+    }
 
     user.joinedCourses.push(course);
     await this.usersService.save(user);

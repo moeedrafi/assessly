@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CoursesService } from 'src/courses/courses.service';
 import { StudentCourseDTO } from './dtos/student-course.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
@@ -22,12 +22,12 @@ export class CoursesController {
     return this.coursesServices.findOne(Number(courseId), user.sub);
   }
 
-  @Post('/join/:courseid')
+  @Post('/join')
   joinCourse(
-    @Param('courseid') courseId: string,
-    @CurrentUser() user: { sub: number; name: string },
+    @Body() body: { code: string },
+    @CurrentUser() user: { sub: number },
   ) {
-    return this.coursesServices.join(user.sub, Number(courseId));
+    return this.coursesServices.join(user.sub, body.code);
   }
 
   @Post('/leave/:courseid')

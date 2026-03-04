@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
 import { cookies } from "next/headers";
+import { JoinCourse } from "./JoinCourse";
 import { StudentCourses } from "./StudentCourses";
 import type { JoinedCourse } from "@/types/course";
 import {
@@ -32,6 +33,17 @@ const CoursesPage = async () => {
           <p className="text-sm text-muted-foreground">
             View Details of the courses you are teaching in
           </p>
+        </div>
+
+        <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg max-w-md">
+          <div className="space-y-1">
+            <h2 className="text-xl sm:text-2xl font-bold">Join a Course</h2>
+            <p className="text-sm text-muted-foreground">
+              Enter the course code provided by your instructor.
+            </p>
+          </div>
+
+          <JoinCourse />
         </div>
 
         <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">

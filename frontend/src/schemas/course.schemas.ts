@@ -16,3 +16,13 @@ export const courseSchema = z.object({
 });
 
 export type CourseFormData = z.infer<typeof courseSchema>;
+
+export const joinCourseSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(6, "Code should be at least 6 characters")
+    .max(50, "Code too long"),
+});
+
+export type JoinCourseFormData = z.infer<typeof joinCourseSchema>;

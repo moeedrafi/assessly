@@ -3,23 +3,23 @@ import { RefObject } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 
-interface DeleteModalProps {
+interface ModalProps {
   title: string;
   description: string;
   close: () => void;
-  onDelete: () => void;
+  onClick: () => void;
   isLoading: boolean;
   dialogRef: RefObject<HTMLDialogElement | null>;
 }
 
-export const DeleteModal = ({
+export const Modal = ({
   title,
   description,
   close,
   dialogRef,
-  onDelete,
+  onClick,
   isLoading,
-}: DeleteModalProps) => {
+}: ModalProps) => {
   return (
     <Dialog
       ref={dialogRef}
@@ -33,7 +33,7 @@ export const DeleteModal = ({
 
         <div className="flex items-center gap-2">
           <Button
-            onClick={onDelete}
+            onClick={onClick}
             className="w-full"
             variant="destructive"
             loading={isLoading}
