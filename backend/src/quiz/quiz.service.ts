@@ -1,5 +1,6 @@
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -10,9 +11,10 @@ import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { CoursesService } from 'src/courses/courses.service';
 import { QuestionService } from 'src/question/question.service';
 import { CreateQuizDTO } from './dtos/create-quiz.dto';
-import { StudentAnswer } from './entities/student-answer.entity';
 import { AttemptQuizDTO } from './dtos/attempt-quiz.dto';
 import { UserRole } from 'src/enum';
+import { QuestionAttempt } from './entities/question-attempt.entity';
+import { QuizAttempt } from './entities/quiz-attempt.entity';
 
 @Injectable()
 export class QuizService {
@@ -20,8 +22,10 @@ export class QuizService {
     @InjectRepository(Quiz) private repo: Repository<Quiz>,
     private coursesServices: CoursesService,
     private questionServices: QuestionService,
-    @InjectRepository(StudentAnswer)
-    private studentAnswerRepo: Repository<StudentAnswer>,
+    @InjectRepository(QuizAttempt)
+    private quizAttemptRepo: Repository<QuizAttempt>,
+    @InjectRepository(QuestionAttempt)
+    private questionAttemptRepo: Repository<QuestionAttempt>,
   ) {}
 
   /* ADMIN */
@@ -291,24 +295,23 @@ export class QuizService {
   async attempt(
     quizId: number,
     user: { sub: number; role: UserRole },
-    quizAnswers: AttemptQuizDTO,
+    { answers }: AttemptQuizDTO,
   ) {
     if (!quizId) throw new NotFoundException('quiz not found');
+
+    // check role
     if (user.role === UserRole.ADMIN) {
       throw new ForbiddenException('Admins cannot attempt quizzes');
     }
 
+    // fetch quiz + questions
     const quiz = await this.repo.findOne({
       where: { id: quizId },
-      relations: [
-        'course',
-        'course.students',
-        'questions',
-        'questions.options',
-      ],
+      relations: ['course.students', 'questions', 'questions.options'],
     });
     if (!quiz) throw new NotFoundException('quiz not exists');
 
+    // check student in course
     const isJoinedCourse = quiz.course.students.some(
       (student) => student.id === user.sub,
     );
@@ -316,49 +319,62 @@ export class QuizService {
       throw new ForbiddenException('Student not enrolled in course');
     }
 
-    let totalScore = 0;
+    // check already attempted quiz
+    const isAttempted = await this.quizAttemptRepo.findOne({
+      where: { student: { id: user.sub }, quiz: { id: quizId } },
+    });
+    if (isAttempted) {
+      throw new BadRequestException('Quiz already attempted');
+    }
 
     const questionMap = new Map(quiz.questions.map((q) => [q.id, q]));
 
-    const processedAnswers = quizAnswers.answers.map((answer) => {
-      const question = questionMap.get(answer.questionId);
-      if (!question) {
-        throw new NotFoundException(`Question ${answer.questionId} not found`);
-      }
+    // create quiz attempt
+    const quizAttempt = this.quizAttemptRepo.create({
+      score: 0,
+      student: { id: user.sub },
+      quiz: { id: quizId },
+    });
+    await this.quizAttemptRepo.save(quizAttempt);
 
+    let score = 0;
+    const questionAttempts: QuestionAttempt[] = [];
+
+    for (const { questionId, selectedOptionIds } of answers) {
+      // get question
+      const question = questionMap.get(questionId);
+      if (!question) throw new NotFoundException('question not found');
+
+      // extract correct options
       const correctOptionIds = question.options
         .filter((o) => o.isCorrect)
         .map((o) => o.id);
 
-      let marksObtained = 0;
-      const selected = new Set(answer.selectedOptionIds);
       const correct = new Set(correctOptionIds);
 
+      // compare selected vs correct
       const isCorrect =
-        selected.size === correct.size &&
-        [...selected].every((id) => correct.has(id));
+        selectedOptionIds.length === correctOptionIds.length &&
+        selectedOptionIds.every((id) => correct.has(id));
 
-      if (isCorrect) {
-        marksObtained = question.marks;
-      }
+      // calculate marks
+      const marksObtained = isCorrect ? question.marks : 0;
+      score += marksObtained;
 
-      totalScore += marksObtained;
+      questionAttempts.push(
+        this.questionAttemptRepo.create({
+          quizAttempt,
+          question,
+          selectedOptionIds,
+          isCorrect,
+          marksObtained,
+        }),
+      );
+    }
 
-      return {
-        questionId: answer.questionId,
-        selectedOptionIds: answer.selectedOptionIds,
-        marksObtained,
-        isCorrect,
-      };
-    });
+    await this.questionAttemptRepo.save(questionAttempts);
+    quizAttempt.score = score;
 
-    const studentAnswer = this.studentAnswerRepo.create({
-      answers: processedAnswers,
-      quiz,
-      student: { id: user.sub },
-      totalScore,
-    });
-
-    return this.studentAnswerRepo.save(studentAnswer);
+    return this.quizAttemptRepo.save(quizAttempt);
   }
 }

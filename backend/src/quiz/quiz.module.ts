@@ -6,12 +6,13 @@ import { OptionModule } from 'src/option/option.module';
 import { QuizController } from 'src/quiz/quiz.controller';
 import { CoursesModule } from 'src/courses/courses.module';
 import { QuestionModule } from 'src/question/question.module';
-import { StudentAnswer } from 'src/quiz/entities/student-answer.entity';
 import { AdminQuizController } from './admin-quiz.controller';
+import { QuizAttempt } from './entities/quiz-attempt.entity';
+import { QuestionAttempt } from './entities/question-attempt.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Quiz, StudentAnswer]),
+    TypeOrmModule.forFeature([Quiz, QuizAttempt, QuestionAttempt]),
     CoursesModule,
     QuestionModule,
     OptionModule,

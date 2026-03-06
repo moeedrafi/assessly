@@ -22,6 +22,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { QuestionModule } from './question/question.module';
 import { OptionModule } from './option/option.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { QuizAttempt } from './quiz/entities/quiz-attempt.entity';
+import { QuestionAttempt } from './quiz/entities/question-attempt.entity';
 
 @Module({
   imports: [
@@ -31,7 +33,15 @@ import { AnalyticsModule } from './analytics/analytics.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      entities: [User, Courses, Quiz, Question, Option, StudentAnswer],
+      entities: [
+        User,
+        Courses,
+        Quiz,
+        Question,
+        Option,
+        QuizAttempt,
+        QuestionAttempt,
+      ],
       url: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
       synchronize: true,

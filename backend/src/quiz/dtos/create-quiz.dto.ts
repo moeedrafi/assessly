@@ -21,6 +21,9 @@ export class CreateQuizDTO {
   @IsNumber()
   timeLimit: number;
 
+  @IsNumber()
+  passingMarks: number;
+
   @IsBoolean()
   isPublished: boolean;
 
@@ -30,10 +33,6 @@ export class CreateQuizDTO {
   @IsDateString()
   @IsOptional()
   endsAt: string;
-
-  @IsNumber()
-  @IsOptional()
-  passingMarks: number;
 
   @IsArray()
   question: CreateQuestionDTO[];
