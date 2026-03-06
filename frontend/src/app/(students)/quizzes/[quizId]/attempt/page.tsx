@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Timer } from "@/components/Timer";
+import dynamic from "next/dynamic";
+const Timer = dynamic(
+  () => import("@/components/Timer").then((mod) => mod.Timer),
+  { ssr: false },
+);
 
 const quizQuestions = [
   {

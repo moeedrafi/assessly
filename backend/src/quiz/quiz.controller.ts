@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { QuizService } from 'src/quiz/quiz.service';
 import { AttemptQuizDTO } from './dtos/attempt-quiz.dto';
+import { UserRole } from 'src/enum';
 
 @Controller('quiz')
 export class QuizController {
@@ -52,9 +53,9 @@ export class QuizController {
   @Post(':quizid/attempted')
   attemptedQuiz(
     @Param('quizid') quizId: string,
-    @CurrentUser() user: { sub: number },
+    @CurrentUser() user: { sub: number; role: UserRole },
     @Body() body: AttemptQuizDTO,
   ) {
-    return this.quizServices.attempt(Number(quizId), user.sub, body);
+    return this.quizServices.attempt(Number(quizId), user, body);
   }
 }

@@ -21,9 +21,10 @@ export class StudentAnswer {
 
   @Column({ type: 'json' })
   answers: {
-    questionId: string;
-    selectionOptionIs: number[];
-    marksObtained?: number;
+    questionId: number;
+    selectedOptionIds: number[];
+    marksObtained: number;
+    isCorrect: boolean;
   }[];
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })

@@ -1,5 +1,6 @@
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,6 +12,7 @@ import { QuestionService } from 'src/question/question.service';
 import { CreateQuizDTO } from './dtos/create-quiz.dto';
 import { StudentAnswer } from './entities/student-answer.entity';
 import { AttemptQuizDTO } from './dtos/attempt-quiz.dto';
+import { UserRole } from 'src/enum';
 
 @Injectable()
 export class QuizService {
@@ -288,43 +290,72 @@ export class QuizService {
 
   async attempt(
     quizId: number,
-    studentId: number,
+    user: { sub: number; role: UserRole },
     quizAnswers: AttemptQuizDTO,
   ) {
+    if (!quizId) throw new NotFoundException('quiz not found');
+    if (user.role === UserRole.ADMIN) {
+      throw new ForbiddenException('Admins cannot attempt quizzes');
+    }
+
     const quiz = await this.repo.findOne({
       where: { id: quizId },
-      relations: ['questions', 'questions.options', 'course'],
+      relations: [
+        'course',
+        'course.students',
+        'questions',
+        'questions.options',
+      ],
     });
-    if (!quiz) throw new NotFoundException('quiz not found');
+    if (!quiz) throw new NotFoundException('quiz not exists');
+
+    const isJoinedCourse = quiz.course.students.some(
+      (student) => student.id === user.sub,
+    );
+    if (!isJoinedCourse) {
+      throw new ForbiddenException('Student not enrolled in course');
+    }
 
     let totalScore = 0;
-    const processedAnswers = quizAnswers.answers.map((a) => {
-      const question = quiz?.questions.find((q) => q.id === a.questionId);
-      if (!question)
-        throw new NotFoundException(`Question ${a.questionId} not found`);
+
+    const questionMap = new Map(quiz.questions.map((q) => [q.id, q]));
+
+    const processedAnswers = quizAnswers.answers.map((answer) => {
+      const question = questionMap.get(answer.questionId);
+      if (!question) {
+        throw new NotFoundException(`Question ${answer.questionId} not found`);
+      }
 
       const correctOptionIds = question.options
         .filter((o) => o.isCorrect)
-        .map((opt) => opt.id);
+        .map((o) => o.id);
 
-      const marksObtained =
-        correctOptionIds.sort().toString() === a.selectedOptionIds.toString()
-          ? question.marks
-          : 0;
+      let marksObtained = 0;
+      const selected = new Set(answer.selectedOptionIds);
+      const correct = new Set(correctOptionIds);
+
+      const isCorrect =
+        selected.size === correct.size &&
+        [...selected].every((id) => correct.has(id));
+
+      if (isCorrect) {
+        marksObtained = question.marks;
+      }
 
       totalScore += marksObtained;
 
       return {
-        questionId: a.questionId.toString(),
-        selectedOptionIds: a.selectedOptionIds,
+        questionId: answer.questionId,
+        selectedOptionIds: answer.selectedOptionIds,
         marksObtained,
+        isCorrect,
       };
     });
 
     const studentAnswer = this.studentAnswerRepo.create({
       answers: processedAnswers,
       quiz,
-      student: { id: studentId },
+      student: { id: user.sub },
       totalScore,
     });
 
