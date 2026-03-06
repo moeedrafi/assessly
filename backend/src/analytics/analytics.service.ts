@@ -6,7 +6,6 @@ import { Courses } from 'src/courses/courses.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { DashboardKpisDTO } from './dtos/dashboard-kpis.dto';
 import { RecentUserDTO } from './dtos/recent-user.dto';
-import { CourseSnapshotDTO } from './dtos/course-snapshot.dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -124,5 +123,36 @@ export class AnalyticsService {
     };
   }
 
-  async getDashboardAlerts() {}
+  async getRecentQuiz(studentId: number) {
+    const quizzes = await this.quizRepo
+      .createQueryBuilder('quiz')
+      .leftJoin(
+        'quiz.studentAnswers',
+        'studentAttempt',
+        'studentAttempt.studentId = :studentId',
+        {
+          studentId,
+        },
+      )
+      .leftJoin('quiz.studentAnswers', 'allAttempts')
+
+      .select('quiz.id', 'id')
+      .addSelect('quiz.name', 'name')
+      .addSelect('quiz.totalMarks', 'totalMarks')
+      .addSelect('quiz.passingMarks', 'passingMarks')
+      .addSelect('studentAttempt.totalScore', 'score')
+      .addSelect('AVG(allAttempts.totalScore)', 'avgScore')
+
+      .groupBy('quiz.id')
+      .addGroupBy('quiz.name')
+      .addGroupBy('quiz.totalMarks')
+      .addGroupBy('quiz.passingMarks')
+      .addGroupBy('studentAttempt.totalScore')
+      .addGroupBy('studentAttempt.createdAt')
+
+      .orderBy('studentAttempt.createdAt', 'DESC')
+      .getRawMany();
+
+    return quizzes;
+  }
 }

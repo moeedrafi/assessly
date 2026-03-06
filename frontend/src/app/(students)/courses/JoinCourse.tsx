@@ -1,10 +1,10 @@
 "use client";
-
 import { api } from "@/lib/api";
 import { toast } from "react-hot-toast";
 import { ApiError } from "@/lib/error";
 import { useForm } from "@tanstack/react-form";
 import { Button } from "@/components/ui/Button";
+import { useQueryClient } from "@tanstack/react-query";
 import { JoinCourseFormData, joinCourseSchema } from "@/schemas/course.schemas";
 
 const initialState: JoinCourseFormData = {
@@ -12,6 +12,8 @@ const initialState: JoinCourseFormData = {
 };
 
 export const JoinCourse = () => {
+  const queryClient = useQueryClient();
+
   const form = useForm({
     defaultValues: initialState,
     validators: { onBlur: joinCourseSchema },
@@ -27,6 +29,7 @@ export const JoinCourse = () => {
           "/courses/join",
           validatedData.data,
         );
+        queryClient.invalidateQueries({ queryKey: ["courses"] });
         toast.success(res.message);
       } catch (error) {
         if (error instanceof ApiError) {
