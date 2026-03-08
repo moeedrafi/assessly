@@ -132,7 +132,7 @@ select {
 
 select {
   background: var(--bg-light);
-  padding: 10px;
+  padding: 8px;
   transition: 0.4s;
 }
 

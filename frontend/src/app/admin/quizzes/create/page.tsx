@@ -1,4 +1,5 @@
-import { CreateQuizForm } from "@/components/forms/CreateQuizForm";
+// import { CreateQuizForm } from "@/components/forms/CreateQuizForm";
+import { QuizForm } from "@/components/QuizForm";
 
 const AdminCreateQuizzesPage = () => {
   return (
@@ -13,7 +14,7 @@ const AdminCreateQuizzesPage = () => {
         </div>
 
         <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
-          <CreateQuizForm />
+          <QuizForm />
         </div>
       </section>
     </main>

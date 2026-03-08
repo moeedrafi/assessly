@@ -21,4 +21,5 @@ export interface QuizDetail extends QuizEntity {
 
 export type CreateQuiz = Omit<QuizEntity, "id" | "createdAt" | "updatedAt"> & {
   questions: CreateQuestion[];
+  courseId: number;
 };
