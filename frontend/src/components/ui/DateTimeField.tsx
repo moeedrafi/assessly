@@ -1,10 +1,14 @@
 import { useFieldContext } from "@/hooks/form-context";
 
-type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+type DateTimeFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
 };
 
-export const TextArea = ({ label, required, ...props }: TextAreaProps) => {
+export const DateTimeField = ({
+  label,
+  required,
+  ...props
+}: DateTimeFieldProps) => {
   const field = useFieldContext<string>();
 
   return (
@@ -17,10 +21,10 @@ export const TextArea = ({ label, required, ...props }: TextAreaProps) => {
       >
         {label}
       </label>
-      <textarea
-        required
+      <input
         id={field.name}
         name={field.name}
+        type="datetime-local"
         value={field.state.value}
         aria-invalid={!field.state.meta.isValid}
         onChange={(e) => field.handleChange(e.target.value)}

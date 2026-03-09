@@ -15,9 +15,9 @@ export const NumberField = ({
     <div className="w-full flex flex-col gap-1">
       <label
         htmlFor={field.name}
-        className={
+        className={`font-semibold text-sm text-muted-foreground ${
           required ? "after:content-['*'] after:ml-1 after:text-red-500" : ""
-        }
+        }`}
       >
         {label}
       </label>

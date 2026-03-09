@@ -1,5 +1,4 @@
-// import { CreateQuizForm } from "@/components/forms/CreateQuizForm";
-import { QuizForm } from "@/components/QuizForm";
+import { QuizForm } from "@/components/forms/QuizForm";
 
 const AdminCreateQuizzesPage = () => {
   return (

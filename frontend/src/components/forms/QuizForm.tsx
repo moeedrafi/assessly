@@ -1,9 +1,9 @@
 "use client";
 import { useAppForm } from "@/hooks/form";
+import { QuestionForm } from "./QuestionForm";
 import { useCourses } from "@/hooks/useCourses";
 import { TeachingCourse } from "@/types/course";
 import { createQuizFormOptions } from "@/lib/shared-form";
-import { QuestionForm } from "./forms/QuestionForm";
 
 export const QuizForm = () => {
   const { data: courses } = useCourses<TeachingCourse[]>("/admin/courses");
@@ -59,53 +59,15 @@ export const QuizForm = () => {
           )}
         </form.AppField>
 
-        <form.Field name="startsAt">
+        <form.AppField name="startsAt">
           {(field) => (
-            <div className="w-full flex flex-col gap-1">
-              <label htmlFor={field.name}>Start Date & Time</label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="datetime-local"
-                value={field.state.value}
-                aria-invalid={!field.state.meta.isValid}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
-              />
-              {field.state.meta.isTouched && !field.state.meta.isValid && (
-                <em role="alert" className="text-sm text-red-500">
-                  {field.state.meta.errors
-                    .map((err) => err?.message)
-                    .join(", ")}
-                </em>
-              )}
-            </div>
+            <field.DateTimeField required label="Start Date & Time" />
           )}
-        </form.Field>
+        </form.AppField>
 
-        <form.Field name="endsAt">
-          {(field) => (
-            <div className="w-full flex flex-col gap-1">
-              <label htmlFor={field.name}>End Date & Time</label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="datetime-local"
-                value={field.state.value}
-                aria-invalid={!field.state.meta.isValid}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
-              />
-              {field.state.meta.isTouched && !field.state.meta.isValid && (
-                <em role="alert" className="text-sm text-red-500">
-                  {field.state.meta.errors
-                    .map((err) => err?.message)
-                    .join(", ")}
-                </em>
-              )}
-            </div>
-          )}
-        </form.Field>
+        <form.AppField name="endsAt">
+          {(field) => <field.DateTimeField required label="End Date & Time" />}
+        </form.AppField>
       </div>
 
       {/* TOTAL MARKS + PASSING MARKS */}
@@ -131,17 +93,16 @@ export const QuizForm = () => {
         </form.AppField>
       </div>
 
-      {/* DESC */}
       <form.AppField name="description">
         {(field) => (
           <field.TextArea
+            required
             label="Quiz Description"
             placeholder="Enter quiz description"
           />
         )}
       </form.AppField>
 
-      {/* QUESTIONS */}
       <QuestionForm form={form} />
 
       <div className="flex items-center gap-3">

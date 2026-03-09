@@ -4,6 +4,7 @@ import { TextField } from "@/components/ui/TextField";
 import { NumberField } from "@/components/ui/NumberField";
 import { SelectField } from "@/components/ui/SelectField";
 import { fieldContext, formContext } from "./form-context";
+import { DateTimeField } from "@/components/ui/DateTimeField";
 import { SubscribeButton } from "@/components/ui/SubscribeButton";
 
 export const { useAppForm, withForm } = createFormHook({
@@ -11,6 +12,7 @@ export const { useAppForm, withForm } = createFormHook({
     TextField,
     NumberField,
     TextArea,
+    DateTimeField,
     SelectField,
   },
   formComponents: {
