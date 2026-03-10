@@ -5,7 +5,7 @@ import { BookIcon, BookOpenCheckIcon, LibraryBigIcon } from "lucide-react";
 
 export const Stats = async () => {
   const cookieStore = await cookies();
-  const { data } = await api.get<StatsCard>("/analytics/kpis", {
+  const { data } = await api.get<StatsCard>("/admin/analytics/kpis", {
     Cookie: cookieStore.toString(),
   });
 

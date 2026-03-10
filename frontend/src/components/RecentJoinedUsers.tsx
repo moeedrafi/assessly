@@ -14,7 +14,7 @@ export const RecentJoinedUsers = ({
   const { data = [], isLoading } = useQuery({
     queryKey: ["recent-users"],
     queryFn: async () => {
-      const res = await api.get<RecentUser[]>("/analytics/recent-users");
+      const res = await api.get<RecentUser[]>("/admin/analytics/recent-users");
       return res.data;
     },
     staleTime: Infinity,
@@ -72,7 +72,7 @@ export const RecentJoinedUsers = ({
     <div className="bg-bg flex flex-col shadow-lg col-span-12 xl:col-span-8 space-y-4 p-6 sm:p-8 rounded-lg border border-color">
       <h3 className="text-xl sm:text-2xl font-bold">Recent Users</h3>
 
-      <Table data={data} columns={columns} isLoading={isLoading} />
+      <Table className="" data={data} columns={columns} isLoading={isLoading} />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import Image from "next/image";
+import { UserRole } from "@/types/user";
 import { CompletedQuizzes } from "@/components/CompletedQuizzes";
 import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
-import { UserRole } from "@/types/user";
 
 const stats = [
   {
@@ -142,6 +142,7 @@ const CourseIdPage = async ({
         <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h3>
           <UpcomingQuizzes
+            courseId={Number(courseId)}
             role={UserRole.ADMIN}
             url={`/admin/quiz/${courseId}/upcoming`}
           />
@@ -152,6 +153,7 @@ const CourseIdPage = async ({
           <h3 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h3>
           <CompletedQuizzes
             role={UserRole.ADMIN}
+            courseId={Number(courseId)}
             url={`/admin/quiz/${courseId}/completed`}
           />
         </div>

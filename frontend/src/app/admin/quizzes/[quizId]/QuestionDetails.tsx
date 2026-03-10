@@ -1,14 +1,11 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/Skeleton";
 import type { QuestionDetail } from "@/types/question";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export const QuestionDetails = () => {
-  const { quizId } = useParams();
-  const { data: questions, isLoading: isQuestionsLoading } = useQuery({
+export const QuestionDetails = ({ quizId }: { quizId: number }) => {
+  const { data: questions } = useSuspenseQuery({
     queryKey: ["questions", quizId],
     queryFn: async () => {
       const res = await api.get<QuestionDetail[]>(`/question/${quizId}`);
@@ -17,8 +14,6 @@ export const QuestionDetails = () => {
     staleTime: Infinity,
   });
 
-  if (isQuestionsLoading) return <Skeleton max={1} />;
-  if (!questions) return null;
   if (questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-5 border border-dashed border-color rounded-lg">

@@ -9,11 +9,11 @@ const AdminDashboardPage = async () => {
   const cookieStore = await cookies();
 
   const [recentUsers, courseSnapshot] = await Promise.all([
-    api.get<RecentUser[]>("/analytics/recent-users", {
+    api.get<RecentUser[]>("/admin/analytics/recent-users", {
       Cookie: cookieStore.toString(),
     }),
     api.get<CourseSnapshotType[], PaginationMeta>(
-      "/analytics/course-snapshot?page=1&rpp=5",
+      "/admin/analytics/course-snapshot?page=1&rpp=5",
       { Cookie: cookieStore.toString() },
     ),
   ]);

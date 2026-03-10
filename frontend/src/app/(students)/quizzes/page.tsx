@@ -51,13 +51,13 @@ const QuizzesPage = async () => {
           <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h2>
 
-            <UpcomingQuizzes role={UserRole.ADMIN} url="/quiz/upcoming" />
+            <UpcomingQuizzes role={UserRole.USER} url="/quiz/upcoming" />
           </div>
 
           <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold">Attempted Quizzes</h2>
 
-            <CompletedQuizzes role={UserRole.ADMIN} url="/quiz/attempted" />
+            <CompletedQuizzes role={UserRole.USER} url="/quiz/attempted" />
           </div>
         </HydrationBoundary>
       </section>

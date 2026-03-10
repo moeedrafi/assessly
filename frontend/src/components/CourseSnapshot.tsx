@@ -21,7 +21,7 @@ export const CourseSnapshot = ({
     CourseSnapshotType[]
   >(
     ["course-snapshot", page, rpp],
-    "/analytics/course-snapshot",
+    "/admin/analytics/course-snapshot",
     { page, rpp },
     {
       staleTime: Infinity,

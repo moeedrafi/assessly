@@ -5,9 +5,15 @@ import type { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/Skeleton";
 
-export const MissedQuizzes = ({ url }: { url: string }) => {
+export const MissedQuizzes = ({
+  url,
+  courseId,
+}: {
+  url: string;
+  courseId: number;
+}) => {
   const { data: missedQuizzes, isLoading } = useQuery({
-    queryKey: ["missedQuizzes"],
+    queryKey: ["missedQuizzes", { courseId }],
     queryFn: async () => {
       const res = await api.get<QuizEntity[]>(url);
       return res.data;

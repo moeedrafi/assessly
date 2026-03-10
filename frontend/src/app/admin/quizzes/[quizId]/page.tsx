@@ -36,11 +36,11 @@ const QuizIdPage = async ({
       <section className="w-full font-lato space-y-4 px-2 py-4">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <QuizDetails />
-
-          <Suspense fallback={<Skeleton max={1} />}>
-            <QuestionDetails />
-          </Suspense>
         </HydrationBoundary>
+
+        <Suspense fallback={<Skeleton max={1} />}>
+          <QuestionDetails quizId={Number(quizId)} />
+        </Suspense>
       </section>
     </main>
   );

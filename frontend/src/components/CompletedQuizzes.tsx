@@ -8,12 +8,14 @@ import { useQuery } from "@tanstack/react-query";
 export const CompletedQuizzes = ({
   url,
   role,
+  courseId,
 }: {
   url: string;
   role: UserRole;
+  courseId?: number;
 }) => {
   const { data: completedQuizzes, isLoading } = useQuery({
-    queryKey: ["completedQuizzes"],
+    queryKey: ["completedQuizzes", { courseId }],
     queryFn: async () => {
       const res = await api.get<QuizEntity[]>(url);
       return res.data;
