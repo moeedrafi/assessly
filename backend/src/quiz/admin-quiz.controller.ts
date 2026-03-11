@@ -21,13 +21,12 @@ export class AdminQuizController {
   constructor(private quizServices: QuizService) {}
 
   @Serialize(QuizDTO)
-  @Post(':courseid')
+  @Post()
   createCourse(
     @CurrentUser() user: { sub: number; name: string },
-    @Param('courseid') courseId: string,
     @Body() body: CreateQuizDTO,
   ) {
-    return this.quizServices.create(user.sub, Number(courseId), body);
+    return this.quizServices.create(user.sub, body);
   }
 
   @Get(':courseid/completed')

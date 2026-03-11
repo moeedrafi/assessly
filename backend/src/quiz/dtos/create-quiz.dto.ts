@@ -3,7 +3,6 @@ import {
   IsBoolean,
   IsDateString,
   IsNumber,
-  IsOptional,
   IsString,
 } from 'class-validator';
 import { CreateQuestionDTO } from 'src/question/dtos/create-question.dto';
@@ -22,6 +21,9 @@ export class CreateQuizDTO {
   timeLimit: number;
 
   @IsNumber()
+  courseId: number;
+
+  @IsNumber()
   passingMarks: number;
 
   @IsBoolean()
@@ -31,9 +33,8 @@ export class CreateQuizDTO {
   startsAt: string;
 
   @IsDateString()
-  @IsOptional()
   endsAt: string;
 
   @IsArray()
-  question: CreateQuestionDTO[];
+  questions: CreateQuestionDTO[];
 }

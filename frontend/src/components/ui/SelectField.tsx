@@ -35,7 +35,10 @@ export const SelectField = ({
         id={field.name}
         name={field.name}
         value={field.state.value ?? ""}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+          field.handleChange(isNaN(Number(value)) ? value : Number(value));
+        }}
         className="bg-light px-3 py-2.5 ring-1 ring-color rounded-lg focus-visible:ring-2 outline-none"
       >
         {placeholder && <option value="">{placeholder}</option>}

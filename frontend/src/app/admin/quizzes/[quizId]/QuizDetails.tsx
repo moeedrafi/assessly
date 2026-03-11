@@ -73,9 +73,9 @@ export const QuizDetails = () => {
               label="Publish"
               value={
                 <span
-                  className={`px-2 py-1 rounded-sm text-white ${!quiz.isPublished ? "bg-primary" : "bg-muted-foreground"}`}
+                  className={`px-2 py-1 rounded-sm text-white ${quiz.isPublished ? "bg-secondary" : "bg-muted-foreground"}`}
                 >
-                  {!quiz.isPublished ? "Published" : "Draft"}
+                  {quiz.isPublished ? "Published" : "Draft"}
                 </span>
               }
             />

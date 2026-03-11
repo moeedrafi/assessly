@@ -29,13 +29,10 @@ export class QuizService {
   ) {}
 
   /* ADMIN */
-  async create(
-    teacherId: number,
-    courseId: number,
-    createQuizDto: CreateQuizDTO,
-  ) {
+  async create(teacherId: number, createQuizDto: CreateQuizDTO) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
-    if (!courseId) throw new UnauthorizedException('course id required');
+
+    const { courseId, ...quizDto } = createQuizDto;
 
     await this.coursesServices.findOneAdminCourse(courseId, teacherId);
 
@@ -44,12 +41,12 @@ export class QuizService {
       isPublished,
       name,
       passingMarks,
-      question,
+      questions,
       timeLimit,
       totalMarks,
       startsAt,
       endsAt,
-    } = createQuizDto;
+    } = quizDto;
 
     const quiz = this.repo.create({
       name,
@@ -65,7 +62,7 @@ export class QuizService {
 
     const savedQuiz = await this.repo.save(quiz);
 
-    for (const q of question) {
+    for (const q of questions) {
       await this.questionServices.create({ ...q, quiz: savedQuiz });
     }
 

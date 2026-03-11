@@ -2,6 +2,8 @@ import { toast } from "react-hot-toast";
 import { QuestionType } from "@/types/enum";
 import { formOptions } from "@tanstack/react-form";
 import { CreateQuizFormData, createQuizSchema } from "@/schemas/quiz.schemas";
+import { ApiError } from "./error";
+import { api } from "./api";
 
 const createQuizFormValues: CreateQuizFormData = {
   name: "",
@@ -37,6 +39,21 @@ export const createQuizFormOptions = formOptions({
       return;
     }
 
-    console.log(validatedData.data);
+    try {
+      const res = await api.post<void, CreateQuizFormData>(
+        "/admin/quiz",
+        validatedData.data,
+      );
+
+      toast.success(res.message);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
   },
 });
