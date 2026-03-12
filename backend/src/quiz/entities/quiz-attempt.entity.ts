@@ -21,7 +21,7 @@ export class QuizAttempt {
   @Column()
   score: number;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.quizAttempts, { onDelete: 'CASCADE' })
   student: User;
 
   @ManyToOne(() => Quiz, { onDelete: 'CASCADE' })

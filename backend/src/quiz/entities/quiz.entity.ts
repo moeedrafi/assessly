@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Question } from 'src/question/question.entity';
+import { QuizAttempt } from './quiz-attempt.entity';
 
 @Entity()
 export class Quiz {
@@ -46,6 +47,9 @@ export class Quiz {
 
   @OneToMany(() => Question, (question) => question.quiz)
   questions: Question[];
+
+  @OneToMany(() => QuizAttempt, (attempt) => attempt.quiz)
+  attempts: QuizAttempt[];
 
   @CreateDateColumn()
   createdAt: Date;

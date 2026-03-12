@@ -169,11 +169,7 @@ export class QuizService {
 
     const quizzes = await this.repo
       .createQueryBuilder('quiz')
-      .innerJoin('quiz.course', 'course')
-      .innerJoin('course.students', 'student', 'student.id = :studentId', {
-        studentId,
-      })
-      .innerJoin('quiz.studentAnswers', 'sa', 'sa.studentId = :studentId', {
+      .innerJoin('quiz.attempts', 'sa', 'sa.studentId = :studentId', {
         studentId,
       })
       .getMany();

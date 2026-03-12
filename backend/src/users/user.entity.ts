@@ -1,5 +1,6 @@
-import { Courses } from 'src/courses/courses.entity';
 import { UserRole } from 'src/enum';
+import { Courses } from 'src/courses/courses.entity';
+import { QuizAttempt } from 'src/quiz/entities/quiz-attempt.entity';
 import {
   Entity,
   Column,
@@ -46,6 +47,9 @@ export class User {
   @ManyToMany(() => Courses, (courses) => courses.students)
   @JoinTable()
   joinedCourses: Courses[];
+
+  @OneToMany(() => QuizAttempt, (attempt) => attempt.student)
+  quizAttempts: QuizAttempt[];
 
   @CreateDateColumn()
   createdAt: Date;
