@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Courses } from 'src/courses/courses.entity';
-import { Quiz } from 'src/quiz/entities/quiz.entity';
+import { Quiz } from 'src/quiz/quiz.entity';
 import { DashboardKpisDTO } from './dtos/dashboard-kpis.dto';
 import { RecentUserDTO } from './dtos/recent-user.dto';
 

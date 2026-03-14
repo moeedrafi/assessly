@@ -1,4 +1,6 @@
 import { Courses } from 'src/courses/courses.entity';
+import { Question } from 'src/question/question.entity';
+import { QuizAttempt } from 'src/quiz-attempt/quiz-attempt.entity';
 import {
   Entity,
   Column,
@@ -8,8 +10,6 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Question } from 'src/question/question.entity';
-import { QuizAttempt } from './quiz-attempt.entity';
 
 @Entity()
 export class Quiz {

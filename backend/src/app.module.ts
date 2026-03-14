@@ -8,10 +8,9 @@ import { AppController } from 'src/app.controller';
 
 import { User } from 'src/users/user.entity';
 import { Courses } from 'src/courses/courses.entity';
-import { Quiz } from 'src/quiz/entities/quiz.entity';
+import { Quiz } from 'src/quiz/quiz.entity';
 import { Option } from 'src/option/option.entity';
 import { Question } from 'src/question/question.entity';
-import { StudentAnswer } from 'src/quiz/entities/student-answer.entity';
 
 import { AuthModule } from 'src/auth/auth.module';
 import { QuizModule } from 'src/quiz/quiz.module';
@@ -22,8 +21,9 @@ import { AuthGuard } from './guards/auth.guard';
 import { QuestionModule } from './question/question.module';
 import { OptionModule } from './option/option.module';
 import { AnalyticsModule } from './analytics/analytics.module';
-import { QuizAttempt } from './quiz/entities/quiz-attempt.entity';
-import { QuestionAttempt } from './quiz/entities/question-attempt.entity';
+import { QuizAttempt } from './quiz-attempt/quiz-attempt.entity';
+import { QuestionAttempt } from './quiz-attempt/question-attempt.entity';
+import { QuizAttemptModule } from './quiz-attempt/quiz-attempt.module';
 
 @Module({
   imports: [
@@ -65,6 +65,7 @@ import { QuestionAttempt } from './quiz/entities/question-attempt.entity';
     QuestionModule,
     OptionModule,
     AnalyticsModule,
+    QuizAttemptModule,
   ],
   controllers: [AppController],
   providers: [

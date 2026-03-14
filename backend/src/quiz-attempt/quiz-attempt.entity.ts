@@ -1,6 +1,6 @@
 import { User } from 'src/users/user.entity';
-import { Quiz } from 'src/quiz/entities/quiz.entity';
-import { QuestionAttempt } from 'src/quiz/entities/question-attempt.entity';
+import { Quiz } from 'src/quiz/quiz.entity';
+import { QuestionAttempt } from 'src/quiz-attempt/question-attempt.entity';
 import {
   Entity,
   Column,

@@ -7,18 +7,18 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { QuizDTO } from 'src/quiz/dtos/quiz.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
-import { QuizService } from 'src/quiz/quiz.service';
-import { CreateQuizDTO } from './dtos/create-quiz.dto';
+import { CreateQuizDTO } from 'src/quiz/dtos/create-quiz.dto';
+import { QuizDetailDTO } from 'src/quiz/dtos/quiz-detail.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { QuizDTO } from './dtos/quiz.dto';
-import { QuizDetailDTO } from './dtos/quiz-detail.dto';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { QuizAdminService } from 'src/quiz/services/quiz-admin.service';
 
 @Controller('/admin/quiz')
 @UseGuards(AdminGuard)
 export class AdminQuizController {
-  constructor(private quizServices: QuizService) {}
+  constructor(private quizAdminService: QuizAdminService) {}
 
   @Serialize(QuizDTO)
   @Post()
@@ -26,47 +26,45 @@ export class AdminQuizController {
     @CurrentUser() user: { sub: number; name: string },
     @Body() body: CreateQuizDTO,
   ) {
-    return this.quizServices.create(user.sub, body);
+    return this.quizAdminService.create(user.sub, body);
   }
 
   @Get(':courseid/completed')
-  getAdminCompletedQuizzes(
+  getCompletedQuizzes(
     @CurrentUser() user: { sub: number },
     @Param('courseid') courseId: string,
   ) {
-    return this.quizServices.findAdminCompletedQuizzes(
-      user.sub,
-      Number(courseId),
-    );
+    return this.quizAdminService.findCompletedQuiz(user.sub, Number(courseId));
   }
 
   @Get(':courseid/upcoming')
-  getAdminUpcomingQuizzes(
+  getUpcomingQuizzes(
     @CurrentUser() user: { sub: number },
     @Param('courseid') courseId: string,
   ) {
-    return this.quizServices.findAdminUpcomingQuizzes(
-      user.sub,
-      Number(courseId),
-    );
+    return this.quizAdminService.findUpcomingQuiz(user.sub, Number(courseId));
   }
 
   @Get('completed')
   getAllCompletedQuizzes(@CurrentUser() user: { sub: number }) {
-    return this.quizServices.findAllCompletedQuizzes(user.sub);
+    return this.quizAdminService.findAllCompletedQuiz(user.sub);
   }
 
   @Get('upcoming')
   getAllUpcomingQuizzes(@CurrentUser() user: { sub: number }) {
-    return this.quizServices.findAllUpcomingQuizzes(user.sub);
+    return this.quizAdminService.findAllUpcomingQuiz(user.sub);
   }
 
   @Serialize(QuizDetailDTO)
   @Get(':quizid')
-  getOneQuiz(
+  getOne(
     @CurrentUser() user: { sub: number },
     @Param('quizid', ParseIntPipe) quizId: number,
   ) {
-    return this.quizServices.findOneAdminQuiz(user.sub, quizId);
+    return this.quizAdminService.findOne(user.sub, quizId);
   }
+
+  // TODO: Delete quiz
+  // TODO: Publish quiz
+  // TODO: Update quiz
 }

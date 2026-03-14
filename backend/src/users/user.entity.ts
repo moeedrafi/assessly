@@ -1,6 +1,6 @@
 import { UserRole } from 'src/enum';
 import { Courses } from 'src/courses/courses.entity';
-import { QuizAttempt } from 'src/quiz/entities/quiz-attempt.entity';
+import { QuizAttempt } from 'src/quiz-attempt/quiz-attempt.entity';
 import {
   Entity,
   Column,

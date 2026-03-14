@@ -1,4 +1,4 @@
-import { Quiz } from 'src/quiz/entities/quiz.entity';
+import { Quiz } from 'src/quiz/quiz.entity';
 import { QuestionType } from 'src/enum';
 import {
   Entity,
