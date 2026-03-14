@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CoursesService } from 'src/courses/courses.service';
-import { StudentCourseDTO } from './dtos/student-course.dto';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CoursesService } from 'src/courses/services/courses.service';
+import { StudentCourseDTO } from 'src/courses/dtos/student-course.dto';
 
 @Controller('courses')
 export class CoursesController {

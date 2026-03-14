@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Quiz } from 'src/quiz/quiz.entity';
-import { CoursesService } from 'src/courses/courses.service';
+import { CoursesService } from 'src/courses/services/courses.service';
 
 @Injectable()
 export class QuizService {
@@ -105,15 +105,10 @@ export class QuizService {
   }
 
   async findMissedQuiz(studentId: number, courseId: number) {
-    if (!studentId) throw new UnauthorizedException('not authenticated');
-    if (!courseId) throw new UnauthorizedException('course id required');
-
-    await this.coursesServices.findOne(courseId, studentId);
-
     const now = new Date();
 
     const quizzes = await this.buildStudentQuizQuery(studentId)
-      .andWhere('quiz.startsAt < :now', { now })
+      .andWhere('quiz.endsAt < :now', { now })
       .andWhere('course.id = :courseId', { courseId })
       .andWhere('attempt.id IS NULL')
       .getMany();
@@ -122,32 +117,32 @@ export class QuizService {
   }
 
   /* COMPLETED QUIZZES */
-  // async findAllCompletedQuiz(studentId: number) {
-  //   const now = new Date();
+  async findAllCompletedQuiz(studentId: number) {
+    const now = new Date();
 
-  //   const quizzes = await this.buildStudentQuizQuery(studentId)
-  //     .andWhere('quiz.endsAt < :now', { now })
-  //     .andWhere('attempt.id IS NOT NULL')
-  //     .getMany();
+    const quizzes = await this.buildStudentQuizQuery(studentId)
+      .andWhere('quiz.endsAt < :now', { now })
+      .andWhere('attempt.id IS NOT NULL')
+      .getMany();
 
-  //   return {
-  //     data: quizzes,
-  //     message: 'Successfully fetched all completed quizzes',
-  //     meta: null,
-  //   };
-  // }
+    return {
+      data: quizzes,
+      message: 'Successfully fetched all completed quizzes',
+      meta: null,
+    };
+  }
 
-  // async findCompletedQuiz(studentId: number, courseId: number) {
-  //   if (!courseId) throw new UnauthorizedException('course id required');
+  async findCompletedQuiz(studentId: number, courseId: number) {
+    if (!courseId) throw new UnauthorizedException('course id required');
 
-  //   const now = new Date();
+    const now = new Date();
 
-  //   const quizzes = await this.buildStudentQuizQuery(studentId)
-  //     .andWhere('quiz.endsAt < :now', { now })
-  //     .andWhere('attempt.id IS NOT NULL')
-  //     .andWhere('course.id = :courseId', { courseId })
-  //     .getMany();
+    const quizzes = await this.buildStudentQuizQuery(studentId)
+      .andWhere('quiz.endsAt < :now', { now })
+      .andWhere('attempt.id IS NOT NULL')
+      .andWhere('course.id = :courseId', { courseId })
+      .getMany();
 
-  //   return { data: quizzes, message: 'Fetched completed quizzes' };
-  // }
+    return { data: quizzes, message: 'Fetched completed quizzes' };
+  }
 }

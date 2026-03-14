@@ -2,15 +2,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Quiz } from 'src/quiz/quiz.entity';
-import { CoursesService } from 'src/courses/courses.service';
 import { CreateQuizDTO } from 'src/quiz/dtos/create-quiz.dto';
 import { QuestionService } from 'src/question/question.service';
+import { AdminCourseService } from 'src/courses/services/admin-course.service';
 
 @Injectable()
 export class QuizAdminService {
   constructor(
     @InjectRepository(Quiz) private repo: Repository<Quiz>,
-    private coursesServices: CoursesService,
+    private coursesService: AdminCourseService,
     private questionServices: QuestionService,
   ) {}
 
@@ -19,7 +19,7 @@ export class QuizAdminService {
 
     const { courseId, ...quizDto } = createQuizDto;
 
-    await this.coursesServices.findOneAdminCourse(courseId, teacherId);
+    await this.coursesService.findOne(courseId, teacherId);
 
     const {
       description,
@@ -79,10 +79,11 @@ export class QuizAdminService {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     if (!courseId) throw new UnauthorizedException('course id required');
 
-    await this.coursesServices.findOneAdminCourse(courseId, teacherId);
-
     const quizzes = await this.repo.find({
-      where: { course: { id: courseId }, endsAt: MoreThan(new Date()) },
+      where: {
+        course: { id: courseId, teacher: { id: teacherId } },
+        endsAt: MoreThan(new Date()),
+      },
     });
 
     return {

@@ -1,5 +1,5 @@
+import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { LessThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QuizAttempt } from 'src/quiz-attempt/quiz-attempt.entity';
 
@@ -8,32 +8,6 @@ export class QuizAttemptService {
   constructor(
     @InjectRepository(QuizAttempt) private repo: Repository<QuizAttempt>,
   ) {}
-
-  async findAllCompletedQuizzes(studentId: number) {
-    const now = new Date();
-
-    const quizzes = await this.repo.find({
-      where: {
-        student: { id: studentId },
-        quiz: { endsAt: LessThan(now) },
-      },
-    });
-
-    return { data: quizzes, message: 'Fetched completed quizzes' };
-  }
-
-  async findCompletedQuizzes(studentId: number, courseId: number) {
-    const now = new Date();
-
-    const quizzes = await this.repo.find({
-      where: {
-        student: { id: studentId },
-        quiz: { endsAt: LessThan(now), course: { id: courseId } },
-      },
-    });
-
-    return { data: quizzes, message: 'Fetched course completed quizzes' };
-  }
 
   async attempt() {}
 

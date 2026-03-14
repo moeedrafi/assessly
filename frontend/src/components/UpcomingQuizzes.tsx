@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { Skeleton } from "./Skeleton";
 import { UserRole } from "@/types/user";
 import type { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
@@ -23,13 +24,7 @@ export const UpcomingQuizzes = ({
     staleTime: Infinity,
   });
 
-  if (isLoading) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        Fetching upcoming quizzes...
-      </p>
-    );
-  }
+  if (isLoading) return <Skeleton max={3} />;
 
   if (!upcomingQuizzes || upcomingQuizzes.length === 0) {
     return <p className="text-muted-foreground text-sm">No Upcoming Quizzes</p>;

@@ -22,7 +22,7 @@ export class AdminQuizController {
 
   @Serialize(QuizDTO)
   @Post()
-  createCourse(
+  createQuiz(
     @CurrentUser() user: { sub: number; name: string },
     @Body() body: CreateQuizDTO,
   ) {

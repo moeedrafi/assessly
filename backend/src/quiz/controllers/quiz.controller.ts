@@ -49,16 +49,16 @@ export class QuizController {
   }
 
   /* COMPLETED QUIZZES */
-  // @Get('completed')
-  // getAllCompletedQuiz(@CurrentUser() user: { sub: number }) {
-  //   return this.quizServices.findAllCompletedQuiz(user.sub);
-  // }
+  @Get('completed')
+  getAllCompletedQuiz(@CurrentUser() user: { sub: number }) {
+    return this.quizServices.findAllCompletedQuiz(user.sub);
+  }
 
-  // @Get(':courseid/completed')
-  // getCompletedQuiz(
-  //   @CurrentUser() user: { sub: number },
-  //   @Param('courseid') courseId: string,
-  // ) {
-  //   return this.quizServices.findCompletedQuiz(user.sub, Number(courseId));
-  // }
+  @Get(':courseid/completed')
+  getCompletedQuiz(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid') courseId: string,
+  ) {
+    return this.quizServices.findCompletedQuiz(user.sub, Number(courseId));
+  }
 }

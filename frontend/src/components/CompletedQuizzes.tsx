@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { Skeleton } from "./Skeleton";
 import { UserRole } from "@/types/user";
 import { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
@@ -23,7 +24,7 @@ export const CompletedQuizzes = ({
     staleTime: Infinity,
   });
 
-  if (isLoading) return <p>loaing...</p>;
+  if (isLoading) return <Skeleton max={3} />;
 
   if (!completedQuizzes || completedQuizzes.length === 0) {
     return (
