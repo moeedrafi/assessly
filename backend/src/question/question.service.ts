@@ -1,15 +1,16 @@
 import { Repository } from 'typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Question } from './question.entity';
-import { OptionService } from 'src/option/option.service';
-import { CreateQuestionDTO } from './dtos/create-question.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Quiz } from 'src/quiz/quiz.entity';
+import { Question } from 'src/question/question.entity';
+import { OptionService } from 'src/option/option.service';
+import { CreateQuestionDTO } from 'src/question/dtos/create-question.dto';
 
 @Injectable()
 export class QuestionService {
   constructor(
     @InjectRepository(Question) private repo: Repository<Question>,
+    @InjectRepository(Quiz) private quizRepo: Repository<Quiz>,
     private optionServices: OptionService,
   ) {}
 
@@ -29,13 +30,21 @@ export class QuestionService {
   async findAll(quizId: number) {
     if (!quizId) throw new NotFoundException('quiz not found');
 
-    const question = await this.repo
+    const quiz = await this.quizRepo.findOne({
+      where: { id: quizId },
+      select: ['timeLimit'],
+    });
+
+    const questions = await this.repo
       .createQueryBuilder('question')
       .leftJoin('question.quiz', 'quiz')
       .leftJoinAndSelect('question.options', 'options')
       .where('quiz.id = :quizId', { quizId })
       .getMany();
 
-    return { data: question, message: 'Successfully fetched questions' };
+    return {
+      data: { timeLimit: quiz?.timeLimit, questions },
+      message: 'Successfully fetched questions',
+    };
   }
 }

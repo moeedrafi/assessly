@@ -1,4 +1,4 @@
-import { CreateQuestion } from "@/types/question";
+import type { CreateQuestion, QuestionDetail } from "@/types/question";
 
 export interface QuizEntity {
   id: number;
@@ -23,3 +23,8 @@ export type CreateQuiz = Omit<QuizEntity, "id" | "createdAt" | "updatedAt"> & {
   questions: CreateQuestion[];
   courseId: number;
 };
+
+export interface QuizQuestions {
+  timeLimit: number;
+  questions: QuestionDetail[];
+}

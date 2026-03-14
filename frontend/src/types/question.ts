@@ -1,9 +1,10 @@
+import { QuestionType } from "./enum";
 import { CreateOption, OptionEntity } from "@/types/option";
 
 export interface QuestionEntity {
   id: number;
   text: string;
-  type: string;
+  type: QuestionType;
   marks: number;
 }
 
