@@ -1,8 +1,18 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Quiz } from 'src/quiz/quiz.entity';
 import { CoursesService } from 'src/courses/services/courses.service';
+import { UserRole } from 'src/enum';
+import { AttemptQuizDTO } from 'src/quiz-attempt/dtos/attempt-quiz.dto';
+import { QuestionAttempt } from 'src/quiz-attempt/question-attempt.entity';
+import { QuizAttempt } from 'src/quiz-attempt/quiz-attempt.entity';
 
 @Injectable()
 export class QuizService {

@@ -16,7 +16,10 @@ export const Timer = ({ duration }: { duration: number }) => {
   });
 
   const [timer, setTimer] = useState<number>(() =>
-    Math.max(0, Math.ceil((startTime! + duration * 1000 - Date.now()) / 1000)),
+    Math.max(
+      0,
+      Math.ceil((startTime! + duration * 60 * 1000 - Date.now()) / 1000),
+    ),
   );
 
   const minutes = Math.floor(timer / 60);
@@ -27,7 +30,7 @@ export const Timer = ({ duration }: { duration: number }) => {
   useEffect(() => {
     if (!startTime) return;
 
-    const totalQuizDuration = startTime + duration * 1000;
+    const totalQuizDuration = startTime + duration * 60 * 1000;
 
     const intervalId = setInterval(() => {
       const remaining = totalQuizDuration - Date.now();

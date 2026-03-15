@@ -1,18 +1,21 @@
 "use client";
-
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { api } from "@/lib/api";
-import { useParams } from "next/navigation";
+import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
-import type { QuizQuestions } from "@/types/quiz";
+import { useParams, useRouter } from "next/navigation";
+
+import { api } from "@/lib/api";
+import { ApiError } from "@/lib/error";
 import { QuestionType } from "@/types/enum";
+import type { QuizQuestions } from "@/types/quiz";
 const Timer = dynamic(
   () => import("@/components/Timer").then((mod) => mod.Timer),
   { ssr: false },
 );
 
 const QuizAttemptPage = () => {
+  const router = useRouter();
   const { quizId } = useParams<{ quizId: string }>();
 
   const { data, isLoading } = useQuery({
@@ -25,9 +28,7 @@ const QuizAttemptPage = () => {
 
   const [questionNumber, setQuestionNumber] = useState<number>(0);
 
-  const [answers, setAnswers] = useState<{
-    [questionId: number]: number | number[];
-  }>({});
+  const [answers, setAnswers] = useState<Record<number, number[]>>({});
 
   if (isLoading) return <p>LOADING....</p>;
   if (!data) return <p>No question found!</p>;
@@ -35,6 +36,8 @@ const QuizAttemptPage = () => {
   const isPrev = questionNumber === 0;
   const question = data.questions[questionNumber];
   const isNext = data.questions.length - 1 === questionNumber;
+
+  const skippedQuestions = data.questions.filter((q) => !answers[q.id]).length;
 
   const nextQuestion = () => {
     if (isNext) return;
@@ -51,33 +54,46 @@ const QuizAttemptPage = () => {
   const handleSingleChoice = (optionId: number) => {
     setAnswers((prev) => ({
       ...prev,
-      [question.id]: optionId,
+      [question.id]: [optionId],
     }));
   };
 
   const handleMultipleChoice = (optionId: number) => {
     setAnswers((prev) => {
-      const currentOptions = prev[question.id] as number[] | undefined;
+      const currentOptions = prev[question.id] ?? [];
 
-      // nothing is checked
-      if (!currentOptions) return { ...prev, [question.id]: [optionId] };
-
-      // if clicked option is selected remove it
       if (currentOptions.includes(optionId)) {
         return {
           ...prev,
           [question.id]: currentOptions.filter((id) => id !== optionId),
         };
-      } else {
-        return { ...prev, [question.id]: [...currentOptions, optionId] };
       }
+
+      return { ...prev, [question.id]: [...currentOptions, optionId] };
     });
   };
 
-  const submitQuiz = () => {
-    // router.push("/quizzes/1/result");
+  const submitQuiz = async () => {
+    const payload = {
+      answers: Object.entries(answers).map(([questionId, optionIds]) => ({
+        questionId: Number(questionId),
+        selectedOptionIds: optionIds,
+      })),
+    };
 
-    console.log(answers);
+    try {
+      const res = await api.post(`/quiz-attempt/${quizId}/attempt`, payload);
+      toast.success(res.message);
+      // router.push(`/quizzes/${quizId}/result`);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
   };
 
   return (
@@ -109,13 +125,7 @@ const QuizAttemptPage = () => {
                   }
                   name={`question-${question.id}`}
                   value={option.text.toLowerCase()}
-                  checked={
-                    question.type === QuestionType.SINGLE_CHOICE
-                      ? answers[question.id] === option.id
-                      : ((
-                          answers[question.id] as number[] | undefined
-                        )?.includes(option.id) ?? false)
-                  }
+                  checked={answers[question.id]?.includes(option.id) ?? false}
                   onChange={() =>
                     question.type === QuestionType.SINGLE_CHOICE
                       ? handleSingleChoice(option.id)
@@ -146,6 +156,13 @@ const QuizAttemptPage = () => {
               {isNext ? "Submit Quiz" : "Next"}
             </button>
           </div>
+
+          {isNext && (
+            <p className="text-muted-foreground">
+              Before submitting just know that you skipped {skippedQuestions}{" "}
+              questions
+            </p>
+          )}
         </div>
       </section>
     </main>

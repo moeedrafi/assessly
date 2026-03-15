@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { UserRole } from 'src/enum';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AttemptQuizDTO } from 'src/quiz-attempt/dtos/attempt-quiz.dto';
@@ -7,13 +14,13 @@ import { QuizAttemptService } from 'src/quiz-attempt/quiz-attempt.service';
 export class QuizAttemptController {
   constructor(private quizAttemptService: QuizAttemptService) {}
 
-  @Post(':quizid/attempted')
+  @Post(':quizid/attempt')
   attemptQuiz(
-    @Param('quizid') quizId: string,
+    @Param('quizid', ParseIntPipe) quizId: number,
     @CurrentUser() user: { sub: number; role: UserRole },
     @Body() body: AttemptQuizDTO,
   ) {
-    return this.quizAttemptService.attempt();
+    return this.quizAttemptService.attempt(quizId, user, body);
   }
 
   @Get(':quizid/result')
