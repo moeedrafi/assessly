@@ -1,4 +1,9 @@
-import type { CreateQuestion, QuestionDetail } from "@/types/question";
+import type { OptionEntity } from "@/types/option";
+import type {
+  CreateQuestion,
+  QuestionDetail,
+  QuestionEntity,
+} from "@/types/question";
 
 export interface QuizEntity {
   id: number;
@@ -27,4 +32,13 @@ export type CreateQuiz = Omit<QuizEntity, "id" | "createdAt" | "updatedAt"> & {
 export interface QuizQuestions {
   timeLimit: number;
   questions: QuestionDetail[];
+}
+
+export interface QuizResult {
+  id: number;
+  isCorrect: boolean;
+  marksObtained: number;
+  selectedOptionIds: number[];
+  question: QuestionEntity;
+  options: OptionEntity[];
 }

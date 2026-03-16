@@ -25,10 +25,10 @@ export class QuizAttemptController {
 
   @Get(':quizid/result')
   result(
-    @Param('quizid') quizId: string,
-    @CurrentUser() user: { sub: number; role: UserRole },
+    @Param('quizid', ParseIntPipe) quizId: number,
+    @CurrentUser() user: { sub: number },
   ) {
-    return this.quizAttemptService.result();
+    return this.quizAttemptService.result(quizId, user.sub);
   }
 
   // TODO: Leaderboards

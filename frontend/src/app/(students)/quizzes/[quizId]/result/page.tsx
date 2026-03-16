@@ -1,103 +1,157 @@
-const quizQuestions = [
-  {
-    id: 1,
-    title: "Question 1",
-    options: [
-      { id: "1", content: "Option 1" },
-      { id: "2", content: "Option 2" },
-      { id: "3", content: "Option 3" },
-      { id: "4", content: "Option 4" },
-    ],
-    correctOptionId: "1",
-  },
-  {
-    id: 2,
-    title: "Question 2",
-    options: [
-      { id: "1", content: "Q2 Option 1" },
-      { id: "2", content: "Q2 Option 2" },
-      { id: "3", content: "Q2 Option 3" },
-      { id: "4", content: "Q2 Option 4" },
-    ],
-    correctOptionId: "3",
-  },
-  {
-    id: 3,
-    title: "Question 3",
-    options: [
-      { id: "1", content: "Q3 Option 1" },
-      { id: "2", content: "Q3 Option 2" },
-      { id: "3", content: "Q3 Option 3" },
-      { id: "4", content: "Q3 Option 4" },
-    ],
-    correctOptionId: "4",
-  },
-];
+"use client";
+import { api } from "@/lib/api";
+import { useParams } from "next/navigation";
+import type { QuizResult } from "@/types/quiz";
+import { useQuery } from "@tanstack/react-query";
 
-const userAnswers: UserAnswerType = {
-  1: "1",
-  2: "3",
-  3: "1",
-};
-
-type UserAnswerType = {
-  [id: number]: string;
+const getGrade = (percentage: number) => {
+  if (percentage >= 90) return "A";
+  if (percentage >= 80) return "B";
+  if (percentage >= 70) return "C";
+  if (percentage >= 60) return "D";
+  return "F";
 };
 
 const QuizResultPage = () => {
-  const questions = quizQuestions;
+  const { quizId } = useParams();
+  const { data, isLoading } = useQuery({
+    queryKey: ["result", quizId],
+    queryFn: async () => {
+      const res = await api.get<QuizResult[]>(`/quiz-attempt/${18}/result`);
+      return res.data;
+    },
+  });
 
-  // when the user answer is same as correct option then we add 1 else 0
-  const correctQuestions = quizQuestions.reduce(
-    (acc, c) => acc + (c.correctOptionId === userAnswers[c.id] ? 1 : 0),
-    0
-  );
+  if (isLoading) return <p>LOADING...</p>;
+  if (!data) return <p>404 Not Found</p>;
+
+  const correctAnswers = data.filter((d) => d.isCorrect).length;
+  const totalMarks = data.reduce((acc, q) => acc + q.question.marks, 0);
+  const obtainedMarks = data.reduce((acc, q) => acc + q.marksObtained, 0);
+  const percentage = Math.round((obtainedMarks / totalMarks) * 100);
+  const grade = getGrade(percentage);
 
   return (
     <main>
-      <section className="w-full font-lato space-y-4 p-4">
-        {/* Heading */}
-        <div className="space-y-2 text-center p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">Quiz Title</h1>
-          <p className="text-muted-foreground">
-            {correctQuestions} correct out of {quizQuestions.length}
-          </p>
+      <section className="w-full font-lato space-y-6 p-6">
+        {/* SUMMARY CARD */}
+        <div className="bg-bg p-6 border border-color shadow rounded-lg space-y-4 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold">Quiz Results</h1>
+
+          <div className="flex justify-center gap-8 text-sm sm:text-base">
+            <div>
+              <p className="font-semibold">
+                {obtainedMarks}/{totalMarks}
+              </p>
+              <p className="text-muted-foreground">Score</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">{percentage}%</p>
+              <p className="text-muted-foreground">Accuracy</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">
+                {correctAnswers}/{data.length}
+              </p>
+              <p className="text-muted-foreground">Correct</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">{grade}</p>
+              <p className="text-muted-foreground">Grade</p>
+            </div>
+          </div>
+
+          {/* PROGRESS BAR */}
+          <div className="w-full bg-dark h-3 rounded overflow-hidden">
+            <div
+              className="bg-green-500 h-3"
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
         </div>
 
+        {/* QUESTIONS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {questions.map((question) => (
+          {data.map((result, index) => (
             <div
-              key={question.id}
+              key={result.id}
               className="space-y-4 bg-bg p-6 sm:p-8 rounded-lg shadow border border-color"
             >
-              <p className="text-sm leading-[1.6em] text-muted-foreground">
-                {question.title}
-              </p>
+              {/* QUESTION HEADER */}
+              <div className="flex justify-between items-start gap-4">
+                <div className="space-y-1">
+                  <h3 className="font-semibold">Question {index + 1}</h3>
 
+                  <p className="text-sm text-muted-foreground leading-[1.5em]">
+                    {result.question.text}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`font-semibold ${
+                      result.isCorrect ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {result.marksObtained}/{result.question.marks}
+                  </span>
+
+                  <span
+                    className={`text-xs font-semibold px-2 py-1 rounded ${
+                      result.isCorrect
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {result.isCorrect ? "Correct" : "Incorrect"}
+                  </span>
+                </div>
+              </div>
+
+              {/* OPTIONS */}
               <ul className="space-y-2 text-muted-foreground">
-                {question.options.map((option) => {
-                  const userSelectedOptionId = userAnswers[question.id];
-                  const isUserSelected = option.id === userSelectedOptionId;
+                {result.options.map((option) => {
+                  const isCorrectOption = option.isCorrect;
+                  const isUserSelected = result.selectedOptionIds.includes(
+                    option.id,
+                  );
 
-                  const isCorrectOption =
-                    question.correctOptionId === option.id;
+                  let textColor = "";
+                  let extraLabel = "";
 
-                  // the user selected option AND this options is not correct
-                  const isWrongSelection = isUserSelected && !isCorrectOption;
+                  if (isCorrectOption) {
+                    textColor = "text-green-600";
+                    if (!isUserSelected) extraLabel = " (Correct answer)";
+                  }
+
+                  if (isUserSelected && !isCorrectOption) {
+                    textColor = "text-red-600";
+                    extraLabel = " (Your selection)";
+                  }
 
                   return (
                     <label
                       key={option.id}
-                      className={`flex items-center gap-2 ${
-                        isCorrectOption
-                          ? "text-green-500"
-                          : isWrongSelection
-                          ? "text-red-500"
-                          : ""
-                      }`}
+                      className={`flex items-center gap-2 text-sm ${textColor}`}
                     >
-                      <input type="radio" disabled checked={isUserSelected} />
-                      {option.content}
+                      <input
+                        disabled
+                        type={
+                          result.question.type === "multiple_choice"
+                            ? "checkbox"
+                            : "radio"
+                        }
+                        checked={isUserSelected}
+                      />
+                      <span>
+                        {option.text}
+                        <span className="text-xs ml-1 opacity-70">
+                          {extraLabel}
+                        </span>
+                      </span>
                     </label>
                   );
                 })}

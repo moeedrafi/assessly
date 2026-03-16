@@ -55,9 +55,9 @@ const QuizzesPage = async () => {
           </div>
 
           <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
-            <h2 className="text-xl sm:text-2xl font-bold">Attempted Quizzes</h2>
+            <h2 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h2>
 
-            <CompletedQuizzes role={UserRole.USER} url="/quiz/attempted" />
+            <CompletedQuizzes role={UserRole.USER} url="/quiz/completed" />
           </div>
         </HydrationBoundary>
       </section>
