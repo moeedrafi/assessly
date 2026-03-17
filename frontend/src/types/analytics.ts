@@ -18,3 +18,12 @@ export interface CourseSnapshotType {
   avgScore: number;
   passRate: number;
 }
+
+export interface RecentQuiz {
+  id: number;
+  name: string;
+  totalMarks: number;
+  passingMarks: number;
+  score: number;
+  avgScore: number;
+}

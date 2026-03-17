@@ -126,33 +126,28 @@ export class AnalyticsService {
   async getRecentQuiz(studentId: number) {
     const quizzes = await this.quizRepo
       .createQueryBuilder('quiz')
-      .leftJoin(
-        'quiz.studentAnswers',
-        'studentAttempt',
-        'studentAttempt.studentId = :studentId',
-        {
-          studentId,
-        },
-      )
-      .leftJoin('quiz.studentAnswers', 'allAttempts')
+      .innerJoin('quiz.attempts', 'attempt', 'attempt.studentId = :studentId', {
+        studentId,
+      })
+      .leftJoin('quiz.attempts', 'allAttempts')
 
       .select('quiz.id', 'id')
       .addSelect('quiz.name', 'name')
       .addSelect('quiz.totalMarks', 'totalMarks')
       .addSelect('quiz.passingMarks', 'passingMarks')
-      .addSelect('studentAttempt.totalScore', 'score')
-      .addSelect('AVG(allAttempts.totalScore)', 'avgScore')
+      .addSelect('attempt.score', 'score')
+      .addSelect('AVG(allAttempts.score)', 'avgScore')
 
       .groupBy('quiz.id')
       .addGroupBy('quiz.name')
       .addGroupBy('quiz.totalMarks')
       .addGroupBy('quiz.passingMarks')
-      .addGroupBy('studentAttempt.totalScore')
-      .addGroupBy('studentAttempt.createdAt')
+      .addGroupBy('attempt.score')
+      .addGroupBy('attempt.createdAt')
 
-      .orderBy('studentAttempt.createdAt', 'DESC')
+      .orderBy('attempt.createdAt', 'DESC')
       .getRawMany();
 
-    return quizzes;
+    return { data: quizzes, message: 'Fetched recent quizzes' };
   }
 }

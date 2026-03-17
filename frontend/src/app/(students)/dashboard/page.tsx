@@ -1,7 +1,17 @@
-import { AvailableQuizzes } from "@/components/quiz/AvailableQuiz";
+import { api } from "@/lib/api";
+import { cookies } from "next/headers";
 import { UserRole } from "@/types/user";
+import { RecentQuizzes } from "./RecentQuizzes";
+import type { RecentQuiz } from "@/types/analytics";
+import { AvailableQuizzes } from "@/components/quiz/AvailableQuiz";
 
-const DashboardPage = () => {
+const DashboardPage = async () => {
+  const cookieStore = await cookies();
+
+  const res = await api.get<RecentQuiz[]>("/analytics/recent-quiz", {
+    Cookie: cookieStore.toString(),
+  });
+
   return (
     <main>
       <section className="w-full font-lato space-y-4 px-2 py-4">
@@ -18,6 +28,8 @@ const DashboardPage = () => {
 
           <AvailableQuizzes role={UserRole.USER} url="/quiz/available" />
         </div>
+
+        <RecentQuizzes initialData={res.data} />
       </section>
     </main>
   );
