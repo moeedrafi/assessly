@@ -26,8 +26,32 @@ export const RecentQuizzes = ({
       { accessorKey: "name", header: "Quiz" },
       { accessorKey: "totalMarks", header: "Total Marks" },
       { accessorKey: "passingMarks", header: "Passing Marks" },
-      { accessorKey: "score", header: "Score" },
-      { accessorKey: "avgScore", header: "Average Score" },
+      {
+        accessorKey: "score",
+        header: "Score",
+        cell: ({ row }) => {
+          const score = row.original.score;
+          const avg = row.original.avgScore;
+
+          const isAbove = score > avg;
+          const isEqual = score === avg;
+
+          return (
+            <div className="flex items-center gap-2">
+              <span
+                className={`${isAbove ? "text-green-500" : isEqual ? "text-gray-400" : "text-red-500"} `}
+              >
+                {score}
+              </span>
+
+              {isAbove && <span className="text-green-500">▲</span>}
+              {!isAbove && !isEqual && <span className="text-red-500">▼</span>}
+              {isEqual && <span className="text-gray-400">●</span>}
+            </div>
+          );
+        },
+      },
+      { accessorKey: "avgScore", header: "Average" },
     ],
     [],
   );

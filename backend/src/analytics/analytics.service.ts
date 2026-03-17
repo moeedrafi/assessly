@@ -136,7 +136,7 @@ export class AnalyticsService {
       .addSelect('quiz.totalMarks', 'totalMarks')
       .addSelect('quiz.passingMarks', 'passingMarks')
       .addSelect('attempt.score', 'score')
-      .addSelect('AVG(allAttempts.score)', 'avgScore')
+      .addSelect('ROUND(AVG(allAttempts.score), 2)', 'avgScore')
 
       .groupBy('quiz.id')
       .addGroupBy('quiz.name')
