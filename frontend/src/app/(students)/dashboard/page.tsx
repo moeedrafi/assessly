@@ -1,14 +1,22 @@
-import { api } from "@/lib/api";
 import { cookies } from "next/headers";
 import { UserRole } from "@/types/user";
+import { api, PaginationMeta } from "@/lib/api";
 import { RecentQuizzes } from "./RecentQuizzes";
-import type { RecentQuiz } from "@/types/analytics";
+import { StudentCourseSnapshot } from "./StudentCourseSnapshot";
 import { AvailableQuizzes } from "@/components/quiz/AvailableQuiz";
+import type { RecentQuiz, StudentCourseSnapshotType } from "@/types/analytics";
 
 const DashboardPage = async () => {
   const cookieStore = await cookies();
 
   const res = await api.get<RecentQuiz[]>("/analytics/recent-quiz", {
+    Cookie: cookieStore.toString(),
+  });
+
+  const courseSnapshot = await api.get<
+    StudentCourseSnapshotType[],
+    PaginationMeta
+  >("/analytics/course-snapshot?page=1&rpp=5", {
     Cookie: cookieStore.toString(),
   });
 
@@ -30,6 +38,7 @@ const DashboardPage = async () => {
         </div>
 
         <RecentQuizzes initialData={res.data} />
+        <StudentCourseSnapshot initialData={courseSnapshot} />
       </section>
     </main>
   );

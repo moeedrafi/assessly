@@ -27,3 +27,11 @@ export interface RecentQuiz {
   score: number;
   avgScore: number;
 }
+
+export interface StudentCourseSnapshotType {
+  id: number;
+  name: string;
+  totalQuizzes: number;
+  yourAvg: number;
+  totalAvg: number;
+}

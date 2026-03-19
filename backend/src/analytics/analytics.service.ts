@@ -150,4 +150,50 @@ export class AnalyticsService {
 
     return { data: quizzes, message: 'Fetched recent quizzes' };
   }
+
+  async studentCourseSnapshot(studentId: number, page: number, rpp: number) {
+    const offset = (page - 1) * rpp;
+
+    const totalItems = await this.courseRepo
+      .createQueryBuilder('course')
+      .innerJoin('course.students', 'student', 'student.id = :studentId', {
+        studentId,
+      })
+      .getCount();
+
+    const data = await this.courseRepo
+      .createQueryBuilder('course')
+      .innerJoin('course.students', 'student', 'student.id = :studentId', {
+        studentId,
+      })
+      .leftJoin('course.quizzes', 'quiz')
+      .innerJoin('quiz.attempts', 'attempt', 'attempt.studentId = :studentId', {
+        studentId,
+      })
+      .leftJoin('quiz.attempts', 'allAttempts')
+
+      .select('course.id', 'id')
+      .addSelect('course.name', 'name')
+      .addSelect('COUNT(DISTINCT quiz.id)', 'totalQuizzes')
+      .addSelect('ROUND(AVG(attempt.score), 2)', 'yourAvg')
+      .addSelect('ROUND(AVG(allAttempts.score), 2)', 'totalAvg')
+
+      .groupBy('course.id')
+      .addGroupBy('course.name')
+
+      .limit(rpp)
+      .offset(offset)
+      .getRawMany();
+
+    return {
+      data,
+      message: 'Fetched student course snapshot successfully',
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
+    };
+  }
 }
