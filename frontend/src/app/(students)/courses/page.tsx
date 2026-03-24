@@ -16,10 +16,9 @@ const CoursesPage = async () => {
   await queryClient.prefetchQuery({
     queryKey: ["courses"],
     queryFn: async () => {
-      const res = await api.get<JoinedCourse[]>("/courses", {
+      await api.get<JoinedCourse[]>("/courses", {
         Cookie: cookieStore.toString(),
       });
-      return res.data;
     },
     staleTime: Infinity,
   });

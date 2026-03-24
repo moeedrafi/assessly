@@ -15,7 +15,7 @@ export const Courses = () => {
   const [rpp, setRpp] = useState<number>(5);
 
   const { data, isLoading, isPlaceholderData } = useApiQuery<TeachingCourse[]>(
-    ["course-snapshot", page, rpp],
+    ["courses", page, rpp],
     "/admin/courses",
     { page, rpp },
     {
