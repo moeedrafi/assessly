@@ -6,14 +6,14 @@ import { CurrentUser } from 'src/decorators/current-user.decorator';
 export class QuizController {
   constructor(private quizServices: QuizService) {}
 
-  /* UPCOMING QUIZZES */
-  @Get('upcoming')
-  getAllUpcomingQuiz(
+  @Get()
+  getAll(
     @CurrentUser() user: { sub: number },
     @Query('page', ParseIntPipe) page = 1,
     @Query('rpp', ParseIntPipe) rpp = 5,
+    @Query('status') status: 'missed' | 'upcoming' | 'completed',
   ) {
-    return this.quizServices.findAllUpcomingQuiz(user.sub, page, rpp);
+    return this.quizServices.findAll(user.sub, page, rpp, status);
   }
 
   @Get(':courseid/upcoming')
@@ -22,6 +22,22 @@ export class QuizController {
     @Param('courseid') courseId: string,
   ) {
     return this.quizServices.findUpcomingQuiz(user.sub, Number(courseId));
+  }
+
+  @Get(':courseid/missed')
+  getMissedQuiz(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid') courseId: string,
+  ) {
+    return this.quizServices.findMissedQuiz(user.sub, Number(courseId));
+  }
+
+  @Get(':courseid/completed')
+  getCompletedQuiz(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid') courseId: string,
+  ) {
+    return this.quizServices.findCompletedQuiz(user.sub, Number(courseId));
   }
 
   /* AVAILABLE QUIZZES */
@@ -40,41 +56,5 @@ export class QuizController {
     @Param('courseid') courseId: string,
   ) {
     return this.quizServices.findAvailableQuiz(user.sub, Number(courseId));
-  }
-
-  /* MISSED QUIZZES */
-  @Get('missed')
-  getAllMissedQuiz(
-    @CurrentUser() user: { sub: number },
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('rpp', ParseIntPipe) rpp = 5,
-  ) {
-    return this.quizServices.findAllMissedQuiz(user.sub, page, rpp);
-  }
-
-  @Get(':courseid/missed')
-  getMissedQuiz(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
-  ) {
-    return this.quizServices.findMissedQuiz(user.sub, Number(courseId));
-  }
-
-  /* COMPLETED QUIZZES */
-  @Get('completed')
-  getAllCompletedQuiz(
-    @CurrentUser() user: { sub: number },
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('rpp', ParseIntPipe) rpp = 5,
-  ) {
-    return this.quizServices.findAllCompletedQuiz(user.sub, page, rpp);
-  }
-
-  @Get(':courseid/completed')
-  getCompletedQuiz(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
-  ) {
-    return this.quizServices.findCompletedQuiz(user.sub, Number(courseId));
   }
 }

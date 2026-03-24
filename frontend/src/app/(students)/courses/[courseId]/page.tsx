@@ -1,8 +1,5 @@
 import Image from "next/image";
-import { UserRole } from "@/types/user";
-import { MissedQuizzes } from "@/components/MissedQuizzes";
-import { UpcomingQuizzes } from "@/components/UpcomingQuizzes";
-import { CompletedQuizzes } from "@/components/CompletedQuizzes";
+import { Quizzes } from "@/components/quiz/Quizzes";
 
 const stats = [
   {
@@ -142,30 +139,10 @@ const CourseIdPage = async ({
           </div>
         </div>
 
-        <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
-          <h3 className="text-xl sm:text-2xl font-bold">Upcoming Quizzes</h3>
-          <UpcomingQuizzes
-            role={UserRole.USER}
-            courseId={Number(courseId)}
-            url={`/quiz/${courseId}/upcoming`}
-          />
-        </div>
+        <div className="shadow-inset-lg space-y-4 p-6 sm:p-8 rounded-lg">
+          <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
 
-        <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
-          <h3 className="text-xl sm:text-2xl font-bold">Missed Quizzes</h3>
-          <MissedQuizzes
-            courseId={Number(courseId)}
-            url={`/quiz/${courseId}/missed`}
-          />
-        </div>
-
-        <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
-          <h3 className="text-xl sm:text-2xl font-bold">Completed Quizzes</h3>
-          <CompletedQuizzes
-            role={UserRole.USER}
-            courseId={Number(courseId)}
-            url={`/quiz/${courseId}/completed`}
-          />
+          <Quizzes courseId={courseId} url="/quiz" />
         </div>
       </section>
     </main>
