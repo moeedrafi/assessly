@@ -93,41 +93,60 @@ export class QuizAdminService {
     };
   }
 
-  async findAllCompletedQuiz(teacherId: number) {
+  async findAllCompletedQuiz(teacherId: number, page: number, rpp: number) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     const now = new Date();
+    const offset = (page - 1) * rpp;
 
-    const quizzes = await this.repo
+    const [quizzes, totalItems] = await this.repo
       .createQueryBuilder('quiz')
       .leftJoin('quiz.course', 'course')
       .leftJoin('course.teacher', 'teacher')
       .where('teacher.id = :teacherId', { teacherId })
       .andWhere('quiz.endsAt < :now', { now })
-      .getMany();
+      .offset(offset)
+      .orderBy('quiz.createdAt', 'DESC')
+      .limit(rpp)
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all completed quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 
-  async findAllUpcomingQuiz(teacherId: number) {
+  async findAllUpcomingQuiz(teacherId: number, page: number, rpp: number) {
     if (!teacherId) throw new UnauthorizedException('not authenticated');
     const now = new Date();
 
-    const quizzes = await this.repo
+    const offset = (page - 1) * rpp;
+
+    const [quizzes, totalItems] = await this.repo
       .createQueryBuilder('quiz')
       .leftJoin('quiz.course', 'course')
       .leftJoin('course.teacher', 'teacher')
       .where('teacher.id = :teacherId', { teacherId })
       .andWhere('quiz.endsAt > :now', { now })
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all Upcoming quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 

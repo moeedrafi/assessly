@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { api } from "@/lib/api";
+import { api, PaginationMeta } from "@/lib/api";
 import { cookies } from "next/headers";
 import { PlusCircle } from "lucide-react";
 import { Courses } from "@/components/Courses";
@@ -17,10 +17,9 @@ const AdminCoursesPage = async () => {
   await queryClient.prefetchQuery({
     queryKey: ["courses"],
     queryFn: async () => {
-      const res = await api.get<TeachingCourse[]>("/admin/courses", {
+      await api.get<TeachingCourse[], PaginationMeta>("/admin/courses", {
         Cookie: cookieStore.toString(),
       });
-      return res.data;
     },
     staleTime: Infinity,
   });

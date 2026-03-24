@@ -18,10 +18,11 @@ export class CoursesService {
     private usersService: UsersService,
   ) {}
 
-  async findAll(studentId: number) {
+  async findAll(studentId: number, page: number, rpp: number) {
     if (!studentId) throw new UnauthorizedException();
+    const offset = (page - 1) * rpp;
 
-    const courses = await this.repo
+    const [courses, totalItems] = await this.repo
       .createQueryBuilder('course')
       .leftJoin('course.teacher', 'teacher')
       .leftJoin('course.students', 'student')
@@ -33,12 +34,19 @@ export class CoursesService {
         'course.isActive',
         'teacher.name',
       ])
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .getManyAndCount();
 
     return {
       data: courses,
       message: 'Successfully fetched courses',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 

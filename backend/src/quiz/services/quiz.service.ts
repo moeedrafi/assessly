@@ -1,18 +1,8 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Quiz } from 'src/quiz/quiz.entity';
 import { CoursesService } from 'src/courses/services/courses.service';
-import { UserRole } from 'src/enum';
-import { AttemptQuizDTO } from 'src/quiz-attempt/dtos/attempt-quiz.dto';
-import { QuestionAttempt } from 'src/quiz-attempt/question-attempt.entity';
-import { QuizAttempt } from 'src/quiz-attempt/quiz-attempt.entity';
 
 @Injectable()
 export class QuizService {
@@ -35,18 +25,27 @@ export class QuizService {
   }
 
   /* UPCOMING QUIZZES */
-  async findAllUpcomingQuiz(studentId: number) {
+  async findAllUpcomingQuiz(studentId: number, page: number, rpp: number) {
     const now = new Date();
+    const offset = (page - 1) * rpp;
 
-    const quizzes = await this.buildStudentQuizQuery(studentId)
+    const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
       .andWhere('quiz.startsAt > :now', { now })
       .andWhere('attempt.id IS NULL')
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all Upcoming quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 
@@ -65,19 +64,28 @@ export class QuizService {
   }
 
   /* AVAILABLE QUIZZES */
-  async findAllAvailableQuiz(studentId: number) {
+  async findAllAvailableQuiz(studentId: number, page: number, rpp: number) {
     const now = new Date();
+    const offset = (page - 1) * rpp;
 
-    const quizzes = await this.buildStudentQuizQuery(studentId)
+    const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
       .andWhere('quiz.startsAt <= :now', { now })
       .andWhere('quiz.endsAt > :now', { now })
       .andWhere('attempt.id IS NULL')
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all Upcoming quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 
@@ -99,18 +107,27 @@ export class QuizService {
   }
 
   /* MISSED QUIZZES */
-  async findAllMissedQuiz(studentId: number) {
+  async findAllMissedQuiz(studentId: number, page: number, rpp: number) {
     const now = new Date();
+    const offset = (page - 1) * rpp;
 
-    const quizzes = await this.buildStudentQuizQuery(studentId)
+    const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
       .where('quiz.startsAt < :now', { now })
       .andWhere('attempt.id IS NULL')
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all Upcoming quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 
@@ -127,18 +144,27 @@ export class QuizService {
   }
 
   /* COMPLETED QUIZZES */
-  async findAllCompletedQuiz(studentId: number) {
+  async findAllCompletedQuiz(studentId: number, page: number, rpp: number) {
     const now = new Date();
+    const offset = (page - 1) * rpp;
 
-    const quizzes = await this.buildStudentQuizQuery(studentId)
+    const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
       .andWhere('quiz.endsAt < :now', { now })
       .andWhere('attempt.id IS NOT NULL')
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all completed quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 

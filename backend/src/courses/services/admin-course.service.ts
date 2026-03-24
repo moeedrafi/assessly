@@ -68,14 +68,27 @@ export class AdminCourseService {
     return { message: 'Course Deleted Successfully!' };
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: number, page: number, rpp: number) {
     if (!userId) throw new UnauthorizedException();
-    const courses = await this.repo.findBy({ teacher: { id: userId } });
+
+    const offset = (page - 1) * rpp;
+
+    const [courses, totalItems] = await this.repo.findAndCount({
+      where: { teacher: { id: userId } },
+      skip: offset,
+      take: rpp,
+      order: { id: 'DESC' },
+    });
 
     return {
       data: courses,
       message: 'Successfully fetched courses',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 

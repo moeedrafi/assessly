@@ -85,22 +85,22 @@ export class AnalyticsService {
       .where('course.teacherId = :teacherId', { teacherId })
       .leftJoin('course.students', 'students')
       .leftJoin('course.quizzes', 'quiz')
-      .leftJoin('quiz.studentAnswers', 'sa')
+      .leftJoin('quiz.attempts', 'attempt')
       .select('course.id', 'id')
       .addSelect('course.name', 'title')
       .addSelect('COUNT(DISTINCT students.id)', 'totalStudents')
-      .addSelect('AVG(sa.totalScore)', 'avgScore')
+      .addSelect('AVG(attempt.score)', 'avgScore')
       .addSelect(
         `
       (
         SUM(
           CASE 
-            WHEN sa.totalScore >= quiz.passingMarks THEN 1
+            WHEN attempt.score >= quiz.passingMarks THEN 1
             ELSE 0
           END
         ) * 100.0
         /
-        NULLIF(COUNT(sa.id), 0)
+        NULLIF(COUNT(attempt.id), 0)
       )
     `,
         'passRate',

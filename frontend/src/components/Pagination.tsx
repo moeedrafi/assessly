@@ -61,24 +61,26 @@ export const Pagination = ({
             : "No records found"}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-2 order-1 sm:order-2">
-          {pages.map((p, index) =>
-            p === "..." ? (
-              <span key={index} className="px-2">
-                ...
-              </span>
-            ) : (
-              <Button
-                key={p}
-                onClick={() => onPageChange(p as number)}
-                disabled={p === page}
-                variant={p === page ? "primary" : "ghost"}
-              >
-                {p}
-              </Button>
-            ),
-          )}
-        </div>
+        {pages.length === rpp ? (
+          <div className="flex flex-wrap justify-center gap-2 order-1 sm:order-2">
+            {pages.map((p, index) =>
+              p === "..." ? (
+                <span key={index} className="px-2">
+                  ...
+                </span>
+              ) : (
+                <Button
+                  key={p}
+                  onClick={() => onPageChange(p as number)}
+                  disabled={p === page}
+                  variant={p === page ? "primary" : "ghost"}
+                >
+                  {p}
+                </Button>
+              ),
+            )}
+          </div>
+        ) : null}
 
         <div className="order-3 w-1/4">
           <select

@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { QuizDTO } from 'src/quiz/dtos/quiz.dto';
@@ -46,13 +47,21 @@ export class AdminQuizController {
   }
 
   @Get('completed')
-  getAllCompletedQuizzes(@CurrentUser() user: { sub: number }) {
-    return this.quizAdminService.findAllCompletedQuiz(user.sub);
+  getAllCompletedQuizzes(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.quizAdminService.findAllCompletedQuiz(user.sub, page, rpp);
   }
 
   @Get('upcoming')
-  getAllUpcomingQuizzes(@CurrentUser() user: { sub: number }) {
-    return this.quizAdminService.findAllUpcomingQuiz(user.sub);
+  getAllUpcomingQuizzes(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.quizAdminService.findAllUpcomingQuiz(user.sub, page, rpp);
   }
 
   @Serialize(QuizDetailDTO)

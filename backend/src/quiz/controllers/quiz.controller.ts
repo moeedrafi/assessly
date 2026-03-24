@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { QuizService } from 'src/quiz/services/quiz.service';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 
@@ -8,8 +8,12 @@ export class QuizController {
 
   /* UPCOMING QUIZZES */
   @Get('upcoming')
-  getAllUpcomingQuiz(@CurrentUser() user: { sub: number }) {
-    return this.quizServices.findAllUpcomingQuiz(user.sub);
+  getAllUpcomingQuiz(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.quizServices.findAllUpcomingQuiz(user.sub, page, rpp);
   }
 
   @Get(':courseid/upcoming')
@@ -22,8 +26,12 @@ export class QuizController {
 
   /* AVAILABLE QUIZZES */
   @Get('available')
-  getAllAvailableQuiz(@CurrentUser() user: { sub: number }) {
-    return this.quizServices.findAllAvailableQuiz(user.sub);
+  getAllAvailableQuiz(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.quizServices.findAllAvailableQuiz(user.sub, page, rpp);
   }
 
   @Get(':courseid/available')
@@ -36,8 +44,12 @@ export class QuizController {
 
   /* MISSED QUIZZES */
   @Get('missed')
-  getAllMissedQuiz(@CurrentUser() user: { sub: number }) {
-    return this.quizServices.findAllMissedQuiz(user.sub);
+  getAllMissedQuiz(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.quizServices.findAllMissedQuiz(user.sub, page, rpp);
   }
 
   @Get(':courseid/missed')
@@ -50,8 +62,12 @@ export class QuizController {
 
   /* COMPLETED QUIZZES */
   @Get('completed')
-  getAllCompletedQuiz(@CurrentUser() user: { sub: number }) {
-    return this.quizServices.findAllCompletedQuiz(user.sub);
+  getAllCompletedQuiz(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.quizServices.findAllCompletedQuiz(user.sub, page, rpp);
   }
 
   @Get(':courseid/completed')

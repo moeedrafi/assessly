@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { CoursesService } from 'src/courses/services/courses.service';
@@ -10,8 +18,12 @@ export class CoursesController {
 
   @Serialize(StudentCourseDTO)
   @Get()
-  getCourses(@CurrentUser() user: { sub: number; name: string }) {
-    return this.coursesServices.findAll(user.sub);
+  getCourses(
+    @CurrentUser() user: { sub: number; name: string },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.coursesServices.findAll(user.sub, page, rpp);
   }
 
   @Get(':courseid')

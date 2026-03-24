@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AdminGuard } from 'src/guards/admin.guard';
@@ -50,8 +52,12 @@ export class AdminCoursesController {
   }
 
   @Get()
-  getCourses(@CurrentUser() user: { sub: number; name: string }) {
-    return this.coursesService.findAll(user.sub);
+  getCourses(
+    @CurrentUser() user: { sub: number; name: string },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+  ) {
+    return this.coursesService.findAll(user.sub, page, rpp);
   }
 
   @Get(':courseid')
