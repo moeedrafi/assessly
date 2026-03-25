@@ -42,3 +42,5 @@ export interface QuizResult {
   question: QuestionEntity;
   options: OptionEntity[];
 }
+
+export type QuizStatus = "all" | "completed" | "upcoming" | "missed";

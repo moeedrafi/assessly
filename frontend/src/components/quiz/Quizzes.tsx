@@ -1,51 +1,63 @@
 "use client";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-
-import { api } from "@/lib/api";
+import { useEffect, useState } from "react";
 import { Tabs } from "@/components/Tabs";
-import type { QuizEntity } from "@/types/quiz";
+import type { QuizStatus } from "@/types/quiz";
+import { useQuizzes } from "@/hooks/useQuizzes";
 import { Skeleton } from "@/components/Skeleton";
 import { Pagination } from "@/components/Pagination";
 import { QuizCard } from "@/components/quiz/QuizCard";
 
-type QuizStatus = "all" | "completed" | "upcoming" | "missed";
+const getTabs = (
+  role: "student" | "admin",
+): { label: string; value: QuizStatus }[] => {
+  const base: { label: string; value: QuizStatus }[] = [
+    { label: "All", value: "all" },
+    { label: "Completed", value: "completed" },
+    { label: "Upcoming", value: "upcoming" },
+  ];
+
+  if (role === "student") {
+    base.push({ label: "Missed", value: "missed" });
+  }
+
+  return base;
+};
 
 export const Quizzes = ({
+  scope = "all",
+  role = "student",
   courseId,
-  url,
 }: {
-  courseId: string;
-  url: string;
+  courseId?: string;
+  role?: "student" | "admin";
+  scope?: "all" | "course";
 }) => {
   const [page, setPage] = useState<number>(1);
   const [rpp, setRpp] = useState<number>(5);
   const [selectedStatus, setSelectedStatus] = useState<QuizStatus>("all");
 
-  const { data, isLoading, isPlaceholderData } = useQuery({
-    queryKey: ["quiz", { courseId, selectedStatus, page, rpp }],
-    queryFn: async () => {
-      return api.get<QuizEntity[]>(
-        `/${url}?page=${page}&rpp=${rpp}&status=${selectedStatus}`,
-      );
-    },
-    staleTime: Infinity,
-    placeholderData: (prevData) => prevData,
+  const { data, isPlaceholderData, isLoading } = useQuizzes({
+    rpp,
+    page,
+    role,
+    scope,
+    courseId,
+    status: selectedStatus,
   });
 
   const quizzes = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;
   const totalPages = data?.meta?.totalPages ?? 1;
 
+  useEffect(() => {
+    const id = setTimeout(() => setPage(1), 0);
+    return () => clearTimeout(id);
+  }, [selectedStatus, scope, courseId]);
+
   return (
     <div className="space-y-3">
       <Tabs
-        items={[
-          { label: "All", value: "all" },
-          { label: "Completed", value: "completed" },
-          { label: "Upcoming", value: "upcoming" },
-          { label: "Missed", value: "missed" },
-        ]}
+        items={getTabs(role)}
         onChange={setSelectedStatus}
         value={selectedStatus}
       />

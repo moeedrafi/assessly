@@ -141,8 +141,7 @@ const CourseIdPage = async ({
 
         <div className="shadow-inset-lg space-y-4 p-6 sm:p-8 rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
-
-          <Quizzes courseId={courseId} url="/quiz" />
+          <Quizzes courseId={courseId} scope="course" />
         </div>
       </section>
     </main>
