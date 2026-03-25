@@ -30,38 +30,31 @@ export class AdminQuizController {
     return this.quizAdminService.create(user.sub, body);
   }
 
-  @Get(':courseid/completed')
-  getCompletedQuizzes(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
-  ) {
-    return this.quizAdminService.findCompletedQuiz(user.sub, Number(courseId));
-  }
-
-  @Get(':courseid/upcoming')
-  getUpcomingQuizzes(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
-  ) {
-    return this.quizAdminService.findUpcomingQuiz(user.sub, Number(courseId));
-  }
-
-  @Get('completed')
-  getAllCompletedQuizzes(
+  @Get()
+  getAll(
     @CurrentUser() user: { sub: number },
     @Query('page', ParseIntPipe) page = 1,
     @Query('rpp', ParseIntPipe) rpp = 5,
+    @Query('status') status: 'upcoming' | 'completed',
   ) {
-    return this.quizAdminService.findAllCompletedQuiz(user.sub, page, rpp);
+    return this.quizAdminService.findAll(user.sub, page, rpp, status);
   }
 
-  @Get('upcoming')
-  getAllUpcomingQuizzes(
+  @Get(':courseid')
+  getCourseQuiz(
     @CurrentUser() user: { sub: number },
+    @Param('courseid', ParseIntPipe) courseId: number,
     @Query('page', ParseIntPipe) page = 1,
     @Query('rpp', ParseIntPipe) rpp = 5,
+    @Query('status') status: 'upcoming' | 'completed',
   ) {
-    return this.quizAdminService.findAllUpcomingQuiz(user.sub, page, rpp);
+    return this.quizAdminService.findAllCourseQuiz(
+      user.sub,
+      courseId,
+      page,
+      rpp,
+      status,
+    );
   }
 
   @Serialize(QuizDetailDTO)

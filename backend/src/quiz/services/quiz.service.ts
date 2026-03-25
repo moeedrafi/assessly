@@ -7,57 +7,14 @@ import { Quiz } from 'src/quiz/quiz.entity';
 export class QuizService {
   constructor(@InjectRepository(Quiz) private repo: Repository<Quiz>) {}
 
-  private buildStudentQuizQuery(studentId: number) {
+  private buildQuizQuery(studentId: number) {
     return this.repo
       .createQueryBuilder('quiz')
       .innerJoin('quiz.course', 'course')
       .innerJoin('course.students', 'student', 'student.id = :studentId', {
         studentId,
       })
-      .leftJoin('quiz.attempts', 'attempt', 'attempt.studentId = :studentId', {
-        studentId,
-      })
       .where('quiz.isPublished = true');
-  }
-
-  async findUpcomingQuiz(studentId: number, courseId: number) {
-    if (!courseId) throw new UnauthorizedException('course id required');
-
-    const now = new Date();
-
-    const quizzes = await this.buildStudentQuizQuery(studentId)
-      .andWhere('quiz.startsAt > :now', { now })
-      .andWhere('attempt.id IS NULL')
-      .andWhere('course.id = :courseId', { courseId })
-      .getMany();
-
-    return { data: quizzes, message: 'Fetched upcoming quizzes' };
-  }
-
-  async findMissedQuiz(studentId: number, courseId: number) {
-    const now = new Date();
-
-    const quizzes = await this.buildStudentQuizQuery(studentId)
-      .andWhere('quiz.endsAt < :now', { now })
-      .andWhere('course.id = :courseId', { courseId })
-      .andWhere('attempt.id IS NULL')
-      .getMany();
-
-    return { data: quizzes, message: 'Fetched missed quizzes' };
-  }
-
-  async findCompletedQuiz(studentId: number, courseId: number) {
-    if (!courseId) throw new UnauthorizedException('course id required');
-
-    const now = new Date();
-
-    const quizzes = await this.buildStudentQuizQuery(studentId)
-      .andWhere('quiz.endsAt < :now', { now })
-      .andWhere('attempt.id IS NOT NULL')
-      .andWhere('course.id = :courseId', { courseId })
-      .getMany();
-
-    return { data: quizzes, message: 'Fetched completed quizzes' };
   }
 
   async findAll(
@@ -68,82 +25,108 @@ export class QuizService {
   ) {
     const now = new Date();
     const offset = (page - 1) * rpp;
+    const query = this.buildQuizQuery(studentId);
 
     if (status === 'completed') {
-      const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
-        .andWhere('quiz.endsAt < :now', { now })
-        .andWhere('attempt.id IS NOT NULL')
-        .offset(offset)
-        .limit(rpp)
-        .orderBy('quiz.createdAt', 'DESC')
-        .getManyAndCount();
-
-      return {
-        data: quizzes,
-        message: 'Successfully fetched all completed quizzes',
-        meta: {
-          totalItems,
-          totalPages: Math.ceil(totalItems / rpp),
-          page,
-          rpp,
-        },
-      };
+      query.andWhere('quiz.endsAt < :now', { now })
+        .andWhere(`EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`);
     } else if (status === 'missed') {
-      const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
-        .where('quiz.startsAt < :now', { now })
-        .andWhere('attempt.id IS NULL')
-        .offset(offset)
-        .limit(rpp)
-        .orderBy('quiz.createdAt', 'DESC')
-        .getManyAndCount();
-
-      return {
-        data: quizzes,
-        message: 'Successfully fetched all completed quizzes',
-        meta: {
-          totalItems,
-          totalPages: Math.ceil(totalItems / rpp),
-          page,
-          rpp,
-        },
-      };
+      query.andWhere('quiz.endsAt < :now', { now })
+        .andWhere(`NOT EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`);
     } else if (status === 'upcoming') {
-      const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
-        .andWhere('quiz.startsAt > :now', { now })
-        .andWhere('attempt.id IS NULL')
-        .offset(offset)
-        .limit(rpp)
-        .orderBy('quiz.createdAt', 'DESC')
-        .getManyAndCount();
-
-      return {
-        data: quizzes,
-        message: 'Successfully fetched all upcoming quizzes',
-        meta: {
-          totalItems,
-          totalPages: Math.ceil(totalItems / rpp),
-          page,
-          rpp,
-        },
-      };
-    } else {
-      const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
-        .offset(offset)
-        .limit(rpp)
-        .orderBy('quiz.createdAt', 'DESC')
-        .getManyAndCount();
-
-      return {
-        data: quizzes,
-        message: 'Successfully fetched all quizzes',
-        meta: {
-          totalItems,
-          totalPages: Math.ceil(totalItems / rpp),
-          page,
-          rpp,
-        },
-      };
+      query.andWhere('quiz.startsAt > :now', { now })
+        .andWhere(`NOT EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`);
     }
+
+    const [quizzes, totalItems] = await query
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
+
+    // const t = await this.buildQuizQuery(studentId).getCount();
+
+    return {
+      data: quizzes,
+      message: `Successfully fetched ${status ?? 'all'} quizzes`,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
+    };
+  }
+
+  async findAllCourseQuiz(
+    studentId: number,
+    courseId: number,
+    page: number,
+    rpp: number,
+    status: 'missed' | 'upcoming' | 'completed',
+  ) {
+    if (!courseId) throw new UnauthorizedException('course id required');
+    const now = new Date();
+    const offset = (page - 1) * rpp;
+    const query = this.buildQuizQuery(studentId);
+
+    if (status === 'completed') {
+      query
+        .andWhere('quiz.endsAt < :now', { now })
+        .andWhere(
+          `EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`,
+        )
+        .andWhere('course.id = :courseId', { courseId });
+    } else if (status === 'missed') {
+      query
+        .andWhere('quiz.endsAt < :now', { now })
+        .andWhere(
+          `NOT EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`,
+        )
+        .andWhere('course.id = :courseId', { courseId });
+    } else if (status === 'upcoming') {
+      query
+        .andWhere('quiz.startsAt > :now', { now })
+        .andWhere(
+          `NOT EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`,
+        )
+        .andWhere('course.id = :courseId', { courseId });
+    }
+
+    const [quizzes, totalItems] = await query
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return {
+      data: quizzes,
+      message: `Successfully fetched ${status ?? 'all'} quizzes`,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
+    };
   }
 
   /* AVAILABLE QUIZZES */
@@ -151,7 +134,7 @@ export class QuizService {
     const now = new Date();
     const offset = (page - 1) * rpp;
 
-    const [quizzes, totalItems] = await this.buildStudentQuizQuery(studentId)
+    const [quizzes, totalItems] = await this.buildQuizQuery(studentId)
       .andWhere('quiz.startsAt <= :now', { now })
       .andWhere('quiz.endsAt > :now', { now })
       .andWhere('attempt.id IS NULL')
@@ -172,20 +155,39 @@ export class QuizService {
     };
   }
 
-  async findAvailableQuiz(studentId: number, courseId: number) {
+  async findCourseAvailableQuiz(
+    studentId: number,
+    courseId: number,
+    page: number,
+    rpp: number,
+  ) {
     const now = new Date();
+    const offset = (page - 1) * rpp;
 
-    const quizzes = await this.buildStudentQuizQuery(studentId)
+    const [quizzes, totalItems] = await this.buildQuizQuery(studentId)
       .andWhere('quiz.startsAt <= :now', { now })
       .andWhere('quiz.endsAt > :now', { now })
-      .andWhere('attempt.id IS NULL')
+      .andWhere(
+        `NOT EXISTS (SELECT 1 FROM attempt a
+          WHERE a.quizId = quiz.id
+          AND a.studentId = :studentId
+          )`,
+      )
       .andWhere('course.id = :courseId', { courseId })
-      .getMany();
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all Upcoming quizzes',
-      meta: null,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
     };
   }
 }

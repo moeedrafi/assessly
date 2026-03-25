@@ -16,28 +16,21 @@ export class QuizController {
     return this.quizServices.findAll(user.sub, page, rpp, status);
   }
 
-  @Get(':courseid/upcoming')
-  getUpcomingQuiz(
+  @Get(':courseid')
+  getCourseQuiz(
     @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
+    @Param('courseid', ParseIntPipe) courseId: number,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+    @Query('status') status: 'missed' | 'upcoming' | 'completed',
   ) {
-    return this.quizServices.findUpcomingQuiz(user.sub, Number(courseId));
-  }
-
-  @Get(':courseid/missed')
-  getMissedQuiz(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
-  ) {
-    return this.quizServices.findMissedQuiz(user.sub, Number(courseId));
-  }
-
-  @Get(':courseid/completed')
-  getCompletedQuiz(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
-  ) {
-    return this.quizServices.findCompletedQuiz(user.sub, Number(courseId));
+    return this.quizServices.findAllCourseQuiz(
+      user.sub,
+      courseId,
+      page,
+      rpp,
+      status,
+    );
   }
 
   /* AVAILABLE QUIZZES */
@@ -51,10 +44,17 @@ export class QuizController {
   }
 
   @Get(':courseid/available')
-  getAvailableQuiz(
+  getCourseAvailable(
     @CurrentUser() user: { sub: number },
-    @Param('courseid') courseId: string,
+    @Param('courseid', ParseIntPipe) courseId: number,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
   ) {
-    return this.quizServices.findAvailableQuiz(user.sub, Number(courseId));
+    return this.quizServices.findCourseAvailableQuiz(
+      user.sub,
+      courseId,
+      page,
+      rpp,
+    );
   }
 }
