@@ -32,6 +32,15 @@ export class QuizAttemptController {
   }
 
   // TODO: Leaderboards
+
   // TODO: Grading
+
   // TODO: Stats (Best, worst, avg quiz)
+  @Get(':courseid/stats')
+  getStats(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid', ParseIntPipe) courseId: number,
+  ) {
+    return this.quizAttemptService.findStats(user.sub, courseId);
+  }
 }

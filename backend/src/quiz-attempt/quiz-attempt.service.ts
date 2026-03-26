@@ -141,4 +141,59 @@ export class QuizAttemptService {
 
     return { data: formatted, message: 'Fetched result successfully' };
   }
+
+  async findStats(studentId: number, courseId: number) {
+    if (!courseId) throw new NotFoundException('course id not found');
+
+    const qb = this.repo
+      .createQueryBuilder('attempt')
+      .innerJoin('attempt.quiz', 'quiz')
+      .innerJoin('quiz.questions', 'question')
+      .innerJoin('attempt.questionAttempts', 'questionAttempt')
+      .select([
+        'attempt.id',
+        'attempt.score',
+        'quiz.name',
+        'COUNT(DISTINCT question.id) AS "totalQuestions"',
+        'COUNT(DISTINCT CASE WHEN questionAttempt.isCorrect THEN questionAttempt.id END) AS "totalCorrect"',
+      ])
+      .where('attempt.studentId = :studentId', { studentId })
+      .andWhere('quiz.courseId = :courseId', { courseId })
+      .groupBy('attempt.id')
+      .addGroupBy('quiz.id');
+
+    const avgSubQuery = this.repo
+      .createQueryBuilder('a')
+      .select('AVG(a.score)', 'avgScore')
+      .innerJoin('a.quiz', 'q')
+      .where('a.studentId = :studentId', { studentId })
+      .andWhere('q.courseId = :courseId', { courseId });
+
+    const [bestQuiz, worstQuiz, avgQuiz] = await Promise.all([
+      await qb.clone().orderBy('attempt.score', 'DESC').getRawOne(),
+      await qb.clone().orderBy('attempt.score', 'ASC').getRawOne(),
+      await qb
+        .clone()
+        .orderBy(`ABS(attempt.score - (${avgSubQuery.getQuery()}))`, 'ASC')
+        .setParameters(avgSubQuery.getParameters())
+        .getRawOne(),
+    ]);
+
+    const convertStats = (quiz) => ({
+      id: Number(quiz.attempt_id),
+      score: Number(quiz.attempt_score),
+      name: quiz.quiz_name,
+      totalQuestions: Number(quiz.totalQuestions),
+      totalCorrect: Number(quiz.totalCorrect),
+    });
+
+    return {
+      data: [
+        { type: 'Best Quiz', ...convertStats(bestQuiz) },
+        { type: 'Worst Quiz', ...convertStats(worstQuiz) },
+        { type: 'Avg Quiz', ...convertStats(avgQuiz) },
+      ],
+      message: 'Fetched stats',
+    };
+  }
 }

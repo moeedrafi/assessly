@@ -44,3 +44,12 @@ export interface QuizResult {
 }
 
 export type QuizStatus = "all" | "completed" | "upcoming" | "missed";
+
+export interface QuizStatsType {
+  id: number;
+  type: string;
+  name: string;
+  score: number;
+  totalQuestions: number;
+  totalCorrect: number;
+}
