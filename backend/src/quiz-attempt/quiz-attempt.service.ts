@@ -196,4 +196,46 @@ export class QuizAttemptService {
       message: 'Fetched stats',
     };
   }
+
+  async getQuizLeaderboard(studentId: number, quizId: number) {
+    if (!quizId) throw new NotFoundException('quiz id not found');
+
+    const attempts = await this.repo.find({
+      where: { quiz: { id: quizId } },
+    });
+
+    return { data: attempts, message: 'Fetched all quiz attempts', meta: null };
+  }
+
+  async getCourseLeaderboard(studentId: number, courseId: number) {
+    if (!courseId) throw new NotFoundException('course id not found');
+
+    const data = await this.repo
+      .createQueryBuilder('attempt')
+      .innerJoin('attempt.quiz', 'quiz')
+      .leftJoin('attempt.student', 'student')
+      .select('attempt.studentId', 'studentId')
+      .addSelect('student.name', 'name')
+      .addSelect('SUM(attempt.score)', 'totalScore')
+      .where('quiz.courseId = :courseId', { courseId })
+      .groupBy('attempt.studentId')
+      .addGroupBy('student.name')
+      .orderBy('SUM(attempt.score)', 'DESC')
+      .getRawMany();
+
+    const ranked = data.map((a, index) => ({
+      studentId: Number(a.studentId),
+      name: a.name,
+      totalScore: Number(a.totalScore),
+      rank: index + 1,
+    }));
+
+    const currentUser = ranked.find((a) => a.studentId === studentId);
+
+    return {
+      data: { ranked, currentUser },
+      message: 'Fetched all course attempts',
+      meta: null,
+    };
+  }
 }

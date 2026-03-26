@@ -31,11 +31,22 @@ export class QuizAttemptController {
     return this.quizAttemptService.result(quizId, user.sub);
   }
 
-  // TODO: Leaderboards
+  @Get('course/:courseid/leaderboard')
+  getCourseLeaderboard(
+    @Param('courseid', ParseIntPipe) courseId: number,
+    @CurrentUser() user: { sub: number },
+  ) {
+    return this.quizAttemptService.getCourseLeaderboard(user.sub, courseId);
+  }
 
-  // TODO: Grading
+  @Get('quiz/:quizid/leaderboard')
+  getQuizLeaderboard(
+    @Param('quizid', ParseIntPipe) quizId: number,
+    @CurrentUser() user: { sub: number },
+  ) {
+    return this.quizAttemptService.getQuizLeaderboard(user.sub, quizId);
+  }
 
-  // TODO: Stats (Best, worst, avg quiz)
   @Get(':courseid/stats')
   getStats(
     @CurrentUser() user: { sub: number },

@@ -50,3 +50,17 @@ export const formattedDateTime = (iso: string) => {
 
   return `${day}${suffix} ${month}, ${year} — ${time}`;
 };
+
+export const getRankStyle = (rank: number) => {
+  if (rank === 1) return "bg-yellow-100 border-yellow-300";
+  if (rank === 2) return "bg-slate-200 border-slate-300";
+  if (rank === 3) return "bg-orange-100 border-orange-300";
+  return "bg-light border-color";
+};
+
+export const getRankDisplay = (rank: number) => {
+  if (rank === 1) return "🥇";
+  if (rank === 2) return "🥈";
+  if (rank === 3) return "🥉";
+  return `${rank}.`;
+};

@@ -35,3 +35,15 @@ export interface StudentCourseSnapshotType {
   yourAvg: number;
   totalAvg: number;
 }
+
+interface Leaderboard {
+  studentId: number;
+  name: string;
+  totalScore: number;
+  rank: number;
+}
+
+export interface LeaderboardType {
+  ranked: Leaderboard[];
+  currentUser: Leaderboard;
+}
