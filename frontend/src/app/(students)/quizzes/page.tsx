@@ -1,4 +1,5 @@
 import { Quizzes } from "@/components/quiz/Quizzes";
+import { DateRangeQuizzes } from "./DateRangeQuizzes";
 
 const QuizzesPage = async () => {
   return (
@@ -15,6 +16,11 @@ const QuizzesPage = async () => {
         <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
           <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
           <Quizzes />
+        </div>
+
+        <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
+          <h3 className="text-xl sm:text-2xl font-bold">Date Range Quiz</h3>
+          <DateRangeQuizzes />
         </div>
       </section>
     </main>

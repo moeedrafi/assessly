@@ -129,6 +129,36 @@ export class QuizService {
     };
   }
 
+  async findDateRangeQuiz(
+    studentId: number,
+    from: string,
+    to: string,
+    page: number,
+    rpp: number,
+  ) {
+    const offset = (page - 1) * rpp;
+    const start = new Date(from);
+    const end = new Date(to);
+
+    const quizzes = await this.buildQuizQuery(studentId)
+      .andWhere('quiz.createdAt BETWEEN :start AND :end', { start, end })
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getMany();
+
+    return {
+      data: quizzes,
+      message: 'Fetched quizzes from range',
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
+    };
+  }
+
   /* AVAILABLE QUIZZES */
   async findAllAvailableQuiz(studentId: number, page: number, rpp: number) {
     const now = new Date();

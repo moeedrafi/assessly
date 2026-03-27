@@ -33,6 +33,17 @@ export class QuizController {
     );
   }
 
+  @Get('range')
+  getQuizFromDateRange(
+    @CurrentUser() user: { sub: number },
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    return this.quizServices.findDateRangeQuiz(user.sub, from, to, page, rpp);
+  }
+
   /* AVAILABLE QUIZZES */
   @Get('available')
   getAllAvailableQuiz(
