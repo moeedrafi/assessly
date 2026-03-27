@@ -97,75 +97,73 @@ const QuizAttemptPage = () => {
   };
 
   return (
-    <main>
-      <section className="w-full font-lato space-y-4 px-2">
-        {/* Heading */}
-        <div className="space-y-2 text-center p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">Quiz Title</h1>
+    <section className="w-full font-lato space-y-4 px-2">
+      {/* Heading */}
+      <div className="space-y-2 text-center p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Quiz Title</h1>
+        <p className="text-muted-foreground">
+          {questionNumber + 1} / {data.questions.length}
+        </p>
+        <Timer duration={data.timeLimit} />
+      </div>
+
+      <div className="space-y-4 max-w-lg mx-auto bg-bg p-6 sm:p-8 rounded-lg shadow border border-color">
+        <p className="text-sm leading-[1.6em] text-muted-foreground">
+          {question.text}
+        </p>
+
+        <ul className="space-y-2 text-muted-foreground">
+          {question.options.map((option) => (
+            <label key={option.id} className="flex items-center gap-2">
+              <input
+                required
+                type={
+                  question.type === QuestionType.SINGLE_CHOICE
+                    ? "radio"
+                    : "checkbox"
+                }
+                name={`question-${question.id}`}
+                value={option.text.toLowerCase()}
+                checked={answers[question.id]?.includes(option.id) ?? false}
+                onChange={() =>
+                  question.type === QuestionType.SINGLE_CHOICE
+                    ? handleSingleChoice(option.id)
+                    : handleMultipleChoice(option.id)
+                }
+              />
+              {option.text}
+            </label>
+          ))}
+        </ul>
+
+        <div className="flex items-center gap-3">
+          <button
+            disabled={isPrev}
+            onClick={prevQuestion}
+            className="w-full border border-primary px-4 py-2 text-primary rounded-md hover:text-secondary hover:border-secondary transition disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={isNext ? submitQuiz : nextQuestion}
+            className={`w-full px-4 py-2 text-primary rounded-md transition ${
+              isNext
+                ? "bg-primary text-white hover:bg-secondary"
+                : "border border-primary hover:text-secondary hover:border-secondary"
+            }`}
+          >
+            {isNext ? "Submit Quiz" : "Next"}
+          </button>
+        </div>
+
+        {isNext && (
           <p className="text-muted-foreground">
-            {questionNumber + 1} / {data.questions.length}
+            Before submitting just know that you skipped {skippedQuestions}{" "}
+            questions
           </p>
-          <Timer duration={data.timeLimit} />
-        </div>
-
-        <div className="space-y-4 max-w-lg mx-auto bg-bg p-6 sm:p-8 rounded-lg shadow border border-color">
-          <p className="text-sm leading-[1.6em] text-muted-foreground">
-            {question.text}
-          </p>
-
-          <ul className="space-y-2 text-muted-foreground">
-            {question.options.map((option) => (
-              <label key={option.id} className="flex items-center gap-2">
-                <input
-                  required
-                  type={
-                    question.type === QuestionType.SINGLE_CHOICE
-                      ? "radio"
-                      : "checkbox"
-                  }
-                  name={`question-${question.id}`}
-                  value={option.text.toLowerCase()}
-                  checked={answers[question.id]?.includes(option.id) ?? false}
-                  onChange={() =>
-                    question.type === QuestionType.SINGLE_CHOICE
-                      ? handleSingleChoice(option.id)
-                      : handleMultipleChoice(option.id)
-                  }
-                />
-                {option.text}
-              </label>
-            ))}
-          </ul>
-
-          <div className="flex items-center gap-3">
-            <button
-              disabled={isPrev}
-              onClick={prevQuestion}
-              className="w-full border border-primary px-4 py-2 text-primary rounded-md hover:text-secondary hover:border-secondary transition disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={isNext ? submitQuiz : nextQuestion}
-              className={`w-full px-4 py-2 text-primary rounded-md transition ${
-                isNext
-                  ? "bg-primary text-white hover:bg-secondary"
-                  : "border border-primary hover:text-secondary hover:border-secondary"
-              }`}
-            >
-              {isNext ? "Submit Quiz" : "Next"}
-            </button>
-          </div>
-
-          {isNext && (
-            <p className="text-muted-foreground">
-              Before submitting just know that you skipped {skippedQuestions}{" "}
-              questions
-            </p>
-          )}
-        </div>
-      </section>
-    </main>
+        )}
+      </div>
+    </section>
   );
 };
 

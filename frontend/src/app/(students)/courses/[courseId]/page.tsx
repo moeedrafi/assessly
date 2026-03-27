@@ -25,26 +25,24 @@ const CourseIdPage = async ({
   }
 
   return (
-    <main>
-      <section className="w-full font-lato space-y-4 p-2">
-        {/* Heading */}
-        <div className="space-y-2 text-center p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">Course Name</h1>
-          <h2 className="text-xl text-muted-foreground">Total Students: 30</h2>
-          <h3 className="text-lg text-muted-foreground">
-            Your Rank: <span className="text-primary font-semibold">2nd</span>
-          </h3>
-        </div>
+    <section className="w-full font-lato space-y-4 p-2">
+      {/* Heading */}
+      <div className="space-y-2 text-center p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Course Name</h1>
+        <h2 className="text-xl text-muted-foreground">Total Students: 30</h2>
+        <h3 className="text-lg text-muted-foreground">
+          Your Rank: <span className="text-primary font-semibold">2nd</span>
+        </h3>
+      </div>
 
-        <QuizStats courseId={courseId} />
-        <Leaderboard courseId={courseId} />
+      <QuizStats courseId={courseId} />
+      <Leaderboard courseId={courseId} />
 
-        <div className="shadow-inset-lg space-y-4 p-6 sm:p-8 rounded-lg">
-          <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
-          <Quizzes courseId={courseId} scope="course" />
-        </div>
-      </section>
-    </main>
+      <div className="shadow-inset-lg space-y-4 p-6 sm:p-8 rounded-lg">
+        <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
+        <Quizzes courseId={courseId} scope="course" />
+      </div>
+    </section>
   );
 };
 

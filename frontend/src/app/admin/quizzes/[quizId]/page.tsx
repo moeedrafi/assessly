@@ -32,17 +32,15 @@ const QuizIdPage = async ({
   });
 
   return (
-    <main>
-      <section className="w-full font-lato space-y-4 px-2 py-4">
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <QuizDetails />
-        </HydrationBoundary>
+    <section className="w-full font-lato space-y-4 px-2 py-4">
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <QuizDetails />
+      </HydrationBoundary>
 
-        <Suspense fallback={<Skeleton max={1} />}>
-          <QuestionDetails quizId={Number(quizId)} />
-        </Suspense>
-      </section>
-    </main>
+      <Suspense fallback={<Skeleton max={1} />}>
+        <QuestionDetails quizId={Number(quizId)} />
+      </Suspense>
+    </section>
   );
 };
 

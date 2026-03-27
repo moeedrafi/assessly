@@ -14,10 +14,10 @@ export default function StudentLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="grid md:grid-cols-[260px_1fr]">
+    <div className="flex h-screen">
       <Sidebar basePath="" role={UserRole.USER} routes={SIDEBAR_ROUTES} />
 
-      {children}
+      <main className="overflow-auto hide-scrollbar">{children}</main>
     </div>
   );
 }
