@@ -1,10 +1,11 @@
 "use client";
 import { useMemo } from "react";
-import { api } from "@/lib/api";
 import { Table } from "@/components/Table";
 import { useQuery } from "@tanstack/react-query";
 import type { RecentUser } from "@/types/analytics";
 import type { ColumnDef } from "@tanstack/react-table";
+import { getRecentJoinedUsers } from "@/services/admin";
+import { adminKeys } from "@/lib/query-key";
 
 export const RecentJoinedUsers = ({
   initialData,
@@ -12,11 +13,8 @@ export const RecentJoinedUsers = ({
   initialData: RecentUser[];
 }) => {
   const { data = [], isLoading } = useQuery({
-    queryKey: ["recent-users"],
-    queryFn: async () => {
-      const res = await api.get<RecentUser[]>("/admin/analytics/recent-users");
-      return res.data;
-    },
+    queryKey: adminKeys.recentUsers(),
+    queryFn: getRecentJoinedUsers,
     staleTime: Infinity,
     initialData,
   });

@@ -1,8 +1,7 @@
 "use client";
-import { api } from "@/lib/api";
 import { useParams } from "next/navigation";
-import type { QuizResult } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
+import { getQuizResult } from "@/services/student";
 
 const getGrade = (percentage: number) => {
   if (percentage >= 90) return "A";
@@ -13,13 +12,10 @@ const getGrade = (percentage: number) => {
 };
 
 const QuizResultPage = () => {
-  const { quizId } = useParams();
+  const { quizId } = useParams<{ quizId: string }>();
   const { data, isLoading } = useQuery({
     queryKey: ["result", quizId],
-    queryFn: async () => {
-      const res = await api.get<QuizResult[]>(`/quiz-attempt/${18}/result`);
-      return res.data;
-    },
+    queryFn: async () => getQuizResult(quizId),
   });
 
   if (isLoading) return <p>LOADING...</p>;

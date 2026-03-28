@@ -3,21 +3,18 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
-import { api } from "@/lib/api";
 import { Detail } from "./Detail";
-import type { QuizDetail } from "@/types/quiz";
 import { Button } from "@/components/ui/Button";
 import { formattedDateTime } from "@/lib/utils";
 import { Skeleton } from "@/components/Skeleton";
+import { getQuizDetail } from "@/services/admin";
+import { adminKeys } from "@/lib/query-key";
 
 export const QuizDetails = () => {
-  const { quizId } = useParams();
+  const { quizId } = useParams<{ quizId: string }>();
   const { data: quiz, isLoading: isQuizLoading } = useQuery({
-    queryKey: ["quiz", quizId],
-    queryFn: async () => {
-      const res = await api.get<QuizDetail>(`/admin/quiz/${quizId}`);
-      return res.data;
-    },
+    queryKey: adminKeys.quiz(quizId),
+    queryFn: () => getQuizDetail(quizId),
     staleTime: Infinity,
   });
 

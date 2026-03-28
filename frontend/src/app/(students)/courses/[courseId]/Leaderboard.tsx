@@ -1,19 +1,13 @@
 "use client";
-import { api } from "@/lib/api";
 import { Award } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import type { LeaderboardType } from "@/types/analytics";
 import { getRankDisplay, getRankStyle } from "@/lib/utils";
+import { getLeaderboard } from "@/services/student";
 
 export const Leaderboard = ({ courseId }: { courseId: string }) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["course-leaderboard", { courseId }],
-    queryFn: async () => {
-      const res = await api.get<LeaderboardType>(
-        `/quiz-attempt/course/${courseId}/leaderboard`,
-      );
-      return res.data;
-    },
+    queryFn: () => getLeaderboard(courseId),
     staleTime: 1000 * 60,
     retry: 1,
   });

@@ -1,5 +1,5 @@
-import { api } from "@/lib/api";
-import type { QuizEntity, QuizStatus } from "@/types/quiz";
+import { getQuizzes } from "@/services/student";
+import type { QuizStatus } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 
 type Params = {
@@ -25,11 +25,7 @@ export const useQuizzes = (params: Params) => {
 
   return useQuery({
     queryKey: ["quiz", { role, scope, courseId, page, rpp, status }],
-    queryFn: async () => {
-      return api.get<QuizEntity[]>(
-        `${endpoint}?page=${page}&rpp=${rpp}&status=${status}`,
-      );
-    },
+    queryFn: () => getQuizzes({ endpoint, page, rpp, status }),
     staleTime: Infinity,
     placeholderData: (prevData) => prevData,
   });

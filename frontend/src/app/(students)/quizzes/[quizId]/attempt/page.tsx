@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { ApiError } from "@/lib/error";
 import { QuestionType } from "@/types/enum";
-import type { QuizQuestions } from "@/types/quiz";
+import { getQuestions } from "@/services/student";
 const Timer = dynamic(
   () => import("@/components/Timer").then((mod) => mod.Timer),
   { ssr: false },
@@ -19,11 +19,8 @@ const QuizAttemptPage = () => {
   const { quizId } = useParams<{ quizId: string }>();
 
   const { data, isLoading } = useQuery({
-    queryKey: [],
-    queryFn: async () => {
-      const res = await api.get<QuizQuestions>(`/question/${quizId}`);
-      return res.data;
-    },
+    queryKey: ["questions", { quizId }],
+    queryFn: () => getQuestions(quizId),
   });
 
   const [questionNumber, setQuestionNumber] = useState<number>(0);

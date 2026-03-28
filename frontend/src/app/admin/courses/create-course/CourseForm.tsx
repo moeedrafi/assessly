@@ -8,6 +8,7 @@ import { useForm } from "@tanstack/react-form";
 import { Button } from "@/components/ui/Button";
 import { useQuery } from "@tanstack/react-query";
 import { CourseFormData, courseSchema } from "@/schemas/course.schemas";
+import { getCourseFormData } from "@/services/admin";
 
 const defaultFormValues: CourseFormData = {
   name: "",
@@ -61,8 +62,8 @@ export const CourseForm = ({
   });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["course", courseId],
-    queryFn: () => api.get<CourseFormData>(`/admin/courses/${courseId}`),
+    queryKey: ["course", { courseId }],
+    queryFn: () => getCourseFormData(courseId!),
     staleTime: Infinity,
     enabled: !!courseId,
   });

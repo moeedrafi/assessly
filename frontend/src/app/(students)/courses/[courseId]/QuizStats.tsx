@@ -1,8 +1,8 @@
 "use client";
 import { useMemo } from "react";
-import { api } from "@/lib/api";
-import { QuizStatsType } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
+import { studentKeys } from "@/lib/query-key";
+import { getStudentQuizStats } from "@/services/student";
 
 export const QuizStats = ({ courseId }: { courseId: string }) => {
   const {
@@ -10,13 +10,8 @@ export const QuizStats = ({ courseId }: { courseId: string }) => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["quiz-stats", { courseId }],
-    queryFn: async () => {
-      const res = await api.get<QuizStatsType[]>(
-        `/quiz-attempt/${courseId}/stats`,
-      );
-      return res.data;
-    },
+    queryKey: studentKeys.quizStats(courseId),
+    queryFn: () => getStudentQuizStats(courseId),
     retry: 1,
     staleTime: 1000 * 60,
   });
@@ -68,7 +63,7 @@ export const QuizStats = ({ courseId }: { courseId: string }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr gap-2">
         {displayStats.map((stat) => (
           <div
-            key={stat.id}
+            key={`${stat.type}-${stat.id}`}
             className={`flex flex-col justify-between h-full space-y-2 p-3 border rounded-lg shadow ${
               isError ? "bg-red-50 border-red-300" : "bg-light border-color"
             }`}

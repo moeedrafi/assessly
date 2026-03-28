@@ -1,16 +1,13 @@
 "use client";
 import Link from "next/link";
-import { api } from "@/lib/api";
-import type { QuestionDetail } from "@/types/question";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { getQuestionsDetail } from "@/services/admin";
+import { adminKeys } from "@/lib/query-key";
 
-export const QuestionDetails = ({ quizId }: { quizId: number }) => {
+export const QuestionDetails = ({ quizId }: { quizId: string }) => {
   const { data: questions } = useSuspenseQuery({
-    queryKey: ["questions", quizId],
-    queryFn: async () => {
-      const res = await api.get<QuestionDetail[]>(`/question/${quizId}`);
-      return res.data;
-    },
+    queryKey: adminKeys.questions(quizId),
+    queryFn: async () => getQuestionsDetail(quizId),
     staleTime: Infinity,
   });
 

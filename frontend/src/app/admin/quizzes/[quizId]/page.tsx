@@ -38,7 +38,7 @@ const QuizIdPage = async ({
       </HydrationBoundary>
 
       <Suspense fallback={<Skeleton max={1} />}>
-        <QuestionDetails quizId={Number(quizId)} />
+        <QuestionDetails quizId={quizId} />
       </Suspense>
     </section>
   );

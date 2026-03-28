@@ -1,11 +1,10 @@
 "use client";
-import { api } from "@/lib/api";
 import { useState } from "react";
-import type { QuizEntity } from "@/types/quiz";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/Skeleton";
 import { Pagination } from "@/components/Pagination";
 import { QuizCard } from "@/components/quiz/QuizCard";
+import { getDateRangeQuizzes } from "@/services/student";
 
 export const DateRangeQuizzes = () => {
   const [to, setTo] = useState<string>("");
@@ -15,14 +14,7 @@ export const DateRangeQuizzes = () => {
 
   const { data, isLoading, isPlaceholderData } = useQuery({
     queryKey: ["date-range", { from, to, page, rpp }],
-    queryFn: () => {
-      const fromIso = new Date(from).toISOString();
-      const toIso = new Date(to).toISOString();
-
-      return api.get<QuizEntity[]>(
-        `/quiz/range?from=${fromIso}&to=${toIso}&page=${page}&rpp=${rpp}`,
-      );
-    },
+    queryFn: () => getDateRangeQuizzes({ from, page, rpp, to }),
     enabled: !!from && !!to,
   });
 

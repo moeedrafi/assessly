@@ -1,10 +1,10 @@
 "use client";
 import { useMemo } from "react";
-import { api } from "@/lib/api";
 import { Table } from "@/components/Table";
 import { useQuery } from "@tanstack/react-query";
 import type { RecentQuiz } from "@/types/analytics";
 import type { ColumnDef } from "@tanstack/react-table";
+import { getRecentQuiz } from "@/services/student";
 
 export const RecentQuizzes = ({
   initialData,
@@ -13,10 +13,7 @@ export const RecentQuizzes = ({
 }) => {
   const { data = [], isLoading } = useQuery({
     queryKey: ["recent-quiz"],
-    queryFn: async () => {
-      const res = await api.get<RecentQuiz[]>("/analytics/recent-quiz");
-      return res.data;
-    },
+    queryFn: getRecentQuiz,
     staleTime: Infinity,
     initialData,
   });
