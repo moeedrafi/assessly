@@ -39,14 +39,6 @@ export class QuizAttemptController {
     return this.quizAttemptService.getCourseLeaderboard(user.sub, courseId);
   }
 
-  @Get('quiz/:quizid/leaderboard')
-  getQuizLeaderboard(
-    @Param('quizid', ParseIntPipe) quizId: number,
-    @CurrentUser() user: { sub: number },
-  ) {
-    return this.quizAttemptService.getQuizLeaderboard(user.sub, quizId);
-  }
-
   @Get(':courseid/stats')
   getStats(
     @CurrentUser() user: { sub: number },

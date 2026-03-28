@@ -15,7 +15,7 @@ export const Sidebar = ({
   const filteredRoutes = routes.filter((route) => route.roles.includes(role));
 
   return (
-    <aside className="hidden min-w-65 md:flex flex-col border-r border-color min-h-screen bg-bg py-6 px-4">
+    <aside className="hidden min-w-65 md:flex flex-col gap-3 border-r border-color min-h-screen bg-bg py-6 px-4">
       <div className="p-6">
         <div className="text-4xl text-center font-bold uppercase leading-[1em] tracking-wide">
           Assesly
@@ -23,7 +23,7 @@ export const Sidebar = ({
       </div>
 
       {/* LINKS */}
-      <nav className="flex-1 overflow-y-auto hide-scrollbar">
+      <nav className="py-1 flex-1 overflow-y-auto hide-scrollbar">
         <ul className="space-y-3 px-1">
           {filteredRoutes.map((route) => {
             const href = `${basePath}/${route.path}`;

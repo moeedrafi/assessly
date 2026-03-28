@@ -16,23 +16,6 @@ export class QuizController {
     return this.quizServices.findAll(user.sub, page, rpp, status);
   }
 
-  @Get(':courseid')
-  getCourseQuiz(
-    @CurrentUser() user: { sub: number },
-    @Param('courseid', ParseIntPipe) courseId: number,
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('rpp', ParseIntPipe) rpp = 5,
-    @Query('status') status: 'missed' | 'upcoming' | 'completed',
-  ) {
-    return this.quizServices.findAllCourseQuiz(
-      user.sub,
-      courseId,
-      page,
-      rpp,
-      status,
-    );
-  }
-
   @Get('range')
   getQuizFromDateRange(
     @CurrentUser() user: { sub: number },
@@ -66,6 +49,23 @@ export class QuizController {
       courseId,
       page,
       rpp,
+    );
+  }
+
+  @Get(':courseid')
+  getCourseQuiz(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid', ParseIntPipe) courseId: number,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('rpp', ParseIntPipe) rpp = 5,
+    @Query('status') status: 'missed' | 'upcoming' | 'completed',
+  ) {
+    return this.quizServices.findAllCourseQuiz(
+      user.sub,
+      courseId,
+      page,
+      rpp,
+      status,
     );
   }
 }

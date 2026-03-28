@@ -39,6 +39,15 @@ export class QuizAttemptService {
     });
     if (!quiz) throw new NotFoundException('quiz not found');
 
+    const now = new Date();
+    const GRACE_PERIOD_MS = 60 * 1000; // 1 minute
+    const isAfterGracePeriod =
+      now.getTime() > quiz.endsAt.getTime() + GRACE_PERIOD_MS;
+
+    if (isAfterGracePeriod) {
+      throw new ForbiddenException('Cannot submit quiz after grace period');
+    }
+
     // Ensure student is enrolled
     const isJoinedCourse = quiz.course.students.some(
       (student) => student.id === user.sub,
@@ -179,13 +188,22 @@ export class QuizAttemptService {
         .getRawOne(),
     ]);
 
-    const convertStats = (quiz) => ({
-      id: Number(quiz.attempt_id),
-      score: Number(quiz.attempt_score),
-      name: quiz.quiz_name,
-      totalQuestions: Number(quiz.totalQuestions),
-      totalCorrect: Number(quiz.totalCorrect),
-    });
+    const convertStats = (quiz) =>
+      quiz
+        ? {
+            id: Number(quiz.attempt_id),
+            score: Number(quiz.attempt_score),
+            name: quiz.quiz_name,
+            totalQuestions: Number(quiz.totalQuestions),
+            totalCorrect: Number(quiz.totalCorrect),
+          }
+        : {
+            id: null,
+            score: 0,
+            name: 'N/A',
+            totalQuestions: 0,
+            totalCorrect: 0,
+          };
 
     return {
       data: [
@@ -195,16 +213,6 @@ export class QuizAttemptService {
       ],
       message: 'Fetched stats',
     };
-  }
-
-  async getQuizLeaderboard(studentId: number, quizId: number) {
-    if (!quizId) throw new NotFoundException('quiz id not found');
-
-    const attempts = await this.repo.find({
-      where: { quiz: { id: quizId } },
-    });
-
-    return { data: attempts, message: 'Fetched all quiz attempts', meta: null };
   }
 
   async getCourseLeaderboard(studentId: number, courseId: number) {
@@ -225,12 +233,19 @@ export class QuizAttemptService {
 
     const ranked = data.map((a, index) => ({
       studentId: Number(a.studentId),
-      name: a.name,
+      name: a.name as string,
       totalScore: Number(a.totalScore),
       rank: index + 1,
     }));
 
-    const currentUser = ranked.find((a) => a.studentId === studentId);
+    const studentInLeaderboard = ranked.find((a) => a.studentId === studentId);
+
+    const currentUser = studentInLeaderboard ?? {
+      studentId,
+      name: 'You',
+      totalScore: 0,
+      rank: null,
+    };
 
     return {
       data: { ranked, currentUser },

@@ -17,7 +17,7 @@ export default function StudentLayout({
     <div className="flex h-screen">
       <Sidebar basePath="" role={UserRole.USER} routes={SIDEBAR_ROUTES} />
 
-      <main className="overflow-auto hide-scrollbar">{children}</main>
+      <main className="w-full overflow-auto hide-scrollbar">{children}</main>
     </div>
   );
 }

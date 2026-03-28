@@ -21,7 +21,7 @@ export default function AdminLayout({
         routes={SIDEBAR_ROUTES}
       />
 
-      <main className="overflow-auto hide-scrollbar">{children}</main>
+      <main className="w-full overflow-auto hide-scrollbar">{children}</main>
     </div>
   );
 }

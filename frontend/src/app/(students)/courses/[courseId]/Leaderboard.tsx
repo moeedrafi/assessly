@@ -6,19 +6,32 @@ import type { LeaderboardType } from "@/types/analytics";
 import { getRankDisplay, getRankStyle } from "@/lib/utils";
 
 export const Leaderboard = ({ courseId }: { courseId: string }) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["course-leaderboard"],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["course-leaderboard", { courseId }],
     queryFn: async () => {
       const res = await api.get<LeaderboardType>(
         `/quiz-attempt/course/${courseId}/leaderboard`,
       );
       return res.data;
     },
-    staleTime: Infinity,
+    staleTime: 1000 * 60,
+    retry: 1,
   });
 
   if (isLoading) return <p>Loading....</p>;
-  if (!data) return <p>No data found</p>;
+  if (isError || !data || data.ranked.length === 0) {
+    return (
+      <div className="bg-bg flex flex-col shadow col-span-12 xl:col-span-4 space-y-2 p-6 sm:p-8 rounded-lg border border-color">
+        <h3 className="text-xl font-bold">Leaderboard</h3>
+
+        <p className="text-sm text-muted-foreground">
+          {isError
+            ? "Failed to load leaderboard. Try again later"
+            : "No leaderboard yet."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-bg flex flex-col shadow col-span-12 xl:col-span-4 space-y-2 p-6 sm:p-8 rounded-lg border border-color">
@@ -27,7 +40,7 @@ export const Leaderboard = ({ courseId }: { courseId: string }) => {
 
         <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-lg font-medium text-sm">
           <Award className="w-4 h-4" />
-          <span>Your Rank: {data.currentUser.rank}</span>
+          <span>Your Rank: {data.currentUser?.rank ?? "N/A"}</span>
         </div>
       </div>
 
