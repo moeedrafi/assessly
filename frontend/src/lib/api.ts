@@ -40,12 +40,31 @@ const handleResponse = async <T, M = PaginationMeta>(
 const makeApiCall = async <T, M = PaginationMeta>(
   endpoint: string,
   options: RequestInit,
+  retry = true,
 ): Promise<ApiResponse<T, M>> => {
   try {
     const response = await fetch(`${BASE_API_URL}${endpoint}`, {
       credentials: "include",
       ...options,
     });
+
+    if (response.status === 401 && retry) {
+      try {
+        await refreshToken();
+        return makeApiCall<T, M>(endpoint, options, false);
+      } catch {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login"; // redirect to login
+        }
+
+        throw new ApiError({
+          statusCode: 401,
+          message: "Session expired",
+          error: "Unauthorized",
+        });
+      }
+    }
+
     return handleResponse<T, M>(response);
   } catch (error) {
     console.error("API call error:", error);
@@ -96,4 +115,28 @@ export const api = {
     endpoint: string,
     headers?: Record<string, string>,
   ) => makeApiCall<T, M>(endpoint, { method: "DELETE", headers }),
+};
+
+let isRefreshing = false;
+let refreshPromise: Promise<void> | null = null;
+
+export const refreshToken = async () => {
+  if (!isRefreshing) {
+    isRefreshing = true;
+
+    refreshPromise = fetch(`${BASE_API_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error("Refresh failed");
+        }
+      })
+      .finally(() => {
+        isRefreshing = false;
+      });
+  }
+
+  return refreshPromise;
 };

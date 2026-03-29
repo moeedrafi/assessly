@@ -62,7 +62,6 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/auth/refresh',
     });
 
     return {
@@ -71,6 +70,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post('/refresh')
   async refresh(
     @Req() req: Request,
@@ -94,7 +94,6 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/auth/refresh',
     });
 
     return { message: 'Tokens refreshed' };
