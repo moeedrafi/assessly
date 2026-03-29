@@ -60,9 +60,6 @@ export class AuthService {
     if (user) throw new ConflictException('User already exists');
 
     const hashedPassword = await this.hashing(password);
-
-    // TODO: Send email verification
-
     const userRole = isAdmin ? UserRole.ADMIN : UserRole.USER;
 
     const createdUser = await this.usersService.create(
@@ -74,15 +71,13 @@ export class AuthService {
 
     return {
       data: createdUser,
-      message: 'Successfully SignedUp',
+      message: 'Successfully Signedup. Now you can login',
     };
   }
 
   async signIn(email: string, password: string) {
     const user = await this.usersService.findOne(email);
     if (!user) throw new UnauthorizedException('Invalid user');
-
-    // TODO: Check email verified
 
     const isCorrect = await this.isPasswordMatch(password, user.password);
     if (!isCorrect) throw new UnauthorizedException('Invalid credentials');

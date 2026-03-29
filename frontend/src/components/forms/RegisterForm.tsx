@@ -1,46 +1,10 @@
 "use client";
 import Link from "next/link";
-import { toast } from "react-hot-toast";
-import { useForm } from "@tanstack/react-form";
-import { api } from "@/lib/api";
-import { ApiError } from "@/lib/error";
-import { RegisterFormData, registerSchema } from "@/schemas/auth.schemas";
-
-const initialState: RegisterFormData = {
-  email: "",
-  name: "",
-  password: "",
-};
+import { useAppForm } from "@/hooks/form";
+import { registerFormOptions } from "@/lib/shared-form";
 
 export const RegisterForm = () => {
-  const form = useForm({
-    defaultValues: initialState,
-    validators: { onBlur: registerSchema },
-    onSubmit: async ({ value }) => {
-      const validatedData = registerSchema.safeParse(value);
-      if (!validatedData.success) {
-        toast.error("Please fix errors in the form");
-        return;
-      }
-
-      try {
-        const res = await api.post<void, RegisterFormData>(
-          "/auth/signup",
-          validatedData.data,
-        );
-
-        toast.success(res.message);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          toast.error(error.message);
-        } else if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("Something went wrong");
-        }
-      }
-    },
-  });
+  const form = useAppForm({ ...registerFormOptions });
 
   return (
     <>
@@ -52,118 +16,54 @@ export const RegisterForm = () => {
           form.handleSubmit();
         }}
       >
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
-          {([canSubmit, isSubmitting]) => (
-            <>
-              <form.Field name="name">
-                {(field) => (
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor={field.name}
-                      className="text-text text-base leading-[1.6em]"
-                    >
-                      Name
-                    </label>
-                    <input
-                      id={field.name}
-                      name={field.name}
-                      disabled={isSubmitting}
-                      value={field.state.value}
-                      placeholder="John Doe"
-                      aria-invalid={!field.state.meta.isValid}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:ring-0 disabled:focus-visible:ring-0"
-                    />
-                    {field.state.meta.isTouched &&
-                      !field.state.meta.isValid && (
-                        <em role="alert" className="text-red-500">
-                          {field.state.meta.errors
-                            .map((err) => err?.message)
-                            .join(", ")}
-                        </em>
-                      )}
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="email">
-                {(field) => (
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor={field.name}
-                      className="text-text text-base leading-[1.6em]"
-                    >
-                      Email
-                    </label>
-                    <input
-                      id={field.name}
-                      name={field.name}
-                      disabled={isSubmitting}
-                      value={field.state.value}
-                      placeholder="john.doe@gmail.com"
-                      aria-invalid={!field.state.meta.isValid}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:ring-0 disabled:focus-visible:ring-0"
-                    />
-                    {field.state.meta.isTouched &&
-                      !field.state.meta.isValid && (
-                        <em role="alert" className="text-red-500">
-                          {field.state.meta.errors
-                            .map((err) => err?.message)
-                            .join(", ")}
-                        </em>
-                      )}
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="password">
-                {(field) => (
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor={field.name}
-                      className="text-text text-base leading-[1.6em]"
-                    >
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      placeholder="******"
-                      disabled={isSubmitting}
-                      aria-invalid={!field.state.meta.isValid}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:opacity-70 disabled:cursor-not-allowed disabled:ring-0 disabled:focus-visible:ring-0"
-                    />
-                    {field.state.meta.isTouched &&
-                      !field.state.meta.isValid && (
-                        <em role="alert" className="text-red-500">
-                          {field.state.meta.errors
-                            .map((err) => err?.message)
-                            .join(", ")}
-                        </em>
-                      )}
-                  </div>
-                )}
-              </form.Field>
-
-              <button
-                type="submit"
-                disabled={!canSubmit}
-                className="mt-5 w-full bg-primary p-2 text-white rounded-lg hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-              >
-                {isSubmitting ? "Registering..." : "Register"}
-              </button>
-            </>
+        <form.AppField name="name">
+          {(field) => (
+            <field.TextField required label="Name" placeholder="John Doe" />
           )}
-        </form.Subscribe>
+        </form.AppField>
+
+        <form.AppField name="email">
+          {(field) => (
+            <field.TextField
+              required
+              type="email"
+              label="Email"
+              placeholder="john.doe@gmail.com"
+            />
+          )}
+        </form.AppField>
+
+        <form.AppField name="password">
+          {(field) => (
+            <field.TextField
+              required
+              type="password"
+              label="Password"
+              placeholder="******"
+            />
+          )}
+        </form.AppField>
+
+        <div className="space-y-3">
+          <form.AppForm>
+            <form.SubscribeButton
+              type="submit"
+              label="Register as Student"
+              className="w-full"
+              onClick={() => form.setFieldValue("isAdmin", false)}
+            />
+          </form.AppForm>
+
+          <form.AppForm>
+            <form.SubscribeButton
+              type="submit"
+              label="Register as Teacher"
+              className="w-full"
+              variant="ghost"
+              onClick={() => form.setFieldValue("isAdmin", true)}
+            />
+          </form.AppForm>
+        </div>
       </form>
 
       <Link
