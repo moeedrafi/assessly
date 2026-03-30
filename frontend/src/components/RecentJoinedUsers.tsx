@@ -7,16 +7,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { getRecentJoinedUsers } from "@/services/admin";
 import { adminKeys } from "@/lib/query-key";
 
-export const RecentJoinedUsers = ({
-  initialData,
-}: {
-  initialData: RecentUser[];
-}) => {
+export const RecentJoinedUsers = () => {
   const { data = [], isLoading } = useQuery({
     queryKey: adminKeys.recentUsers(),
     queryFn: getRecentJoinedUsers,
     staleTime: Infinity,
-    initialData,
   });
 
   const columns = useMemo<ColumnDef<RecentUser>[]>(

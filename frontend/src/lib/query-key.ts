@@ -23,6 +23,7 @@ export const studentKeys = {
 };
 
 export const adminKeys = {
+  stats: () => ["stats"] as const,
   recentUsers: () => ["recent-users"] as const,
   courseSnapshot: (page: number, rpp: number) =>
     ["course-snapshot", { page, rpp }] as const,

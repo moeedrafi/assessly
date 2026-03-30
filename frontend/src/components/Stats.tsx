@@ -1,13 +1,19 @@
-import { api } from "@/lib/api";
-import { cookies } from "next/headers";
-import { StatsCard } from "@/types/analytics";
-import { BookIcon, BookOpenCheckIcon, LibraryBigIcon } from "lucide-react";
+"use client";
 
-export const Stats = async () => {
-  const cookieStore = await cookies();
-  const { data } = await api.get<StatsCard>("/admin/analytics/kpis", {
-    Cookie: cookieStore.toString(),
+import { BookIcon, BookOpenCheckIcon, LibraryBigIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { adminKeys } from "@/lib/query-key";
+import { getStats } from "@/services/admin";
+
+export const Stats = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: adminKeys.stats(),
+    queryFn: getStats,
+    staleTime: Infinity,
   });
+
+  if (isLoading) return <p>LOADING....</p>;
+  if (!data) return <p>Data not found</p>;
 
   return (
     <div className="bg-bg flex flex-col shadow-lg col-span-12 xl:col-span-8 space-y-4 p-6 sm:p-8 rounded-lg border border-color">

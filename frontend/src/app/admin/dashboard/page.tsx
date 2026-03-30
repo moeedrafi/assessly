@@ -1,25 +1,8 @@
-import { api, PaginationMeta } from "@/lib/api";
-import { cookies } from "next/headers";
 import { Stats } from "@/components/Stats";
 import { CourseSnapshot } from "@/components/CourseSnapshot";
 import { RecentJoinedUsers } from "@/components/RecentJoinedUsers";
-import type { CourseSnapshotType, RecentUser } from "@/types/analytics";
 
-const AdminDashboardPage = async () => {
-  const cookieStore = await cookies();
-
-  const [recentUsers, courseSnapshot] = await Promise.all([
-    api.get<RecentUser[]>("/admin/analytics/recent-users", {
-      Cookie: cookieStore.toString(),
-    }),
-    api.get<CourseSnapshotType[], PaginationMeta>(
-      "/admin/analytics/course-snapshot?page=1&rpp=5",
-      { Cookie: cookieStore.toString() },
-    ),
-  ]);
-
-  console.log(cookieStore);
-
+const AdminDashboardPage = () => {
   return (
     <section className="w-full font-lato space-y-4 px-2 py-4">
       {/* Heading */}
@@ -31,8 +14,8 @@ const AdminDashboardPage = async () => {
       </div>
 
       <Stats />
-      <RecentJoinedUsers initialData={recentUsers.data} />
-      <CourseSnapshot initialData={courseSnapshot} />
+      <RecentJoinedUsers />
+      <CourseSnapshot />
     </section>
   );
 };

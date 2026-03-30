@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { CourseFormData } from "@/schemas/course.schemas";
-import type { RecentUser } from "@/types/analytics";
+import type { RecentUser, StatsCard } from "@/types/analytics";
 import { QuestionDetail } from "@/types/question";
 import type { QuizDetail } from "@/types/quiz";
 
@@ -20,5 +20,10 @@ export const getQuizDetail = async (quizId: string) => {
 
 export const getQuestionsDetail = async (quizId: string) => {
   const res = await api.get<QuestionDetail[]>(`/question/${quizId}`);
+  return res.data;
+};
+
+export const getStats = async () => {
+  const res = await api.get<StatsCard>("/admin/analytics/kpis");
   return res.data;
 };
