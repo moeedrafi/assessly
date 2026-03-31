@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { ApiError } from "@/lib/error";
 import { QuestionType } from "@/types/enum";
 import { getQuestions } from "@/services/student";
+import { useProctoring } from "@/hooks/useProctoring";
 const Timer = dynamic(
   () => import("@/components/Timer").then((mod) => mod.Timer),
   { ssr: false },
@@ -23,9 +24,16 @@ const QuizAttemptPage = () => {
     queryFn: () => getQuestions(quizId),
   });
 
+  const [started, setStarted] = useState<boolean>(false);
   const [questionNumber, setQuestionNumber] = useState<number>(0);
-
   const [answers, setAnswers] = useState<Record<number, number[]>>({});
+
+  const { cheating, requestFullscreen } = useProctoring(started);
+
+  const handleStart = async () => {
+    await requestFullscreen();
+    setStarted(true);
+  };
 
   if (isLoading) return <p>LOADING....</p>;
   if (!data) return <p>No question found!</p>;
@@ -81,7 +89,7 @@ const QuizAttemptPage = () => {
     try {
       const res = await api.post(`/quiz-attempt/${quizId}/attempt`, payload);
       toast.success(res.message);
-      // router.push(`/quizzes/${quizId}/result`);
+      router.push(`/quizzes/${quizId}/result`);
     } catch (error) {
       if (error instanceof ApiError) {
         toast.error(error.message);
@@ -93,6 +101,20 @@ const QuizAttemptPage = () => {
     }
   };
 
+  if (!started) {
+    return (
+      <div className="flex flex-col items-center justify-center font-lato h-screen gap-4">
+        <h1 className="text-2xl font-bold">Ready to start quiz?</h1>
+        <button
+          onClick={handleStart}
+          className="px-6 py-3 bg-primary text-white rounded-md"
+        >
+          Start Quiz
+        </button>
+      </div>
+    );
+  }
+
   return (
     <section className="w-full font-lato space-y-4 px-2">
       {/* Heading */}
@@ -102,6 +124,13 @@ const QuizAttemptPage = () => {
           {questionNumber + 1} / {data.questions.length}
         </p>
         <Timer duration={data.timeLimit} />
+        <p>Cheating counter: {cheating}</p>
+        {cheating > 0 && (
+          <div className="text-red-500">
+            Warning: You have left the quiz {cheating} time
+            {cheating > 1 ? "s" : ""}.
+          </div>
+        )}
       </div>
 
       <div className="space-y-4 max-w-lg mx-auto bg-bg p-6 sm:p-8 rounded-lg shadow border border-color">

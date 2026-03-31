@@ -69,8 +69,6 @@ export class AdminCourseService {
   }
 
   async findAll(userId: number, page: number, rpp: number) {
-    if (!userId) throw new UnauthorizedException();
-
     const offset = (page - 1) * rpp;
 
     const [courses, totalItems] = await this.repo.findAndCount({
@@ -116,5 +114,19 @@ export class AdminCourseService {
     if (!course) throw new NotFoundException('course not found');
 
     return { data: course, message: 'Fetched Successfully' };
+  }
+
+  async findAllNoPagination(userId: number) {
+    const courses = await this.repo.find({
+      where: { teacher: { id: userId } },
+      order: { id: 'DESC' },
+      select: ['id', 'name'],
+    });
+
+    return {
+      data: courses,
+      message: 'Successfully fetched courses',
+      meta: null,
+    };
   }
 }

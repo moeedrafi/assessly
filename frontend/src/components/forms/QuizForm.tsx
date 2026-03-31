@@ -6,7 +6,7 @@ import { TeachingCourse } from "@/types/course";
 import { createQuizFormOptions } from "@/lib/shared-form";
 
 export const QuizForm = () => {
-  const { data: courses } = useCourses<TeachingCourse[]>("/admin/courses");
+  const { data: courses } = useCourses<TeachingCourse[]>("/admin/courses/all");
   const form = useAppForm({ ...createQuizFormOptions });
 
   return (

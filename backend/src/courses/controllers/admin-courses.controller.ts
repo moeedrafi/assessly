@@ -60,6 +60,11 @@ export class AdminCoursesController {
     return this.coursesService.findAll(user.sub, page, rpp);
   }
 
+  @Get('all')
+  getAllCourses(@CurrentUser() user: { sub: number }) {
+    return this.coursesService.findAllNoPagination(user.sub);
+  }
+
   @Get(':courseid')
   getCourse(
     @Param('courseid') courseId: string,
