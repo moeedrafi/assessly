@@ -6,16 +6,11 @@ import type { RecentQuiz } from "@/types/analytics";
 import type { ColumnDef } from "@tanstack/react-table";
 import { getRecentQuiz } from "@/services/student";
 
-export const RecentQuizzes = ({
-  initialData,
-}: {
-  initialData: RecentQuiz[];
-}) => {
+export const RecentQuizzes = () => {
   const { data = [], isLoading } = useQuery({
     queryKey: ["recent-quiz"],
     queryFn: getRecentQuiz,
     staleTime: Infinity,
-    initialData,
   });
 
   const columns = useMemo<ColumnDef<RecentQuiz>[]>(

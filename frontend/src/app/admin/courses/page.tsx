@@ -1,29 +1,8 @@
 import Link from "next/link";
-import { api, PaginationMeta } from "@/lib/api";
-import { cookies } from "next/headers";
 import { PlusCircle } from "lucide-react";
 import { Courses } from "@/components/Courses";
-import type { TeachingCourse } from "@/types/course";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
 
-const AdminCoursesPage = async () => {
-  const cookieStore = await cookies();
-  const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ["courses"],
-    queryFn: async () => {
-      await api.get<TeachingCourse[], PaginationMeta>("/admin/courses", {
-        Cookie: cookieStore.toString(),
-      });
-    },
-    staleTime: Infinity,
-  });
-
+const AdminCoursesPage = () => {
   return (
     <section className="w-full font-lato space-y-4 px-2 py-4">
       <div className="space-y-2 text-center p-6 sm:p-8">
@@ -45,9 +24,7 @@ const AdminCoursesPage = async () => {
           </Link>
         </div>
 
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <Courses />
-        </HydrationBoundary>
+        <Courses />
       </div>
     </section>
   );

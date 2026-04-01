@@ -1,28 +1,7 @@
-import { api } from "@/lib/api";
-import { cookies } from "next/headers";
 import { JoinCourse } from "./JoinCourse";
 import { StudentCourses } from "./StudentCourses";
-import type { JoinedCourse } from "@/types/course";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
 
-const CoursesPage = async () => {
-  const cookieStore = await cookies();
-  const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ["courses"],
-    queryFn: async () => {
-      await api.get<JoinedCourse[]>("/courses", {
-        Cookie: cookieStore.toString(),
-      });
-    },
-    staleTime: Infinity,
-  });
-
+const CoursesPage = () => {
   return (
     <section className="w-full font-lato space-y-4 px-2 py-4">
       {/* Heading */}
@@ -46,10 +25,7 @@ const CoursesPage = async () => {
 
       <div className="space-y-2 bg-bg p-6 sm:p-8 border border-color shadow rounded-lg">
         <h2 className="text-xl sm:text-2xl font-bold">Your Courses</h2>
-
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <StudentCourses />
-        </HydrationBoundary>
+        <StudentCourses />
       </div>
     </section>
   );

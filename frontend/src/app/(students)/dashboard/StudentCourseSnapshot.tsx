@@ -4,14 +4,9 @@ import { Table } from "@/components/Table";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { Pagination } from "@/components/Pagination";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { ApiResponse, PaginationMeta } from "@/lib/api";
 import type { StudentCourseSnapshotType } from "@/types/analytics";
 
-export const StudentCourseSnapshot = ({
-  initialData,
-}: {
-  initialData: ApiResponse<StudentCourseSnapshotType[], PaginationMeta>;
-}) => {
+export const StudentCourseSnapshot = () => {
   const [page, setPage] = useState<number>(1);
   const [rpp, setRpp] = useState<number>(5);
 
@@ -23,7 +18,6 @@ export const StudentCourseSnapshot = ({
     { page, rpp },
     {
       staleTime: Infinity,
-      initialData,
       placeholderData: (prevData) => prevData,
     },
   );

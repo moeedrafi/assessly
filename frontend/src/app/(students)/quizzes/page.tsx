@@ -1,7 +1,7 @@
 import { Quizzes } from "@/components/quiz/Quizzes";
 import { DateRangeQuizzes } from "./DateRangeQuizzes";
 
-const QuizzesPage = async () => {
+const QuizzesPage = () => {
   return (
     <section className="w-full font-lato space-y-4 px-2 py-4">
       {/* Heading */}

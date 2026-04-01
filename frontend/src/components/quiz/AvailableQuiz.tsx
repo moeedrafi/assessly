@@ -1,27 +1,18 @@
 "use client";
 import Link from "next/link";
-import { UserRole } from "@/types/user";
-import { QuizEntity } from "@/types/quiz";
-import { Skeleton } from "../Skeleton";
 import { useState } from "react";
-import { useApiQuery } from "@/hooks/useApiQuery";
+import { Skeleton } from "../Skeleton";
+import { QuizEntity } from "@/types/quiz";
 import { Pagination } from "../Pagination";
+import { useApiQuery } from "@/hooks/useApiQuery";
 
-export const AvailableQuizzes = ({
-  url,
-  role,
-  courseId,
-}: {
-  url: string;
-  role: UserRole;
-  courseId?: number;
-}) => {
+export const AvailableQuizzes = ({ courseId }: { courseId?: number }) => {
   const [page, setPage] = useState<number>(1);
   const [rpp, setRpp] = useState<number>(5);
 
   const { data, isLoading, isPlaceholderData } = useApiQuery<QuizEntity[]>(
     ["availableQuizzes", { courseId, page, rpp }],
-    url,
+    "/quiz/available",
     { page, rpp },
     { staleTime: Infinity, placeholderData: (prevData) => prevData },
   );
@@ -104,21 +95,12 @@ export const AvailableQuizzes = ({
                 </div>
               </div>
 
-              {role === UserRole.ADMIN ? (
-                <Link
-                  href={`/admin/quizzes/${quiz.id}`}
-                  className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
-                >
-                  View Details
-                </Link>
-              ) : (
-                <Link
-                  href={`/quizzes/${quiz.id}`}
-                  className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
-                >
-                  View Details
-                </Link>
-              )}
+              <Link
+                href={`/quizzes/${quiz.id}`}
+                className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
+              >
+                View Details
+              </Link>
             </div>
           );
         })}

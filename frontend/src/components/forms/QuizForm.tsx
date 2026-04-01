@@ -111,6 +111,7 @@ export const QuizForm = () => {
             type="submit"
             label="Create Quiz"
             className="px-8 py-3"
+            onClick={() => form.setFieldValue("isPublished", true)}
           />
         </form.AppForm>
 
@@ -120,6 +121,7 @@ export const QuizForm = () => {
             variant="ghost"
             label="Save as Draft"
             className="px-8 py-3"
+            onClick={() => form.setFieldValue("isPublished", false)}
           />
         </form.AppForm>
       </div>

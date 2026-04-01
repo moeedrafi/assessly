@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import { Quizzes } from "@/components/quiz/Quizzes";
 
-const AdminQuizzesPage = async () => {
+const AdminQuizzesPage = () => {
   return (
     <section className="w-full font-lato space-y-4 px-2 py-4">
       {/* Heading */}

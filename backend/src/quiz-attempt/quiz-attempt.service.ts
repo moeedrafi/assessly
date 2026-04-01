@@ -158,13 +158,13 @@ export class QuizAttemptService {
       .createQueryBuilder('attempt')
       .innerJoin('attempt.quiz', 'quiz')
       .innerJoin('quiz.questions', 'question')
-      .innerJoin('attempt.questionAttempts', 'questionAttempt')
+      .innerJoin('attempt.questionAttempts', 'qa')
       .select([
         'attempt.id',
         'attempt.score',
         'quiz.name',
         'COUNT(DISTINCT question.id) AS "totalQuestions"',
-        'COUNT(DISTINCT CASE WHEN questionAttempt.isCorrect THEN questionAttempt.id END) AS "totalCorrect"',
+        'SUM(DISTINCT CASE WHEN qa.isCorrect THEN 1 ELSE 0 END) AS "totalCorrect"',
       ])
       .where('attempt.studentId = :studentId', { studentId })
       .andWhere('quiz.courseId = :courseId', { courseId })
@@ -179,8 +179,20 @@ export class QuizAttemptService {
       .andWhere('q.courseId = :courseId', { courseId });
 
     const [bestQuiz, worstQuiz, avgQuiz] = await Promise.all([
-      await qb.clone().orderBy('attempt.score', 'DESC').getRawOne(),
-      await qb.clone().orderBy('attempt.score', 'ASC').getRawOne(),
+      await qb
+        .clone()
+        .orderBy(
+          `SUM(CASE WHEN qa.isCorrect THEN 1 ELSE 0 END)::float / NULLIF(COUNT(DISTINCT question.id), 0)`,
+          'DESC',
+        )
+        .getRawOne(),
+      await qb
+        .clone()
+        .orderBy(
+          `SUM(CASE WHEN qa.isCorrect THEN 1 ELSE 0 END)::float / NULLIF(COUNT(DISTINCT question.id), 0)`,
+          'ASC',
+        )
+        .getRawOne(),
       await qb
         .clone()
         .orderBy(`ABS(attempt.score - (${avgSubQuery.getQuery()}))`, 'ASC')
