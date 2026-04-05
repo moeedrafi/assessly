@@ -137,17 +137,60 @@ export class QuizService {
 
   async findDateRangeQuiz(
     studentId: number,
-    from: string,
-    to: string,
     page: number,
     rpp: number,
+    status: 'missed' | 'upcoming' | 'completed',
+    from?: string,
+    to?: string,
   ) {
     const offset = (page - 1) * rpp;
-    const start = new Date(from);
-    const end = new Date(to);
 
-    const [quizzes, totalItems] = await this.buildQuizQuery(studentId)
-      .andWhere('quiz.createdAt BETWEEN :start AND :end', { start, end })
+    const query = this.buildQuizQuery(studentId);
+
+    if (from && to) {
+      query.andWhere('quiz.createdAt BETWEEN :startDate AND :endDate', {
+        startDate: new Date(from),
+        endDate: new Date(to),
+      });
+    } else if (from) {
+      query.andWhere('quiz.createdAt >= :startDate', {
+        startDate: new Date(from),
+      });
+    } else if (to) {
+      query.andWhere('quiz.createdAt <= :endDate', {
+        endDate: new Date(to),
+      });
+    }
+
+    const now = new Date();
+
+    if (status === 'completed') {
+      query.andWhere('quiz.endsAt < :now', { now }).andWhere(
+        `EXISTS (SELECT 1 FROM quiz_attempt a
+          WHERE a."quizId" = quiz.id
+          AND a."studentId" = :studentId
+          )`,
+        { studentId },
+      );
+    } else if (status === 'missed') {
+      query.andWhere('quiz.endsAt < :now', { now }).andWhere(
+        `NOT EXISTS (SELECT 1 FROM quiz_attempt a
+          WHERE a."quizId" = quiz.id
+          AND a."studentId" = :studentId
+          )`,
+        { studentId },
+      );
+    } else if (status === 'upcoming') {
+      query.andWhere('quiz.startsAt > :now', { now }).andWhere(
+        `NOT EXISTS (SELECT 1 FROM quiz_attempt a
+          WHERE a."quizId" = quiz.id
+          AND a."studentId" = :studentId
+          )`,
+        { studentId },
+      );
+    }
+
+    const [quizzes, totalItems] = await query
       .offset(offset)
       .limit(rpp)
       .orderBy('quiz.createdAt', 'DESC')
@@ -155,7 +198,8 @@ export class QuizService {
 
     return {
       data: quizzes,
-      message: 'Fetched quizzes from range',
+      message:
+        from && to ? 'Fetched quizzes in date range' : 'Fetched all quizzes',
       meta: {
         totalItems,
         totalPages: Math.ceil(totalItems / rpp),

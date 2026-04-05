@@ -10,7 +10,7 @@ interface TablePaginationProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   rpp: number;
-  setRpp: React.Dispatch<React.SetStateAction<number>>;
+  onRppChange: (rpp: number) => void;
 }
 
 export const Pagination = ({
@@ -19,7 +19,7 @@ export const Pagination = ({
   page,
   onPageChange,
   rpp,
-  setRpp,
+  onRppChange,
   totalPages,
 }: TablePaginationProps) => {
   const start = total === 0 ? 0 : (page - 1) * rpp + 1;
@@ -48,7 +48,7 @@ export const Pagination = ({
   if (isLoading) return null;
 
   const handleRpp = (value: string) => {
-    setRpp(Number(value));
+    onRppChange(Number(value));
     onPageChange(1);
   };
 
@@ -61,16 +61,16 @@ export const Pagination = ({
             : "No records found"}
         </div>
 
-        {pages.length === rpp ? (
+        {rpp < total ? (
           <div className="flex flex-wrap justify-center gap-2 order-1 sm:order-2">
             {pages.map((p, index) =>
               p === "..." ? (
-                <span key={index} className="px-2">
+                <span key={`ellipsis-${index}`} className="px-2">
                   ...
                 </span>
               ) : (
                 <Button
-                  key={p}
+                  key={`page-${p}`}
                   onClick={() => onPageChange(p as number)}
                   disabled={p === page}
                   variant={p === page ? "primary" : "ghost"}
@@ -82,7 +82,7 @@ export const Pagination = ({
           </div>
         ) : null}
 
-        <div className="order-3 w-1/4">
+        <div className="order-3 md:w-1/4">
           <select
             id="rpp"
             name="rpp"

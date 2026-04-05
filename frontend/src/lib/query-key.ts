@@ -8,8 +8,13 @@ export const studentKeys = {
   course: (page: number, rpp: number) => ["course", { page, rpp }] as const,
   quizStats: (courseId: string) => ["quiz-stats", { courseId }] as const,
   leaderboard: (courseId: string) => ["leaderboard", { courseId }] as const,
-  dateRange: (from: string, to: string, page: number, rpp: number) =>
-    ["date-range", { from, to, page, rpp }] as const,
+  dateRange: (
+    from: string | null,
+    to: string | null,
+    page: number,
+    rpp: number,
+    status: QuizStatus,
+  ) => ["date-range", { from, to, page, rpp, status }] as const,
   quizzes: (
     page: number,
     rpp: number,

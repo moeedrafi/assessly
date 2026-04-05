@@ -31,6 +31,7 @@ export const JoinCourse = () => {
         );
         queryClient.invalidateQueries({ queryKey: ["courses"] });
         toast.success(res.message);
+        form.reset();
       } catch (error) {
         if (error instanceof ApiError) {
           toast.error(error.message);

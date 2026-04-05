@@ -1,3 +1,5 @@
+import type { QuizStatus } from "@/types/quiz";
+
 export const saveToStorage = <T>(key: string, value: T) => {
   if (typeof window === "undefined") return;
   localStorage.setItem(key, JSON.stringify(value));
@@ -63,4 +65,20 @@ export const getRankDisplay = (rank: number) => {
   if (rank === 2) return "🥈";
   if (rank === 3) return "🥉";
   return `${rank}.`;
+};
+
+export const getTabs = (
+  role: "student" | "admin",
+): { label: string; value: QuizStatus }[] => {
+  const base: { label: string; value: QuizStatus }[] = [
+    { label: "All", value: "all" },
+    { label: "Completed", value: "completed" },
+    { label: "Upcoming", value: "upcoming" },
+  ];
+
+  if (role === "student") {
+    base.push({ label: "Missed", value: "missed" });
+  }
+
+  return base;
 };

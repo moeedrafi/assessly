@@ -1,60 +1,83 @@
 "use client";
-import { useState } from "react";
+import { getTabs } from "@/lib/utils";
+import { Tabs } from "@/components/Tabs";
+import { useEffect, useState } from "react";
+import type { QuizStatus } from "@/types/quiz";
+import { studentKeys } from "@/lib/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/Skeleton";
 import { Pagination } from "@/components/Pagination";
 import { QuizCard } from "@/components/quiz/QuizCard";
 import { getDateRangeQuizzes } from "@/services/student";
+import { parseAsInteger, parseAsStringEnum, useQueryState } from "nuqs";
 
 export const DateRangeQuizzes = () => {
-  const [to, setTo] = useState<string>("");
-  const [rpp, setRpp] = useState<number>(5);
-  const [page, setPage] = useState<number>(1);
-  const [from, setFrom] = useState<string>("");
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
+  const [selectedStatus, setSelectedStatus] = useQueryState<QuizStatus>(
+    "status",
+    parseAsStringEnum<QuizStatus>([
+      "all",
+      "completed",
+      "upcoming",
+      "missed",
+    ]).withDefault("all"),
+  );
+
+  const [from, setFrom] = useState<string | null>(null);
+  const [to, setTo] = useState<string | null>(null);
 
   const { data, isLoading, isPlaceholderData } = useQuery({
-    queryKey: ["date-range", { from, to, page, rpp }],
-    queryFn: () => getDateRangeQuizzes({ from, page, rpp, to }),
-    enabled: !!from && !!to,
+    queryKey: studentKeys.dateRange(from, to, page, rpp, selectedStatus),
+    queryFn: () =>
+      getDateRangeQuizzes({ from, page, rpp, to, status: selectedStatus }),
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedStatus?.toString(), rpp]);
 
   const quizzes = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;
   const totalPages = data?.meta?.totalPages ?? 1;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
+      <Tabs
+        items={getTabs("student")}
+        onChange={setSelectedStatus}
+        value={selectedStatus}
+      />
+
+      <hr className="text-muted-foreground" />
+
       <div className="flex gap-3">
         <div className="w-full flex flex-col gap-1">
-          <label className="font-semibold text-sm text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">
+          <label className="font-semibold text-sm text-muted-foreground">
             From
           </label>
           <input
             type="datetime-local"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
+            value={from ?? ""}
+            onChange={(e) => setFrom(e.target.value || null)}
             className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
           />
         </div>
 
         <div className="w-full flex flex-col gap-1">
-          <label className="font-semibold text-sm text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">
+          <label className="font-semibold text-sm text-muted-foreground">
             To
           </label>
           <input
             type="datetime-local"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
+            value={to ?? ""}
+            onChange={(e) => setTo(e.target.value || null)}
             className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
           />
         </div>
       </div>
 
-      {!from || !to ? (
-        <p className="text-muted-foreground text-sm col-span-full">
-          Please select a start and end date to see quizzes.
-        </p>
-      ) : isLoading ? (
+      {isLoading ? (
         <Skeleton max={3} />
       ) : quizzes.length === 0 ? (
         <p className="text-muted-foreground text-sm col-span-full">
@@ -75,7 +98,7 @@ export const DateRangeQuizzes = () => {
         total={total}
         totalPages={totalPages}
         onPageChange={setPage}
-        setRpp={setRpp}
+        onRppChange={setRpp}
       />
     </div>
   );

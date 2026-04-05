@@ -1,26 +1,27 @@
 "use client";
 import Link from "next/link";
-import { api } from "@/lib/api";
 import toast from "react-hot-toast";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { api } from "@/lib/api";
 import { Modal } from "@/components/Modal";
 import { useDialog } from "@/hooks/useDialog";
-import { JoinedCourse } from "@/types/course";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/Skeleton";
-import { useQueryClient } from "@tanstack/react-query";
-import { Pagination } from "@/components/Pagination";
-import { useState } from "react";
 import { useApiQuery } from "@/hooks/useApiQuery";
+import type { JoinedCourse } from "@/types/course";
+import { Pagination } from "@/components/Pagination";
 
 export const StudentCourses = () => {
   const queryClient = useQueryClient();
   const { close, dialogRef, open } = useDialog();
 
-  const [page, setPage] = useState<number>(1);
-  const [rpp, setRpp] = useState<number>(5);
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
 
   const { data, isLoading, isPlaceholderData } = useApiQuery<JoinedCourse[]>(
-    ["course", page, rpp],
+    ["courses", page, rpp],
     "/courses",
     { page, rpp },
     {
@@ -119,7 +120,7 @@ export const StudentCourses = () => {
         total={total}
         totalPages={totalPages}
         onPageChange={setPage}
-        setRpp={setRpp}
+        onRppChange={setRpp}
       />
     </>
   );

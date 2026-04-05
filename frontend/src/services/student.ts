@@ -47,18 +47,30 @@ export const getDateRangeQuizzes = async ({
   to,
   page,
   rpp,
+  status,
 }: {
-  from: string;
-  to: string;
+  from: string | null;
+  to: string | null;
   page: number;
   rpp: number;
+  status: QuizStatus;
 }) => {
-  const fromIso = new Date(from).toISOString();
-  const toIso = new Date(to).toISOString();
+  const params = new URLSearchParams();
 
-  return api.get<QuizEntity[]>(
-    `/quiz/range?from=${fromIso}&to=${toIso}&page=${page}&rpp=${rpp}`,
-  );
+  if (from) params.set("from", new Date(from).toISOString());
+  if (to) params.set("to", new Date(to).toISOString());
+
+  params.set("page", page.toString());
+  params.set("rpp", rpp.toString());
+
+  // ⚠️ optional: skip "all"
+  if (status !== "all") {
+    params.set("status", status);
+  }
+
+  console.log(params.getAll("page"));
+
+  return api.get<QuizEntity[]>(`/quiz/range?${params.toString()}`);
 };
 
 export const getQuizResult = async (quizId: string) => {
