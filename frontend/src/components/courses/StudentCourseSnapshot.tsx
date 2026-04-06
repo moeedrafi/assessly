@@ -1,26 +1,20 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Table } from "@/components/Table";
-import { useApiQuery } from "@/hooks/useApiQuery";
 import { Pagination } from "@/components/Pagination";
+import { parseAsInteger, useQueryState } from "nuqs";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { StudentCourseSnapshotType } from "@/types/analytics";
+import { useStudentCourseSnapshot } from "@/hooks/course-snapshot/useStudentCourseSnapshot";
 
 export const StudentCourseSnapshot = () => {
-  const [page, setPage] = useState<number>(1);
-  const [rpp, setRpp] = useState<number>(5);
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
 
-  const { data, isLoading, isPlaceholderData } = useApiQuery<
-    StudentCourseSnapshotType[]
-  >(
-    ["course-snapshot", page, rpp],
-    "/analytics/course-snapshot",
-    { page, rpp },
-    {
-      staleTime: Infinity,
-      placeholderData: (prevData) => prevData,
-    },
-  );
+  const { data, isLoading, isPlaceholderData } = useStudentCourseSnapshot({
+    page,
+    rpp,
+  });
 
   const courses = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;
@@ -46,6 +40,7 @@ export const StudentCourseSnapshot = () => {
         isLoading={isLoading}
         className={isPlaceholderData ? "opacity-60" : ""}
       />
+
       <Pagination
         isLoading={isLoading}
         page={page}
@@ -53,7 +48,7 @@ export const StudentCourseSnapshot = () => {
         total={total}
         totalPages={totalPages}
         onPageChange={setPage}
-        setRpp={setRpp}
+        onRppChange={setRpp}
       />
     </div>
   );

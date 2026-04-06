@@ -3,15 +3,17 @@ import { getTabs } from "@/lib/utils";
 import { Tabs } from "@/components/Tabs";
 import { useEffect, useState } from "react";
 import type { QuizStatus } from "@/types/quiz";
-import { studentKeys } from "@/lib/query-key";
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/Skeleton";
 import { Pagination } from "@/components/Pagination";
 import { QuizCard } from "@/components/quiz/QuizCard";
-import { getDateRangeQuizzes } from "@/services/student";
+import { useRangeQuizzes } from "@/hooks/useRangeQuizzes";
 import { parseAsInteger, parseAsStringEnum, useQueryState } from "nuqs";
 
-export const DateRangeQuizzes = () => {
+export const DateRangeQuizzes = ({
+  role = "student",
+}: {
+  role?: "student" | "admin";
+}) => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
   const [selectedStatus, setSelectedStatus] = useQueryState<QuizStatus>(
@@ -27,15 +29,18 @@ export const DateRangeQuizzes = () => {
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
 
-  const { data, isLoading, isPlaceholderData } = useQuery({
-    queryKey: studentKeys.dateRange(from, to, page, rpp, selectedStatus),
-    queryFn: () =>
-      getDateRangeQuizzes({ from, page, rpp, to, status: selectedStatus }),
+  const { data, isLoading, isPlaceholderData } = useRangeQuizzes({
+    page,
+    role,
+    rpp,
+    status: selectedStatus,
+    from,
+    to,
   });
 
   useEffect(() => {
     setPage(1);
-  }, [selectedStatus?.toString(), rpp]);
+  }, [selectedStatus.toString()]);
 
   const quizzes = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;

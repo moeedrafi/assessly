@@ -1,3 +1,5 @@
+import { UserRole } from "@/types/user";
+
 export interface StatsCard {
   totalUsers: number;
   totalCourses: number;
@@ -47,3 +49,7 @@ export interface LeaderboardType {
   ranked: Leaderboard[];
   currentUser: Leaderboard;
 }
+
+export type SnapshotByRole<T extends string> = T extends UserRole.ADMIN
+  ? CourseSnapshotType[]
+  : StudentCourseSnapshotType[];

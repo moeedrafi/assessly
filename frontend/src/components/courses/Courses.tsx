@@ -3,26 +3,21 @@ import Link from "next/link";
 import { useDialog } from "@/hooks/useDialog";
 import { useDelete } from "@/hooks/useDelete";
 import { Actions } from "@/components/Actions";
-import { TeachingCourse } from "@/types/course";
 import { Skeleton } from "@/components/Skeleton";
+import { Pagination } from "@/components/Pagination";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { DeleteModal } from "@/components/DeleteModal";
-import { useApiQuery } from "@/hooks/useApiQuery";
-import { useState } from "react";
-import { Pagination } from "./Pagination";
+import { useAdminCourses } from "@/hooks/courses/useAdminCourses";
 
 export const Courses = () => {
-  const [page, setPage] = useState<number>(1);
-  const [rpp, setRpp] = useState<number>(5);
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
 
-  const { data, isLoading, isPlaceholderData } = useApiQuery<TeachingCourse[]>(
-    ["courses", { page, rpp }],
-    "/admin/courses",
-    { page, rpp },
-    {
-      staleTime: Infinity,
-      placeholderData: (prevData) => prevData,
-    },
-  );
+  const { data, isLoading, isPlaceholderData } = useAdminCourses({
+    page,
+    rpp,
+  });
+
   const { close, dialogRef, open } = useDialog();
   const { handleDelete, isDeleting } = useDelete("/admin/courses", ["courses"]);
 
@@ -113,7 +108,7 @@ export const Courses = () => {
         total={total}
         totalPages={totalPages}
         onPageChange={setPage}
-        setRpp={setRpp}
+        onRppChange={setRpp}
       />
     </>
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
-import { Quizzes } from "@/components/quiz/Quizzes";
+import { DateRangeQuizzes } from "@/components/quiz/DateRangeQuizzes";
 
 const AdminQuizzesPage = () => {
   return (
@@ -25,7 +25,7 @@ const AdminQuizzesPage = () => {
           </Link>
         </div>
 
-        <Quizzes role="admin" />
+        <DateRangeQuizzes role="admin" />
       </div>
     </section>
   );

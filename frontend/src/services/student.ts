@@ -82,3 +82,7 @@ export const getQuestions = async (quizId: string) => {
   const res = await api.get<QuizQuestions>(`/question/${quizId}`);
   return res.data;
 };
+
+export const getAvailableQuizzes = async () => {
+  return api.get<QuizEntity[]>("/quiz/available");
+};

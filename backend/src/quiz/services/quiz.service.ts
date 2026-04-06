@@ -210,11 +210,10 @@ export class QuizService {
   }
 
   /* AVAILABLE QUIZZES */
-  async findAllAvailableQuiz(studentId: number, page: number, rpp: number) {
+  async findAllAvailableQuiz(studentId: number) {
     const now = new Date();
-    const offset = (page - 1) * rpp;
 
-    const [quizzes, totalItems] = await this.buildQuizQuery(studentId)
+    const quizzes = await this.buildQuizQuery(studentId)
       .andWhere('quiz.startsAt <= :now', { now })
       .andWhere('quiz.endsAt > :now', { now })
       .andWhere(
@@ -224,57 +223,13 @@ export class QuizService {
           )`,
         { studentId },
       )
-      .offset(offset)
-      .limit(rpp)
-      .orderBy('quiz.createdAt', 'DESC')
-      .getManyAndCount();
+      .orderBy('quiz.endsAt', 'ASC')
+      .getMany();
 
     return {
       data: quizzes,
       message: 'Successfully fetched all Upcoming quizzes',
-      meta: {
-        totalItems,
-        totalPages: Math.ceil(totalItems / rpp),
-        page,
-        rpp,
-      },
-    };
-  }
-
-  async findCourseAvailableQuiz(
-    studentId: number,
-    courseId: number,
-    page: number,
-    rpp: number,
-  ) {
-    const now = new Date();
-    const offset = (page - 1) * rpp;
-
-    const [quizzes, totalItems] = await this.buildQuizQuery(studentId)
-      .andWhere('quiz.startsAt <= :now', { now })
-      .andWhere('quiz.endsAt > :now', { now })
-      .andWhere(
-        `NOT EXISTS (SELECT 1 FROM quiz_attempt a
-          WHERE a."quizId" = quiz.id
-          AND a."studentId" = :studentId
-          )`,
-        { studentId },
-      )
-      .andWhere('course.id = :courseId', { courseId })
-      .offset(offset)
-      .limit(rpp)
-      .orderBy('quiz.createdAt', 'DESC')
-      .getManyAndCount();
-
-    return {
-      data: quizzes,
-      message: 'Successfully fetched all Upcoming quizzes',
-      meta: {
-        totalItems,
-        totalPages: Math.ceil(totalItems / rpp),
-        page,
-        rpp,
-      },
+      meta: null,
     };
   }
 }

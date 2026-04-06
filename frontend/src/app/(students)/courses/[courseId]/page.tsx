@@ -1,6 +1,6 @@
 import { QuizStats } from "./QuizStats";
 import { Leaderboard } from "./Leaderboard";
-import { Quizzes } from "@/components/quiz/Quizzes";
+import { CourseQuizzes } from "@/components/quiz/CourseQuizzes";
 
 const CourseIdPage = async ({
   params,
@@ -40,7 +40,7 @@ const CourseIdPage = async ({
 
       <div className="shadow-inset-lg space-y-4 p-6 sm:p-8 rounded-lg">
         <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
-        <Quizzes courseId={courseId} scope="course" />
+        <CourseQuizzes courseId={courseId} />
       </div>
     </section>
   );

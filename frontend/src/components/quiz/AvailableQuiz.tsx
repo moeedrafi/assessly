@@ -1,21 +1,22 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
-import { Skeleton } from "../Skeleton";
-import { QuizEntity } from "@/types/quiz";
-import { Pagination } from "../Pagination";
-import { useApiQuery } from "@/hooks/useApiQuery";
+import { studentKeys } from "@/lib/query-key";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/Skeleton";
+import { Pagination } from "@/components/Pagination";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { getAvailableQuizzes } from "@/services/student";
 
-export const AvailableQuizzes = ({ courseId }: { courseId?: number }) => {
-  const [page, setPage] = useState<number>(1);
-  const [rpp, setRpp] = useState<number>(5);
+export const AvailableQuizzes = () => {
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
 
-  const { data, isLoading, isPlaceholderData } = useApiQuery<QuizEntity[]>(
-    ["availableQuizzes", { courseId, page, rpp }],
-    "/quiz/available",
-    { page, rpp },
-    { staleTime: Infinity, placeholderData: (prevData) => prevData },
-  );
+  const { data, isLoading, isPlaceholderData } = useQuery({
+    queryKey: studentKeys.availableQuizzes(page, rpp),
+    queryFn: getAvailableQuizzes,
+    staleTime: Infinity,
+    placeholderData: (prevData) => prevData,
+  });
 
   const availableQuizzes = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;
@@ -113,7 +114,7 @@ export const AvailableQuizzes = ({ courseId }: { courseId?: number }) => {
         total={total}
         totalPages={totalPages}
         onPageChange={setPage}
-        setRpp={setRpp}
+        onRppChange={setRpp}
       />
     </>
   );

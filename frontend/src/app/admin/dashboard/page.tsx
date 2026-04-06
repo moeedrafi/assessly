@@ -1,5 +1,5 @@
 import { Stats } from "@/components/Stats";
-import { CourseSnapshot } from "@/components/CourseSnapshot";
+import { CourseSnapshot } from "@/components/courses/CourseSnapshot";
 import { RecentJoinedUsers } from "@/components/RecentJoinedUsers";
 
 const AdminDashboardPage = () => {

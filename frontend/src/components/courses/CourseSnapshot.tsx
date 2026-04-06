@@ -4,25 +4,18 @@ import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Table } from "@/components/Table";
-import { useApiQuery } from "@/hooks/useApiQuery";
 import { Pagination } from "@/components/Pagination";
 import type { CourseSnapshotType } from "@/types/analytics";
+import { useAdminCourseSnapshot } from "@/hooks/course-snapshot/useAdminCourseSnapshot";
 
 export const CourseSnapshot = () => {
   const [page, setPage] = useState<number>(1);
   const [rpp, setRpp] = useState<number>(5);
 
-  const { data, isLoading, isPlaceholderData } = useApiQuery<
-    CourseSnapshotType[]
-  >(
-    ["course-snapshot", page, rpp],
-    "/admin/analytics/course-snapshot",
-    { page, rpp },
-    {
-      staleTime: Infinity,
-      placeholderData: (prevData) => prevData,
-    },
-  );
+  const { data, isLoading, isPlaceholderData } = useAdminCourseSnapshot({
+    page,
+    rpp,
+  });
 
   const courses = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;
@@ -70,7 +63,7 @@ export const CourseSnapshot = () => {
         total={total}
         totalPages={totalPages}
         onPageChange={setPage}
-        setRpp={setRpp}
+        onRppChange={setRpp}
       />
     </div>
   );

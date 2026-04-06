@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Quizzes } from "@/components/quiz/Quizzes";
+import { CourseQuizzes } from "@/components/quiz/CourseQuizzes";
 
 const stats = [
   {
@@ -136,7 +136,7 @@ const CourseIdPage = async ({
       {/* QUIZ */}
       <div className="shadow-inset-lg space-y-2 p-6 sm:p-8 rounded-lg">
         <h3 className="text-xl sm:text-2xl font-bold">Quiz</h3>
-        <Quizzes courseId={courseId} scope="course" role="admin" />
+        <CourseQuizzes courseId={courseId} role="admin" />
       </div>
     </section>
   );

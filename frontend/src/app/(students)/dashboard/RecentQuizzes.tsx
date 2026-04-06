@@ -5,10 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import type { RecentQuiz } from "@/types/analytics";
 import type { ColumnDef } from "@tanstack/react-table";
 import { getRecentQuiz } from "@/services/student";
+import { studentKeys } from "@/lib/query-key";
 
 export const RecentQuizzes = () => {
   const { data = [], isLoading } = useQuery({
-    queryKey: ["recent-quiz"],
+    queryKey: studentKeys.recentQuiz(),
     queryFn: getRecentQuiz,
     staleTime: Infinity,
   });

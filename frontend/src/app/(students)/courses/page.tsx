@@ -1,5 +1,5 @@
 import { JoinCourse } from "./JoinCourse";
-import { StudentCourses } from "./StudentCourses";
+import { StudentCourses } from "@/components/courses/StudentCourses";
 
 const CoursesPage = () => {
   return (

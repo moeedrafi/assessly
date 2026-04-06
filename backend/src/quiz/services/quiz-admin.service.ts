@@ -152,4 +152,58 @@ export class QuizAdminService {
       message: 'Successfully fetched quiz',
     };
   }
+
+  async findDateRangeQuiz(
+    teacherId: number,
+    page: number,
+    rpp: number,
+    status: 'upcoming' | 'completed',
+    from?: string,
+    to?: string,
+  ) {
+    const offset = (page - 1) * rpp;
+
+    const query = this.buildQuizQuery(teacherId);
+
+    if (from && to) {
+      query.andWhere('quiz.createdAt BETWEEN :startDate AND :endDate', {
+        startDate: new Date(from),
+        endDate: new Date(to),
+      });
+    } else if (from) {
+      query.andWhere('quiz.createdAt >= :startDate', {
+        startDate: new Date(from),
+      });
+    } else if (to) {
+      query.andWhere('quiz.createdAt <= :endDate', {
+        endDate: new Date(to),
+      });
+    }
+
+    const now = new Date();
+
+    if (status === 'completed') {
+      query.andWhere('quiz.endsAt < :now', { now });
+    } else if (status === 'upcoming') {
+      query.andWhere('quiz.startsAt > :now', { now });
+    }
+
+    const [quizzes, totalItems] = await query
+      .offset(offset)
+      .limit(rpp)
+      .orderBy('quiz.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return {
+      data: quizzes,
+      message:
+        from && to ? 'Fetched quizzes in date range' : 'Fetched all quizzes',
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / rpp),
+        page,
+        rpp,
+      },
+    };
+  }
 }

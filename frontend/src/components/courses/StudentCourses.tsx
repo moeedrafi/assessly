@@ -9,9 +9,8 @@ import { Modal } from "@/components/Modal";
 import { useDialog } from "@/hooks/useDialog";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/Skeleton";
-import { useApiQuery } from "@/hooks/useApiQuery";
-import type { JoinedCourse } from "@/types/course";
 import { Pagination } from "@/components/Pagination";
+import { useStudentCourses } from "@/hooks/courses/useStudentCourses";
 
 export const StudentCourses = () => {
   const queryClient = useQueryClient();
@@ -20,15 +19,10 @@ export const StudentCourses = () => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
 
-  const { data, isLoading, isPlaceholderData } = useApiQuery<JoinedCourse[]>(
-    ["courses", page, rpp],
-    "/courses",
-    { page, rpp },
-    {
-      staleTime: Infinity,
-      placeholderData: (prevData) => prevData,
-    },
-  );
+  const { data, isLoading, isPlaceholderData } = useStudentCourses({
+    page,
+    rpp,
+  });
 
   const courses = data?.data ?? [];
   const total = data?.meta?.totalItems ?? 0;

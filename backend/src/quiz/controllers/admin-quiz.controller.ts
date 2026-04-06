@@ -30,14 +30,23 @@ export class AdminQuizController {
     return this.quizAdminService.create(user.sub, body);
   }
 
-  @Get()
-  getAll(
+  @Get('range')
+  getQuizFromDateRange(
     @CurrentUser() user: { sub: number },
     @Query('page', ParseIntPipe) page = 1,
     @Query('rpp', ParseIntPipe) rpp = 5,
     @Query('status') status: 'upcoming' | 'completed',
+    @Query('from') from?: string,
+    @Query('to') to?: string,
   ) {
-    return this.quizAdminService.findAll(user.sub, page, rpp, status);
+    return this.quizAdminService.findDateRangeQuiz(
+      user.sub,
+      page,
+      rpp,
+      status,
+      from,
+      to,
+    );
   }
 
   @Get(':courseid')

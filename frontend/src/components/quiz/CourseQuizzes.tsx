@@ -2,20 +2,18 @@
 import { getTabs } from "@/lib/utils";
 import { Tabs } from "@/components/Tabs";
 import type { QuizStatus } from "@/types/quiz";
-import { useQuizzes } from "@/hooks/useRangeQuizzes";
 import { Skeleton } from "@/components/Skeleton";
 import { Pagination } from "@/components/Pagination";
 import { QuizCard } from "@/components/quiz/QuizCard";
+import { useCourseQuizzes } from "@/hooks/useCourseQuizzes";
 import { parseAsInteger, parseAsStringEnum, useQueryState } from "nuqs";
 
-export const Quizzes = ({
-  scope = "all",
+export const CourseQuizzes = ({
   role = "student",
   courseId,
 }: {
   courseId?: string;
   role?: "student" | "admin";
-  scope?: "all" | "course";
 }) => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [rpp, setRpp] = useQueryState("rpp", parseAsInteger.withDefault(5));
@@ -29,11 +27,10 @@ export const Quizzes = ({
     ]).withDefault("all"),
   );
 
-  const { data, isPlaceholderData, isLoading } = useQuizzes({
+  const { data, isPlaceholderData, isLoading } = useCourseQuizzes({
     rpp,
     page,
     role,
-    scope,
     courseId,
     status: selectedStatus,
   });

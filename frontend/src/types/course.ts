@@ -1,4 +1,4 @@
-import { UserBase } from "./user";
+import { UserBase, UserRole } from "@/types/user";
 
 interface CourseEntity {
   id: number;
@@ -21,3 +21,7 @@ export type JoinedCourse = Omit<
 export interface TeachingCourse extends CourseEntity {
   students: UserBase[];
 }
+
+export type CourseByRole<T extends string> = T extends UserRole.ADMIN
+  ? TeachingCourse[]
+  : JoinedCourse[];

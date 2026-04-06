@@ -1,6 +1,6 @@
 import { RecentQuizzes } from "./RecentQuizzes";
-import { StudentCourseSnapshot } from "./StudentCourseSnapshot";
 import { AvailableQuizzes } from "@/components/quiz/AvailableQuiz";
+import { StudentCourseSnapshot } from "@/components/courses/StudentCourseSnapshot";
 
 const DashboardPage = async () => {
   return (

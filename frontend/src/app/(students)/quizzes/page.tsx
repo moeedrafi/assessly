@@ -1,4 +1,4 @@
-import { DateRangeQuizzes } from "./DateRangeQuizzes";
+import { DateRangeQuizzes } from "@/components/quiz/DateRangeQuizzes";
 
 const QuizzesPage = () => {
   return (
