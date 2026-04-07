@@ -1,13 +1,82 @@
 "use client";
+import { api } from "@/lib/api";
 import { useAppForm } from "@/hooks/form";
 import { QuestionForm } from "./QuestionForm";
 import { useCourses } from "@/hooks/useCourses";
-import { TeachingCourse } from "@/types/course";
-import { createQuizFormOptions } from "@/lib/shared-form";
+import { useQuery } from "@tanstack/react-query";
+import type { TeachingCourse } from "@/types/course";
+import { CreateQuizFormData, createQuizSchema } from "@/schemas/quiz.schemas";
+import { mapQuizToFormValues } from "@/lib/shared-form";
+import toast from "react-hot-toast";
+import { ApiError } from "@/lib/error";
 
-export const QuizForm = () => {
+export const QuizForm = ({
+  mode,
+  quizId,
+}: {
+  mode: "create" | "edit";
+  quizId?: string;
+}) => {
   const { data: courses } = useCourses<TeachingCourse[]>("/admin/courses/all");
-  const form = useAppForm({ ...createQuizFormOptions });
+  const { data, isLoading } = useQuery({
+    queryKey: ["quiz", quizId],
+    queryFn: async () => {
+      const res = await api.get<CreateQuizFormData>(
+        `/admin/quiz/${quizId}/form`,
+      );
+      return res.data;
+    },
+    enabled: !!quizId,
+  });
+
+  const form = useAppForm({
+    defaultValues: mapQuizToFormValues(data),
+    validators: { onChange: createQuizSchema },
+    onSubmit: async ({ value }: { value: CreateQuizFormData }) => {
+      const validatedData = createQuizSchema.safeParse(value);
+      if (!validatedData.success) {
+        toast.error("Please fix errors in the form");
+        return;
+      }
+
+      try {
+        if (mode === "create") {
+          const res = await api.post<void, CreateQuizFormData>(
+            "/admin/quiz",
+            validatedData.data,
+          );
+          toast.success(res.message);
+        } else {
+          const res = await api.patch<void, CreateQuizFormData>(
+            `/admin/quiz/${quizId}`,
+            validatedData.data,
+          );
+          toast.success(res.message);
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          toast.error(error.message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    },
+  });
+
+  if (isLoading) {
+    return <p>LOADING</p>;
+  }
+
+  if (!data) {
+    return (
+      <div>
+        <p>Not found quiz</p>
+        <p>Go back to quizzes page</p>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -109,7 +178,7 @@ export const QuizForm = () => {
         <form.AppForm>
           <form.SubscribeButton
             type="submit"
-            label="Create Quiz"
+            label={mode === "create" ? "Create Quiz" : "Update Quiz"}
             className="px-8 py-3"
             onClick={() => form.setFieldValue("isPublished", true)}
           />

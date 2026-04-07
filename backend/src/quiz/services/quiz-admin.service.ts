@@ -1,6 +1,10 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Quiz } from 'src/quiz/quiz.entity';
 import { CreateQuizDTO } from 'src/quiz/dtos/create-quiz.dto';
 import { QuestionService } from 'src/question/question.service';
@@ -204,6 +208,28 @@ export class QuizAdminService {
         page,
         rpp,
       },
+    };
+  }
+
+  async getQuizDetail(teacherId: number, quizId: number) {
+    if (!quizId) throw new UnauthorizedException('quiz not found');
+
+    const quiz = await this.repo
+      .createQueryBuilder('quiz')
+      .leftJoinAndSelect('quiz.course', 'course')
+      .innerJoin('course.teacher', 'teacher', 'teacher.id = :teacherId', {
+        teacherId,
+      })
+      .leftJoinAndSelect('quiz.questions', 'question')
+      .leftJoinAndSelect('question.options', 'options')
+      .where('quiz.id = :quizId', { quizId })
+      .getOne();
+
+    if (!quiz) throw new NotFoundException('Quiz not found');
+
+    return {
+      data: { ...quiz, courseId: quiz.course.id },
+      message: 'Successfully fetched quiz',
     };
   }
 }

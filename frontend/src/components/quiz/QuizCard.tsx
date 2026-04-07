@@ -1,12 +1,13 @@
 "use client";
-
 import Link from "next/link";
 import { QuizEntity } from "@/types/quiz";
 
 export const QuizCard = ({
+  role,
   quiz,
   isDimmed,
 }: {
+  role: "admin" | "student";
   quiz: QuizEntity;
   isDimmed?: boolean;
 }) => {
@@ -68,7 +69,9 @@ export const QuizCard = ({
       </div>
 
       <Link
-        href={`/quizzes/${quiz.id}`}
+        href={
+          role === "admin" ? `/admin/quizzes/${quiz.id}` : `/quizzes/${quiz.id}`
+        }
         className="w-full text-center px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-md"
       >
         View Details

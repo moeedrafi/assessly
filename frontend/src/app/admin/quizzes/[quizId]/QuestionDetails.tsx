@@ -1,15 +1,19 @@
 "use client";
 import Link from "next/link";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getQuestionsDetail } from "@/services/admin";
 import { adminKeys } from "@/lib/query-key";
+import { useQuery } from "@tanstack/react-query";
+import { getQuestionsDetail } from "@/services/admin";
 
 export const QuestionDetails = ({ quizId }: { quizId: string }) => {
-  const { data: questions } = useSuspenseQuery({
+  const { data: questions, isLoading } = useQuery({
     queryKey: adminKeys.questions(quizId),
     queryFn: async () => getQuestionsDetail(quizId),
     staleTime: Infinity,
+    enabled: !!quizId,
   });
+
+  if (isLoading) return <p>LOADING...</p>;
+  if (!questions) return <p>No questions found</p>;
 
   if (questions.length === 0) {
     return (

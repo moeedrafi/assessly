@@ -30,20 +30,15 @@ export class QuestionService {
   async findAll(quizId: number) {
     if (!quizId) throw new NotFoundException('quiz not found');
 
-    const quiz = await this.quizRepo.findOne({
-      where: { id: quizId },
-      select: ['timeLimit'],
-    });
-
     const questions = await this.repo
       .createQueryBuilder('question')
-      .leftJoin('question.quiz', 'quiz')
+      .leftJoin('question.quiz', 'quiz', 'quiz.id = :quizId', { quizId })
       .leftJoinAndSelect('question.options', 'options')
       .where('quiz.id = :quizId', { quizId })
       .getMany();
 
     return {
-      data: { timeLimit: quiz?.timeLimit, questions },
+      data: questions,
       message: 'Successfully fetched questions',
     };
   }

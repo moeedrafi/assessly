@@ -1,21 +1,20 @@
 "use client";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
 import { Detail } from "./Detail";
+import { adminKeys } from "@/lib/query-key";
 import { Button } from "@/components/ui/Button";
 import { formattedDateTime } from "@/lib/utils";
 import { Skeleton } from "@/components/Skeleton";
 import { getQuizDetail } from "@/services/admin";
-import { adminKeys } from "@/lib/query-key";
 
-export const QuizDetails = () => {
-  const { quizId } = useParams<{ quizId: string }>();
+export const QuizDetails = ({ quizId }: { quizId: string }) => {
   const { data: quiz, isLoading: isQuizLoading } = useQuery({
     queryKey: adminKeys.quiz(quizId),
     queryFn: () => getQuizDetail(quizId),
     staleTime: Infinity,
+    enabled: !!quizId,
   });
 
   if (isQuizLoading) return <Skeleton max={1} />;

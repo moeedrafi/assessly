@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { QuizDTO } from 'src/quiz/dtos/quiz.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { QuizFormDTO } from 'src/quiz/dtos/quiz-form.dto';
 import { CreateQuizDTO } from 'src/quiz/dtos/create-quiz.dto';
 import { QuizDetailDTO } from 'src/quiz/dtos/quiz-detail.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
@@ -66,16 +67,21 @@ export class AdminQuizController {
     );
   }
 
+  @Serialize(QuizFormDTO)
+  @Get(':quizid/form')
+  getQuiz(
+    @CurrentUser() user: { sub: number; name: string },
+    @Param('quizid', ParseIntPipe) quizId: number,
+  ) {
+    return this.quizAdminService.getQuizDetail(user.sub, quizId);
+  }
+
   @Serialize(QuizDetailDTO)
-  @Get(':quizid')
+  @Get(':quizid/detail')
   getOne(
     @CurrentUser() user: { sub: number },
     @Param('quizid', ParseIntPipe) quizId: number,
   ) {
     return this.quizAdminService.findOne(user.sub, quizId);
   }
-
-  // TODO: Delete quiz
-  // TODO: Publish quiz
-  // TODO: Update quiz
 }

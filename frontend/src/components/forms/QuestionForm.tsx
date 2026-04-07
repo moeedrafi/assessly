@@ -1,11 +1,11 @@
 import { Trash2 } from "lucide-react";
 import { withForm } from "@/hooks/form";
 import { QuestionType } from "@/types/enum";
-import { createQuizFormOptions } from "@/lib/shared-form";
+import { CreateQuizFormData } from "@/schemas/quiz.schemas";
 
 export const QuestionForm = withForm({
-  ...createQuizFormOptions,
-  render: function Render({ form }) {
+  defaultValues: {} as CreateQuizFormData,
+  render: ({ form }) => {
     return (
       <div className="space-y-4">
         <h2 className="text-xl sm:text-2xl font-bold">Questions</h2>

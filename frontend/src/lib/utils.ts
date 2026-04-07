@@ -82,3 +82,11 @@ export const getTabs = (
 
   return base;
 };
+
+export function toLocalDatetimeInput(isoString: string | undefined) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  const offset = date.getTimezoneOffset(); // minutes
+  const localDate = new Date(date.getTime() - offset * 60 * 1000);
+  return localDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+}

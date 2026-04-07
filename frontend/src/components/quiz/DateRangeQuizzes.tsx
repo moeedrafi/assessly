@@ -91,7 +91,12 @@ export const DateRangeQuizzes = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 overflow-y-scroll hide-scrollbar max-h-80">
           {quizzes.map((quiz) => (
-            <QuizCard key={quiz.id} quiz={quiz} isDimmed={isPlaceholderData} />
+            <QuizCard
+              key={quiz.id}
+              role={role}
+              quiz={quiz}
+              isDimmed={isPlaceholderData}
+            />
           ))}
         </div>
       )}

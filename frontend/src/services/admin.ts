@@ -14,7 +14,7 @@ export const getRecentJoinedUsers = async () => {
 };
 
 export const getQuizDetail = async (quizId: string) => {
-  const res = await api.get<QuizDetail>(`/admin/quiz/${quizId}`);
+  const res = await api.get<QuizDetail>(`/admin/quiz/${quizId}/detail`);
   return res.data;
 };
 
