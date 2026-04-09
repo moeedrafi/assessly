@@ -23,6 +23,14 @@ export const QuizCard = ({
         <p className="text-muted-foreground text-sm">{quiz.description}</p>
       </div>
 
+      {role === "admin" ? (
+        <span
+          className={`w-max px-2 rounded-sm text-white ${quiz.isPublished ? "bg-secondary" : "bg-muted-foreground"}`}
+        >
+          {quiz.isPublished ? "Published" : "Draft"}
+        </span>
+      ) : null}
+
       <div className="space-y-1 font-semibold">
         <div className="space-x-1 text-sm">
           <span className="text-muted-foreground">Total Marks: </span>

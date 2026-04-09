@@ -28,6 +28,6 @@ export class Question {
   })
   quiz: Quiz;
 
-  @OneToMany(() => Option, (option) => option.question)
+  @OneToMany(() => Option, (option) => option.question, { cascade: true })
   options: Option[];
 }

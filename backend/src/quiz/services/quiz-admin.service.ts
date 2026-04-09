@@ -9,6 +9,7 @@ import { Quiz } from 'src/quiz/quiz.entity';
 import { CreateQuizDTO } from 'src/quiz/dtos/create-quiz.dto';
 import { QuestionService } from 'src/question/question.service';
 import { AdminCourseService } from 'src/courses/services/admin-course.service';
+import { UpdateQuizDTO } from 'src/quiz/dtos/update-quiz.dto';
 
 @Injectable()
 export class QuizAdminService {
@@ -223,6 +224,8 @@ export class QuizAdminService {
       .leftJoinAndSelect('quiz.questions', 'question')
       .leftJoinAndSelect('question.options', 'options')
       .where('quiz.id = :quizId', { quizId })
+      .orderBy('question.id', 'ASC')
+      .addOrderBy('options.id', 'ASC')
       .getOne();
 
     if (!quiz) throw new NotFoundException('Quiz not found');
@@ -230,6 +233,37 @@ export class QuizAdminService {
     return {
       data: { ...quiz, courseId: quiz.course.id },
       message: 'Successfully fetched quiz',
+    };
+  }
+
+  async update(
+    teacherId: number,
+    quizId: number,
+    updateQuizDto: UpdateQuizDTO,
+  ) {
+    if (!quizId) throw new NotFoundException('quiz not found');
+
+    const { questions, ...data } = updateQuizDto;
+
+    const quiz = await this.repo.findOne({
+      where: { id: quizId, course: { teacher: { id: teacherId } } },
+    });
+    if (!quiz) throw new NotFoundException('course not found');
+
+    Object.assign(quiz, data);
+    await this.repo.save(quiz);
+
+    for (const q of questions) {
+      if (q.id) {
+        await this.questionServices.update(q.id, { ...q });
+      } else {
+        await this.questionServices.create({ ...q, quiz });
+      }
+    }
+
+    return {
+      data: quiz,
+      message: 'Quiz Updated Successfully!',
     };
   }
 }

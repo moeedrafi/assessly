@@ -5,6 +5,7 @@ import { Quiz } from 'src/quiz/quiz.entity';
 import { Question } from 'src/question/question.entity';
 import { OptionService } from 'src/option/option.service';
 import { CreateQuestionDTO } from 'src/question/dtos/create-question.dto';
+import { UpdateQuestionDTO } from 'src/question/dtos/update-question.dto';
 
 @Injectable()
 export class QuestionService {
@@ -41,5 +42,24 @@ export class QuestionService {
       data: questions,
       message: 'Successfully fetched questions',
     };
+  }
+
+  async update(questionId: number, updateQuestionDto: UpdateQuestionDTO) {
+    if (!questionId) throw new NotFoundException('question not found');
+
+    const question = await this.repo.findOne({ where: { id: questionId } });
+    if (!question) throw new NotFoundException('question not found');
+
+    const { options, ...questionData } = updateQuestionDto;
+    Object.assign(question, questionData);
+    await this.repo.save(question);
+
+    for (const option of options) {
+      if (option.id) {
+        await this.optionServices.update(option.id, option);
+      } else {
+        await this.optionServices.create({ ...option, question });
+      }
+    }
   }
 }

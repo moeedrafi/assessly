@@ -1,14 +1,14 @@
 "use client";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
+import { ApiError } from "@/lib/error";
 import { useAppForm } from "@/hooks/form";
 import { QuestionForm } from "./QuestionForm";
 import { useCourses } from "@/hooks/useCourses";
 import { useQuery } from "@tanstack/react-query";
 import type { TeachingCourse } from "@/types/course";
-import { CreateQuizFormData, createQuizSchema } from "@/schemas/quiz.schemas";
 import { mapQuizToFormValues } from "@/lib/shared-form";
-import toast from "react-hot-toast";
-import { ApiError } from "@/lib/error";
+import { CreateQuizFormData, createQuizSchema } from "@/schemas/quiz.schemas";
 
 export const QuizForm = ({
   mode,
@@ -48,7 +48,7 @@ export const QuizForm = ({
           toast.success(res.message);
         } else {
           const res = await api.patch<void, CreateQuizFormData>(
-            `/admin/quiz/${quizId}`,
+            `/admin/quiz/${quizId}/form`,
             validatedData.data,
           );
           toast.success(res.message);

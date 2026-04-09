@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -16,6 +17,7 @@ import { QuizDetailDTO } from 'src/quiz/dtos/quiz-detail.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { QuizAdminService } from 'src/quiz/services/quiz-admin.service';
+import { UpdateQuizDTO } from 'src/quiz/dtos/update-quiz.dto';
 
 @Controller('/admin/quiz')
 @UseGuards(AdminGuard)
@@ -83,5 +85,14 @@ export class AdminQuizController {
     @Param('quizid', ParseIntPipe) quizId: number,
   ) {
     return this.quizAdminService.findOne(user.sub, quizId);
+  }
+
+  @Patch(':quizid/form')
+  updateQuiz(
+    @CurrentUser() user: { sub: number },
+    @Body() body: UpdateQuizDTO,
+    @Param('quizid', ParseIntPipe) quizId: number,
+  ) {
+    return this.quizAdminService.update(user.sub, quizId, body);
   }
 }

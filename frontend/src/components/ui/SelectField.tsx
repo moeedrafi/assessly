@@ -35,11 +35,12 @@ export const SelectField = ({
         id={field.name}
         name={field.name}
         value={field.state.value ?? ""}
+        disabled={field.form.state.isSubmitting}
         onChange={(e) => {
           const value = e.target.value;
           field.handleChange(isNaN(Number(value)) ? value : Number(value));
         }}
-        className="bg-light px-3 py-2.5 ring-1 ring-color rounded-lg focus-visible:ring-2 outline-none"
+        className="bg-light px-3 py-2.5 ring-1 ring-color rounded-lg focus-visible:ring-2 outline-none disabled:cursor-not-allowed disabled:opacity-50"
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map((opt, i) => (

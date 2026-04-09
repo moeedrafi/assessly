@@ -133,5 +133,13 @@ export const mapQuizToFormValues = (
     ...data,
     startsAt: toLocalDatetimeInput(data.startsAt),
     endsAt: toLocalDatetimeInput(data.endsAt),
+    questions: data.questions.map((q) => ({
+      ...q,
+      id: String(q.id),
+      options: q.options.map((o) => ({
+        ...o,
+        id: String(o.id),
+      })),
+    })),
   };
 };

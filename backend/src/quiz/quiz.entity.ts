@@ -45,7 +45,7 @@ export class Quiz {
   })
   course: Courses;
 
-  @OneToMany(() => Question, (question) => question.quiz)
+  @OneToMany(() => Question, (question) => question.quiz, { cascade: true })
   questions: Question[];
 
   @OneToMany(() => QuizAttempt, (attempt) => attempt.quiz)

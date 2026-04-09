@@ -27,9 +27,10 @@ export const NumberField = ({
         name={field.name}
         value={field.state.value}
         aria-invalid={!field.state.meta.isValid}
+        disabled={field.form.state.isSubmitting}
         onChange={(e) => field.handleChange(Number(e.target.value))}
         {...props}
-        className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none"
+        className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:cursor-not-allowed disabled:opacity-50"
       />
       {field.state.meta.isTouched && !field.state.meta.isValid && (
         <em role="alert" className="text-sm text-red-500">
