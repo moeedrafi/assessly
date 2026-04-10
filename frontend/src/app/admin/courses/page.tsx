@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
-import { Courses } from "@/components/Courses";
+import { Courses } from "@/components/courses/Courses";
 
 const AdminCoursesPage = () => {
   return (

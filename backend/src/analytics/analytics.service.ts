@@ -6,6 +6,8 @@ import { Courses } from 'src/courses/courses.entity';
 import { Quiz } from 'src/quiz/quiz.entity';
 import { DashboardKpisDTO } from './dtos/dashboard-kpis.dto';
 import { RecentUserDTO } from './dtos/recent-user.dto';
+import { QuizAttempt } from 'src/quiz-attempt/quiz-attempt.entity';
+import { QuestionAttempt } from 'src/quiz-attempt/question-attempt.entity';
 
 @Injectable()
 export class AnalyticsService {
@@ -18,6 +20,12 @@ export class AnalyticsService {
 
     @InjectRepository(Quiz)
     private readonly quizRepo: Repository<Quiz>,
+
+    @InjectRepository(QuizAttempt)
+    private readonly quizAtemptRepo: Repository<QuizAttempt>,
+
+    @InjectRepository(QuestionAttempt)
+    private readonly questionAttemptRepo: Repository<QuestionAttempt>,
   ) {}
 
   async getDashboardAnalytics() {}
@@ -194,6 +202,36 @@ export class AnalyticsService {
         page,
         rpp,
       },
+    };
+  }
+
+  async findAdminStats(teacherId: number, courseId: number) {
+    const qb = await this.quizRepo
+      .createQueryBuilder('quiz')
+      .leftJoinAndSelect('quiz.attempts', 'attempt')
+      .innerJoin('quiz.course', 'course', 'course.id = :courseId', { courseId })
+      .innerJoin('course.teacher', 'teacher', 'teacher.id = :teacherId', {
+        teacherId,
+      })
+      .select('quiz.id', 'id')
+      .addSelect('quiz.name', 'name')
+      .addSelect('COUNT(DISTINCT attempt.id)', 'totalAttempts')
+      .addSelect('SUM(attempt.score)', 'totalScore')
+      .addSelect('AVG(attempt.score)', 'avgScore')
+
+      .groupBy('quiz.id')
+      .addGroupBy('quiz.name')
+      .having('COUNT(DISTINCT attempt.id) >= 5');
+
+    const [bestQuiz, worstQuiz] = await Promise.all([
+      await qb.clone().orderBy(`avgScore`, 'DESC').getRawOne(),
+      await qb.clone().orderBy(`avgScore`, 'ASC').getRawOne(),
+    ]);
+
+    return {
+      data: { bestQuiz, worstQuiz },
+      message: 'fetched quizzes',
+      meta: null,
     };
   }
 }

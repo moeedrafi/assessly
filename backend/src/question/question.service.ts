@@ -62,4 +62,25 @@ export class QuestionService {
       }
     }
   }
+
+  async getStudentQuestions(quizId: number) {
+    if (!quizId) throw new NotFoundException('quiz not found');
+
+    const quiz = await this.quizRepo.findOne({
+      where: { id: quizId },
+      select: ['timeLimit'],
+    });
+
+    const questions = await this.repo
+      .createQueryBuilder('question')
+      .leftJoin('question.quiz', 'quiz')
+      .leftJoinAndSelect('question.options', 'options')
+      .where('quiz.id = :quizId', { quizId })
+      .getMany();
+
+    return {
+      data: { timeLimit: quiz?.timeLimit, questions },
+      message: 'Successfully fetched questions',
+    };
+  }
 }

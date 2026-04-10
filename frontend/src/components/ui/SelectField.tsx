@@ -1,4 +1,5 @@
 import { useFieldContext } from "@/hooks/form-context";
+import { useStore } from "@tanstack/react-form";
 
 type SelectFieldOption = {
   value: string | number;
@@ -19,6 +20,7 @@ export const SelectField = ({
   placeholder,
 }: SelectFieldProps) => {
   const field = useFieldContext<string | number>();
+  const isSubmitting = useStore(field.form.store, (s) => s.isSubmitting);
 
   return (
     <div className="w-full flex flex-col gap-1">
@@ -35,7 +37,7 @@ export const SelectField = ({
         id={field.name}
         name={field.name}
         value={field.state.value ?? ""}
-        disabled={field.form.state.isSubmitting}
+        disabled={isSubmitting}
         onChange={(e) => {
           const value = e.target.value;
           field.handleChange(isNaN(Number(value)) ? value : Number(value));

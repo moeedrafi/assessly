@@ -37,6 +37,14 @@ const handleResponse = async <T, M = PaginationMeta>(
   return responseBody as ApiResponse<T, M>;
 };
 
+const AUTH_ENDPOINTS = [
+  "/auth/signin",
+  "/auth/signup",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/refresh",
+];
+
 const makeApiCall = async <T, M = PaginationMeta>(
   endpoint: string,
   options: RequestInit,
@@ -48,7 +56,9 @@ const makeApiCall = async <T, M = PaginationMeta>(
       ...options,
     });
 
-    if (response.status === 401 && retry) {
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((url) => endpoint.includes(url));
+
+    if (response.status === 401 && retry && !isAuthEndpoint) {
       try {
         await refreshToken();
         return makeApiCall<T, M>(endpoint, options, false);

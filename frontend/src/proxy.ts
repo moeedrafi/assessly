@@ -26,16 +26,19 @@ export default async function proxy(request: NextRequest) {
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
+  // ✅ 1. Skip middleware for auth routes
+  if (isAuthRoute) {
+    return NextResponse.next();
+  }
+
+  // ✅ 2. No tokens → force login
   if (!accessToken && !refreshToken) {
-    if (isAuthRoute) return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url), 307);
   }
 
+  // ✅ 3. Invalid token → allow request (client will refresh)
   const payload = accessToken ? decodeJwt(accessToken) : null;
   if (!payload) {
-    // If access token invalid, allow request to continue
-    // Client can try refresh
-    if (isAuthRoute && !refreshToken) return NextResponse.next();
     return NextResponse.next();
   }
 
@@ -43,6 +46,7 @@ export default async function proxy(request: NextRequest) {
   const isExpired = Date.now() > payload.exp * 1000;
   const isAdminRoute = pathname.startsWith("/admin");
 
+  // ✅ 4. Only enforce rules if token is valid
   if (!isExpired) {
     if (isAuthRoute) {
       const destination =

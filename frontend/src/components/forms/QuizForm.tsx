@@ -8,7 +8,11 @@ import { useCourses } from "@/hooks/useCourses";
 import { useQuery } from "@tanstack/react-query";
 import type { TeachingCourse } from "@/types/course";
 import { mapQuizToFormValues } from "@/lib/shared-form";
-import { CreateQuizFormData, createQuizSchema } from "@/schemas/quiz.schemas";
+import {
+  CreateQuizFormData,
+  createQuizSchema,
+  QuizPayload,
+} from "@/schemas/quiz.schemas";
 
 export const QuizForm = ({
   mode,
@@ -39,6 +43,23 @@ export const QuizForm = ({
         return;
       }
 
+      const isNumericId = (id: unknown) =>
+        id !== undefined &&
+        !isNaN(Number(id)) &&
+        String(id) === String(Number(id));
+
+      const payload: QuizPayload = {
+        ...validatedData.data,
+        questions: validatedData.data.questions.map((q) => ({
+          ...q,
+          id: isNumericId(q.id) ? Number(q.id) : undefined,
+          options: q.options.map((o) => ({
+            ...o,
+            id: isNumericId(o.id) ? Number(o.id) : undefined,
+          })),
+        })),
+      };
+
       try {
         if (mode === "create") {
           const res = await api.post<void, CreateQuizFormData>(
@@ -47,9 +68,9 @@ export const QuizForm = ({
           );
           toast.success(res.message);
         } else {
-          const res = await api.patch<void, CreateQuizFormData>(
+          const res = await api.patch<void, QuizPayload>(
             `/admin/quiz/${quizId}/form`,
-            validatedData.data,
+            payload,
           );
           toast.success(res.message);
         }

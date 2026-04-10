@@ -1,4 +1,4 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { AnalyticsService } from 'src/analytics/analytics.service';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 
@@ -51,5 +51,13 @@ export class AdminAnalyticsController {
         rpp,
       },
     };
+  }
+
+  @Get(':courseid/stats')
+  getAdminStats(
+    @CurrentUser() user: { sub: number },
+    @Param('courseid', ParseIntPipe) courseId: number,
+  ) {
+    return this.analyticsService.findAdminStats(user.sub, courseId);
   }
 }

@@ -1,4 +1,5 @@
 import { useFieldContext } from "@/hooks/form-context";
+import { useStore } from "@tanstack/react-form";
 
 type TextFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -6,6 +7,7 @@ type TextFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 
 export const TextField = ({ label, required, ...props }: TextFieldProps) => {
   const field = useFieldContext<string>();
+  const isSubmitting = useStore(field.form.store, (s) => s.isSubmitting);
 
   return (
     <div className="w-full flex flex-col gap-1">
@@ -22,7 +24,7 @@ export const TextField = ({ label, required, ...props }: TextFieldProps) => {
         name={field.name}
         value={field.state.value}
         aria-invalid={!field.state.meta.isValid}
-        disabled={field.form.state.isSubmitting}
+        disabled={isSubmitting}
         onChange={(e) => field.handleChange(e.target.value)}
         {...props}
         className="bg-light px-3 py-2 rounded-lg ring-1 ring-color focus-visible:ring-2 outline-none disabled:cursor-not-allowed disabled:opacity-50"

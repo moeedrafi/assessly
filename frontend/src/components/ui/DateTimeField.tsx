@@ -1,4 +1,5 @@
 import { useFieldContext } from "@/hooks/form-context";
+import { useStore } from "@tanstack/react-form";
 
 type DateTimeFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -10,6 +11,7 @@ export const DateTimeField = ({
   ...props
 }: DateTimeFieldProps) => {
   const field = useFieldContext<string>();
+  const isSubmitting = useStore(field.form.store, (s) => s.isSubmitting);
 
   return (
     <div className="w-full flex flex-col gap-1">
@@ -26,7 +28,7 @@ export const DateTimeField = ({
         name={field.name}
         type="datetime-local"
         value={field.state.value}
-        disabled={field.form.state.isSubmitting}
+        disabled={isSubmitting}
         aria-invalid={!field.state.meta.isValid}
         onChange={(e) => field.handleChange(e.target.value)}
         {...props}

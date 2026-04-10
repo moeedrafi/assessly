@@ -1,6 +1,12 @@
 import Link from "next/link";
 
-const QuizPage = () => {
+const QuizPage = async ({
+  params,
+}: {
+  params: Promise<{ quizId: string }>;
+}) => {
+  const { quizId } = await params;
+
   return (
     <section className="w-full font-lato space-y-4">
       {/* Heading */}
@@ -53,7 +59,7 @@ const QuizPage = () => {
             <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
           </ul>
 
-          <Link href="/quizzes/1/attempt">
+          <Link href={`/quizzes/${quizId}/attempt`}>
             <button className="w-full bg-primary px-4 py-2 text-white rounded-md hover:opacity-90 transition">
               Start Quiz
             </button>

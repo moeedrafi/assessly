@@ -82,3 +82,19 @@ export const createQuizSchema = z
   });
 
 export type CreateQuizFormData = z.infer<typeof createQuizSchema>;
+
+export type QuizPayload = Omit<CreateQuizFormData, "questions"> & {
+  questions: Array<
+    Omit<CreateQuizFormData["questions"][number], "id" | "options"> & {
+      id?: number;
+      options: Array<
+        Omit<
+          CreateQuizFormData["questions"][number]["options"][number],
+          "id"
+        > & {
+          id?: number;
+        }
+      >;
+    }
+  >;
+};

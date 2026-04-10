@@ -9,4 +9,9 @@ export class QuestionController {
   getAllQuestions(@Param('quizid', ParseIntPipe) quizId: number) {
     return this.questionService.findAll(quizId);
   }
+
+  @Get(':quizid/all')
+  getStudentQuestions(@Param('quizid', ParseIntPipe) quizId: number) {
+    return this.questionService.getStudentQuestions(quizId);
+  }
 }
